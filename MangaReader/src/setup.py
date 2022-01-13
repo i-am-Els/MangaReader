@@ -256,7 +256,9 @@ class Preference(QWidget, Link):
         self.backButton = QPushButton()
 
         self.backButton.setSizePolicy(self.sizePolicy)
+        self.backButton.setMinimumSize(self.min_button_size)
         self.backButton.setMaximumSize(self.max_button_size)
+        self.backButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         # Set backIcon to backButton
         backIcon = QIcon()
@@ -327,6 +329,11 @@ class Preference(QWidget, Link):
 
 
         self.setLayout(self.baseLayout)
+
+        self.backButton.clicked.connect(self.backAction)
+
+    def backAction(self):
+        Link.talkToStackWidgetIndex(0, Window)
 
     def changeStackIndex(self, w_index):
         self.setCurrentIndex(w_index)
