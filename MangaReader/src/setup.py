@@ -150,9 +150,81 @@ class MainWindow(QWidget, Link):
         self.historyListView = QListView()
         # Add widgets to the historyLayout
 
-        self.historyLayout.addWidget(self.historyLabel)    
-        self.historyLayout.addWidget(self.historyListView)    
+        #---------------------------------------------------
+        self.toggleLayout = QHBoxLayout()
+
+        self.toggleGridView = QPushButton()
+        self.toggleGridView.setCheckable(True)
+        self.toggleGridView.setObjectName("toggleGridView")
+
+        #---------------------------------------------------
+        
+        self.toggleGridView.setSizePolicy(self.sizePolicy)
+        self.toggleGridView.setMinimumSize(self.min_button_size * 1.5)
+        self.toggleGridView.setMaximumSize(self.min_button_size * 1.5)
+        self.toggleGridView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+
+
+        self.toggleGridIcon = QIcon()
+        self.toggleGridIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+
+        self.toggleGridDisabledIcon =QIcon()
+        self.toggleGridDisabledIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+
+        self.toggleGridView.setIcon(self.toggleGridIcon)
+        self.toggleGridView.setIconSize(self.icon_size * 0.75)
+ 
+
+        #----------------------------------------------------
+
+        self.toggleListView = QPushButton()
+        self.toggleListView.setCheckable(True)
+        self.toggleListView.setObjectName("toggleListView")
+        
+        self.toggleListView.setSizePolicy(self.sizePolicy)
+        self.toggleListView.setMinimumSize(self.min_button_size * 1.5)
+        self.toggleListView.setMaximumSize(self.min_button_size * 1.5)
+        self.toggleListView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+
+        self.toggleListIcon = QIcon()
+        self.toggleListIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+
+        self.toggleListDisabledIcon =QIcon()
+        self.toggleListDisabledIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+
+        self.toggleListView.setIcon(self.toggleListDisabledIcon)
+        self.toggleListView.setIconSize(self.icon_size * 0.75)
+
+        #--------------------------------------------------------
+
+        self.toggleList = [self.toggleGridView, self.toggleListView]
+        self.toggleViewValue = ["Grid View", "List View"]
+
+        self.viewOptionIndex = 0
+
+        self.view = QLabel(self.toggleViewValue[self.viewOptionIndex])
+
+        self.toggleLayout.addWidget(self.view)
+        self.toggleLayout.addWidget(self.toggleList[0])
+        self.toggleLayout.addWidget(self.toggleList[1])
+
+        self.toggleLayout.setStretch(0, 4)
+        self.toggleLayout.setStretch(1, 1)
+        self.toggleLayout.setStretch(2, 1)
+
+        self.historySubLayout = QVBoxLayout()
+
+        self.historySubLayout.addWidget(self.historyLabel)    
+        self.historySubLayout.addWidget(self.historyListView)
+
+        self.historyLayout.addLayout(self.historySubLayout)
+        self.historyLayout.addLayout(self.toggleLayout)
+
+        self.historyLayout.setStretch(0, 8)
+        self.historyLayout.setStretch(1, 1)
         self.historyLayout.setSpacing(5)
+
+
 
         #------------------------------------------------
         # Add homeLayout and historyLayout to containerLayout
@@ -196,6 +268,10 @@ class MainWindow(QWidget, Link):
                     padding: 10px;
                     border-radius: 10px;
                 }
+
+                #toggleGridView, #toggleListView{
+                    background-color: none;
+                }
             """
         self.setStyleSheet(self.style)
         #-----------------------------------------------
@@ -203,7 +279,11 @@ class MainWindow(QWidget, Link):
         self.lineEdit.returnPressed.connect(self.searchButton.click)
         
         self.menuButton.clicked.connect(self.menuAction)
+        self.refreshButton.clicked.connect(self.refreshAction)
 
+        self.toggleGridView.clicked.connect(self.viewTypeGridAction)
+
+        self.toggleListView.clicked.connect(self.viewTypeListAction)
         #-----------------------------------------------
 
 
@@ -223,7 +303,7 @@ class MainWindow(QWidget, Link):
 
         self.loadHomeTab()
 
-        self.homeTabStack.setCurrentIndex(1)
+        self.homeTabStack.setCurrentIndex(0)
 
         #----------------------------------------------------
         self.homeTabStackLayout.addWidget(self.homeTabStack)
@@ -252,6 +332,10 @@ class MainWindow(QWidget, Link):
         self.homeLayout.addWidget(self.tabWidget)
 
 
+
+    def loadHomeItems(self):
+        pass
+
     def search(self):
         self.keyword = self.lineEdit.text()
         if self.keyword != "":
@@ -260,6 +344,14 @@ class MainWindow(QWidget, Link):
 
     def menuAction(self):
         Link.talkToStackWidgetIndex(2, Window)
+
+    def refreshAction(self):
+        if self.homeTabStack.currentIndex() == 0:
+            print("Refused to change Index will refresh instead")
+            print(self.homeTabStack.currentIndex())
+        else:
+            self.homeTabStack.setCurrentIndex(0)
+            print(self.homeTabStack.currentIndex())
 
 
     def changeStackIndex(self, w_index):
@@ -270,18 +362,21 @@ class MainWindow(QWidget, Link):
         self.homeDisplay = QWidget()
         self.noInternetDisplay = QWidget()
         self.noSearchResult = QWidget()
+        self.searchResultPage = QWidget()
         #---------------------------------------------------
 
         #----------------------------------------------------
         self.loadHomeDisplay()
         self.loadNoInternetDisplay()
         self.loadNoSearchResult()
+        self.loadSearchResultPage()
 
         #---------------------------------------------------
 
         self.homeTabStack.addWidget(self.homeDisplay)
         self.homeTabStack.addWidget(self.noInternetDisplay)
         self.homeTabStack.addWidget(self.noSearchResult)
+        self.homeTabStack.addWidget(self.searchResultPage)
 
     
     def loadHomeDisplay(self):
@@ -325,17 +420,76 @@ class MainWindow(QWidget, Link):
         self.noInternetDisplayLayout.setStretch(0, 5)
         self.noInternetDisplayLayout.setStretch(1, 1)
         self.noInternetDisplayLayout.setStretch(2, 1)
-        self.noInternetDisplayLayout.setStretch(3, 5)
+        self.noInternetDisplayLayout.setStretch(3, 6)
 
         self.noInternetDisplay.setLayout(self.noInternetDisplayLayout)
 
 
 
     def loadNoSearchResult(self):
-        self.noSearchResultLayout = QHBoxLayout()
+        self.noSearchResultLayout = QVBoxLayout()
+
+        self.noSearchResultLabelpix = QLabel()
+        self.noSearchResultLabeltxt = QLabel("Keyword not Found")
+
+
+        self.noSearchResultLabelpix.setSizePolicy(self.sizePolicy) 
+        pixPixmap = QPixmap('MangaReader/resources/icons/page-not-found.png')
+        self.noSearchResultLabelpix.setPixmap(pixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
+        self.noSearchResultLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.noSearchResultLabeltxt.setSizePolicy(self.sizePolicy)
+        #self.noInternetDisplayLabeltxt.setMaximumHeight(50)
+        noSearchResultLabelFont = QFont()
+        noSearchResultLabelFont.setPointSize(16)
+        noSearchResultLabelFont.setBold(False)
+        self.noSearchResultLabeltxt.setFont(noSearchResultLabelFont)
+        self.noSearchResultLabeltxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.spaceEater1 = QWidget()
+        self.spaceEater1.setSizePolicy(self.sizePolicy)
+
+        self.spaceEater2 = QWidget()
+        self.spaceEater2.setSizePolicy(self.sizePolicy)
+
+        self.noSearchResultLayout.addWidget(self.spaceEater1)
+        self.noSearchResultLayout.addWidget(self.noSearchResultLabelpix)
+        self.noSearchResultLayout.addWidget(self.noSearchResultLabeltxt)
+        self.noSearchResultLayout.addWidget(self.spaceEater2)
+
+
+        self.noSearchResultLayout.setStretch(0, 5)
+        self.noSearchResultLayout.setStretch(1, 1)
+        self.noSearchResultLayout.setStretch(2, 1)
+        self.noSearchResultLayout.setStretch(3, 6)
 
         self.noSearchResult.setLayout(self.noSearchResultLayout)
 
+    def viewTypeGridAction(self):
+        if self.toggleGridView.isChecked():
+            self.toggleListView.setIcon(self.toggleListDisabledIcon)
+            #self.toggleGridView.isChecked = True
+        else:
+            self.toggleGridView.setIcon(self.toggleGridIcon)
+            self.toggleListView.setIcon(self.toggleListDisabledIcon)
+            #self.toggleGridView.isChecked = False
+
+        print(self.toggleGridView.isChecked())
+
+    def viewTypeListAction(self):
+        if self.toggleListView.isChecked():
+            self.toggleListView.setIcon(self.toggleListIcon)
+            self.toggleGridView.setIcon(self.toggleGridDisabledIcon)
+            #self.toggleListView.isChecked = True
+        else:
+            self.toggleGridView.setIcon(self.toggleGridIcon)
+            #self.toggleListView.isChecked = False
+
+        print(self.toggleListView.isChecked())
+
+
+    def loadSearchResultPage(self):
+        self.resultLayout = QGridLayout()
 
 
 class Preference(QWidget, Link):
