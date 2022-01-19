@@ -25,7 +25,6 @@ from reader import Reader
 class Link(object):
 
     def talkToStackWidgetIndex(w_index, obj):
-        print("talk")
         obj.changeStackIndex(obj, w_index)
 
 
@@ -71,7 +70,7 @@ class MainWindow(QWidget, Link):
 
         # TextBox
         self.lineEdit = QLineEdit()
-        self.lineEdit.setPlaceholderText("Enter Search keyword here...")
+        self.lineEdit.setPlaceholderText("Enter Search keyword here... e.g 'Shinkeji no Kyojin', 'Bleach', 'Kimetsu no yaiba' etc...")
         
         self.lineEdit.setSizePolicy(self.sizePolicy)
         self.lineEdit.setMinimumSize(QSize(0, 50))
@@ -107,15 +106,31 @@ class MainWindow(QWidget, Link):
         self.localSearchButton.setIcon(localSearchIcon)
         self.localSearchButton.setIconSize(self.icon_size)
 
+
+        self.refreshButton = QPushButton()
+        self.refreshButton.setCheckable(True)
+        self.refreshButton.setSizePolicy(self.sizePolicy)
+        self.refreshButton.setMinimumSize(self.max_button_size)
+        self.refreshButton.setMaximumSize(self.max_button_size)
+        self.refreshButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        
+        refreshIcon = QIcon()
+        refreshIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.refreshButton.setIcon(refreshIcon)
+        self.refreshButton.setIconSize(self.icon_size)
+
         # Add Widgets to searchLayout
         self.searchLayout.addWidget(self.menuButton)
+        self.searchLayout.addWidget(self.refreshButton)
         self.searchLayout.addWidget(self.lineEdit)
         self.searchLayout.addWidget(self.searchButton)
         self.searchLayout.addWidget(self.localSearchButton)
+        
         self.searchLayout.setStretch(0, 1)
-        self.searchLayout.setStretch(1, 7)
-        self.searchLayout.setStretch(2, 1)
+        self.searchLayout.setStretch(1, 1)
+        self.searchLayout.setStretch(2, 7)
         self.searchLayout.setStretch(3, 1)
+        self.searchLayout.setStretch(4, 1)
 
         #------------------------------------------------
         # Create another horizontal layout to hold objects of focus
@@ -161,9 +176,6 @@ class MainWindow(QWidget, Link):
         #------------------------------------------------
     
         self.style = """
-                QTabWidget{
-                    border: 1px solid rgba(0,0,0,40);
-                }
                 QPushButton{
                     border-radius:25px;
                 }
@@ -198,24 +210,44 @@ class MainWindow(QWidget, Link):
     def create_home_widgets(self):
         self.tabWidget = QTabWidget()
         
+        #---------------------------------------------------
+
         self.home = QWidget()
 
         homeIcon = QIcon()
         homeIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-home-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
 
+        self.homeTabStackLayout = QVBoxLayout()
+
+        self.homeTabStack = QStackedWidget()
+
+        self.loadHomeTab()
+
+        self.homeTabStack.setCurrentIndex(1)
+
+        #----------------------------------------------------
+        self.homeTabStackLayout.addWidget(self.homeTabStack)
+
+        self.home.setLayout(self.homeTabStackLayout)
+        #---------------------------------------------------
+
         self.library = QWidget()
         libraryIcon = QIcon()
-        libraryIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)        
+        libraryIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)   
+
+        #---------------------------------------------------     
         
         self.tabWidget.addTab(self.home, homeIcon, "Home")
         self.tabWidget.addTab(self.library, libraryIcon, "Library")
+        #---------------------------------------------------
 
+        self.tabWidget.setSizePolicy(self.sizePolicy)
         self.tabWidget.setCurrentIndex(0)
         self.tabWidget.setTabPosition(QTabWidget.TabPosition.South)
-        #self.tabWidget.setTabShape(QTabWidget.TabShape.Triangular)
         self.tabWidget.setTabsClosable(False)
         self.tabWidget.setMovable(False)
         self.tabWidget.setIconSize(QSize(64, 24))
+        #---------------------------------------------------
 
         self.homeLayout.addWidget(self.tabWidget)
 
@@ -225,11 +257,85 @@ class MainWindow(QWidget, Link):
         if self.keyword != "":
             print(self.keyword)
 
+
     def menuAction(self):
         Link.talkToStackWidgetIndex(2, Window)
 
+
     def changeStackIndex(self, w_index):
         window.setCurrentIndex(w_index)
+
+
+    def loadHomeTab(self):
+        self.homeDisplay = QWidget()
+        self.noInternetDisplay = QWidget()
+        self.noSearchResult = QWidget()
+        #---------------------------------------------------
+
+        #----------------------------------------------------
+        self.loadHomeDisplay()
+        self.loadNoInternetDisplay()
+        self.loadNoSearchResult()
+
+        #---------------------------------------------------
+
+        self.homeTabStack.addWidget(self.homeDisplay)
+        self.homeTabStack.addWidget(self.noInternetDisplay)
+        self.homeTabStack.addWidget(self.noSearchResult)
+
+    
+    def loadHomeDisplay(self):
+        self.homeDisplayLayout = QGridLayout()
+
+        self.homeDisplay.setLayout(self.homeDisplayLayout)
+
+
+    def loadNoInternetDisplay(self):
+        self.noInternetDisplayLayout = QVBoxLayout()
+
+        self.noInternetDisplayLabelpix = QLabel()
+        self.noInternetDisplayLabeltxt = QLabel("No Internet Connection")
+
+
+        self.noInternetDisplayLabelpix.setSizePolicy(self.sizePolicy) 
+        pixPixmap = QPixmap('MangaReader/resources/icons/icons8-without-internet.png')
+        self.noInternetDisplayLabelpix.setPixmap(pixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
+        self.noInternetDisplayLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.noInternetDisplayLabeltxt.setSizePolicy(self.sizePolicy)
+        #self.noInternetDisplayLabeltxt.setMaximumHeight(50)
+        noInternetDisplayLabelFont = QFont()
+        noInternetDisplayLabelFont.setPointSize(16)
+        noInternetDisplayLabelFont.setBold(False)
+        self.noInternetDisplayLabeltxt.setFont(noInternetDisplayLabelFont)
+        self.noInternetDisplayLabeltxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.spaceEater1 = QWidget()
+        self.spaceEater1.setSizePolicy(self.sizePolicy)
+
+        self.spaceEater2 = QWidget()
+        self.spaceEater2.setSizePolicy(self.sizePolicy)
+
+        self.noInternetDisplayLayout.addWidget(self.spaceEater1)
+        self.noInternetDisplayLayout.addWidget(self.noInternetDisplayLabelpix)
+        self.noInternetDisplayLayout.addWidget(self.noInternetDisplayLabeltxt)
+        self.noInternetDisplayLayout.addWidget(self.spaceEater2)
+
+
+        self.noInternetDisplayLayout.setStretch(0, 5)
+        self.noInternetDisplayLayout.setStretch(1, 1)
+        self.noInternetDisplayLayout.setStretch(2, 1)
+        self.noInternetDisplayLayout.setStretch(3, 5)
+
+        self.noInternetDisplay.setLayout(self.noInternetDisplayLayout)
+
+
+
+    def loadNoSearchResult(self):
+        self.noSearchResultLayout = QHBoxLayout()
+
+        self.noSearchResult.setLayout(self.noSearchResultLayout)
+
 
 
 class Preference(QWidget, Link):
@@ -238,27 +344,34 @@ class Preference(QWidget, Link):
 
         self.max_button_size = QSize(50, 50)
         self.min_button_size = QSize(16, 16)
-        self.icon_size = QSize(35, 35)
+        self.icon_size = QSize(50, 50)
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         #-----------------------------------------------
+        self.gridLayout = QGridLayout()
+
         # Create baseLayout
         self.baseLayout = QVBoxLayout()        
+        self.baseLayout.setSpacing(9)
 
         #-----------------------------------------------
         # Create an horizontal headerLayout
         self.headerLayout = QHBoxLayout()
+        self.headerLayout.setContentsMargins(-1, 10, -1, 10)
+
         self.bodyLayout = QHBoxLayout()
 
         #-----------------------------------------------
         # Create a backButton
         self.backButton = QPushButton()
+        self.backButton.setObjectName("backButton")
 
         self.backButton.setSizePolicy(self.sizePolicy)
         self.backButton.setMinimumSize(self.min_button_size)
         self.backButton.setMaximumSize(self.max_button_size)
         self.backButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.backButton.setGeometry(0, 0, 50, 50)
 
         # Set backIcon to backButton
         backIcon = QIcon()
@@ -266,13 +379,13 @@ class Preference(QWidget, Link):
         self.backButton.setIcon(backIcon)
         self.backButton.setIconSize(self.icon_size)
         self.backButton.setCheckable(True)
-        self.backButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor)) 
 
         #-----------------------------------------------
-        self.headerLabel = QLabel()
+        self.headerLabel = QLabel("Preference | Settings")
         self.headerLabel.setSizePolicy(self.sizePolicy)
+        self.headerLabel.setMaximumHeight(50)
         headerLabelFont = QFont()
-        headerLabelFont.setPointSize(24)
+        headerLabelFont.setPointSize(16)
         headerLabelFont.setBold(True)
         self.headerLabel.setFont(headerLabelFont)
         self.headerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -281,23 +394,42 @@ class Preference(QWidget, Link):
         self.headerLayout.addWidget(self.backButton)
         self.headerLayout.addWidget(self.headerLabel)
 
-        self.headerLayout.setStretch(1, 12)
+        self.headerLayout.setStretch(0, 1)
+        self.headerLayout.setStretch(1, 9)
         #-----------------------------------------------
         self.buttonsLayout = QVBoxLayout()
-        self.buttonsLayout.setSpacing(3)
+        self.buttonsLayout.setSpacing(5)
 
         self.settingsButton = QPushButton("Settings")
         self.settingsButton.setSizePolicy(self.sizePolicy)
+        self.settingsButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.settingsButton.setObjectName("settingsButton")
 
         self.downloadButton = QPushButton("Downloads")
         self.downloadButton.setSizePolicy(self.sizePolicy)
+        self.downloadButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.downloadButton.setObjectName("downloadButton")
 
         self.themesButton = QPushButton("Themes")
         self.themesButton.setSizePolicy(self.sizePolicy)
+        self.themesButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.themesButton.setObjectName("themesButton")
+
+        self.spaceEater = QWidget()
+        self.spaceEater.setSizePolicy(self.sizePolicy)
 
         self.buttonsLayout.addWidget(self.settingsButton)
         self.buttonsLayout.addWidget(self.downloadButton)
         self.buttonsLayout.addWidget(self.themesButton)
+        self.buttonsLayout.addWidget(self.spaceEater)
+
+        self.buttonsLayout.setObjectName("buttonsLayout")
+
+        self.buttonsLayout.setStretch(0, 1)
+        self.buttonsLayout.setStretch(1, 1)
+        self.buttonsLayout.setStretch(2, 1)
+        self.buttonsLayout.setStretch(3, 7)
+
 
         #-----------------------------------------------
         self.stackLayout = QVBoxLayout()
@@ -317,18 +449,41 @@ class Preference(QWidget, Link):
         #-----------------------------------------------
         self.bodyLayout.addLayout(self.buttonsLayout)
         self.bodyLayout.addLayout(self.stackLayout)
-        self.bodyLayout.setStretch(0, 1)
-        self.bodyLayout.setStretch(1, 4)
+        self.bodyLayout.setStretch(0, 2)
+        self.bodyLayout.setStretch(1, 8)
         #-----------------------------------------------
         self.baseLayout.addLayout(self.headerLayout)
         self.baseLayout.addLayout(self.bodyLayout)
 
-        self.baseLayout.setStretch(0, 1)
-        self.baseLayout.setStretch(1, 10)
+        self.baseLayout.setStretch(0, 2)
+        self.baseLayout.setStretch(1, 12)
         #-----------------------------------------------
 
+        self.gridLayout.addLayout(self.baseLayout, 0, 0, 1, 1)
 
-        self.setLayout(self.baseLayout)
+        self.setLayout(self.gridLayout)
+
+        self.style = """
+                QPushButton{
+                    border-radius: 25px;
+                }
+                QPushButton:hover {
+                    background-color: rgba(0,0,0,40);
+                    color: white;
+                }
+                QLabel{
+                    padding: 1px;
+                    background-color: rgba(0,0,0,40);
+                    border-radius: 25px;
+                }
+                #settingsButton, #downloadButton, #themesButton{
+                    border-radius: 15px;
+                }
+        """
+
+        self.setStyleSheet(self.style)
+
+        #-----------------------------------------------
 
         self.backButton.clicked.connect(self.backAction)
 
@@ -375,4 +530,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = Window()
     window.showMaximized()
+    windowIcon = QIcon()
+    windowIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+    window.setWindowIcon(windowIcon)
     sys.exit(app.exec())
