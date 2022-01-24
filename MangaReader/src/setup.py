@@ -16,11 +16,6 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
 
-"""
-from mainWindow import MainWindow 
-from pref import Preference
-from reader import Reader
-"""
 
 class Link(object):
 
@@ -157,6 +152,9 @@ class MainWindow(QWidget, Link):
         self.toggleGridView.setCheckable(True)
         self.toggleGridView.setObjectName("toggleGridView")
 
+        self.toggleListView = QPushButton()
+        self.toggleListView.setCheckable(True)
+        self.toggleListView.setObjectName("toggleListView")
         #---------------------------------------------------
         
         self.toggleGridView.setSizePolicy(self.sizePolicy)
@@ -164,45 +162,27 @@ class MainWindow(QWidget, Link):
         self.toggleGridView.setMaximumSize(self.min_button_size * 1.5)
         self.toggleGridView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-
-        self.toggleGridIcon = QIcon()
-        self.toggleGridIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-
-        self.toggleGridDisabledIcon =QIcon()
-        self.toggleGridDisabledIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-
-        self.toggleGridView.setIcon(self.toggleGridIcon)
-        self.toggleGridView.setIconSize(self.icon_size * 0.75)
- 
-
         #----------------------------------------------------
-
-        self.toggleListView = QPushButton()
-        self.toggleListView.setCheckable(True)
-        self.toggleListView.setObjectName("toggleListView")
         
         self.toggleListView.setSizePolicy(self.sizePolicy)
         self.toggleListView.setMinimumSize(self.min_button_size * 1.5)
         self.toggleListView.setMaximumSize(self.min_button_size * 1.5)
         self.toggleListView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        self.toggleListIcon = QIcon()
-        self.toggleListIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-
-        self.toggleListDisabledIcon =QIcon()
-        self.toggleListDisabledIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-
-        self.toggleListView.setIcon(self.toggleListDisabledIcon)
-        self.toggleListView.setIconSize(self.icon_size * 0.75)
-
         #--------------------------------------------------------
 
         self.toggleList = [self.toggleGridView, self.toggleListView]
         self.toggleViewValue = ["Grid View", "List View"]
 
+        self.previousViewOptionIndex = 0
         self.viewOptionIndex = 0
 
         self.view = QLabel(self.toggleViewValue[self.viewOptionIndex])
+        #----------------------------------------------------
+
+        self.selectViewType(self.viewOptionIndex)
+
+        #----------------------------------------------------
 
         self.toggleLayout.addWidget(self.view)
         self.toggleLayout.addWidget(self.toggleList[0])
@@ -269,8 +249,9 @@ class MainWindow(QWidget, Link):
                     border-radius: 10px;
                 }
 
-                #toggleGridView, #toggleListView{
-                    background-color: none;
+                #toggleGridView:hover, #toggleListView:hover{
+                    background-color: rgba(0,0,0,40);
+                    border-radius: 5px;
                 }
             """
         self.setStyleSheet(self.style)
@@ -281,12 +262,10 @@ class MainWindow(QWidget, Link):
         self.menuButton.clicked.connect(self.menuAction)
         self.refreshButton.clicked.connect(self.refreshAction)
 
-        self.toggleGridView.clicked.connect(self.viewTypeGridAction)
+        self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj('toggleGrid'))
 
-        self.toggleListView.clicked.connect(self.viewTypeListAction)
-        #-----------------------------------------------
-
-
+        self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj('toggleList'))
+        
     def create_home_widgets(self):
         self.tabWidget = QTabWidget()
         
@@ -303,7 +282,7 @@ class MainWindow(QWidget, Link):
 
         self.loadHomeTab()
 
-        self.homeTabStack.setCurrentIndex(0)
+        self.homeTabStack.setCurrentIndex(3)
 
         #----------------------------------------------------
         self.homeTabStackLayout.addWidget(self.homeTabStack)
@@ -331,38 +310,42 @@ class MainWindow(QWidget, Link):
 
         self.homeLayout.addWidget(self.tabWidget)
 
-
-
-    def loadHomeItems(self):
+    def loadHomeItems(self):# More Work 'Online Mode'
         pass
 
-    def search(self):
+    def loadHomeLocalItems(self):# More Work 'Offline Mode'
+        pass
+
+    def search(self):# More Work
         self.keyword = self.lineEdit.text()
         if self.keyword != "":
             print(self.keyword)
-
 
     def menuAction(self):
         Link.talkToStackWidgetIndex(2, Window)
 
     def refreshAction(self):
+        pageToRefreshIndex = self.homeTabStack.currentIndex()
         if self.homeTabStack.currentIndex() == 0:
             print("Refused to change Index will refresh instead")
-            print(self.homeTabStack.currentIndex())
+            self.homeTabStack.setCurrentIndex(0)
         else:
             self.homeTabStack.setCurrentIndex(0)
-            print(self.homeTabStack.currentIndex())
+        self.refresh(pageToRefreshIndex)
 
+    def refresh(self, refreshPgIndex):# Much More work
+        if (refreshPgIndex == 0) or (refreshPgIndex == 3) or (refreshPgIndex == 4):
+            print(refreshPgIndex)
 
     def changeStackIndex(self, w_index):
         window.setCurrentIndex(w_index)
-
 
     def loadHomeTab(self):
         self.homeDisplay = QWidget()
         self.noInternetDisplay = QWidget()
         self.noSearchResult = QWidget()
         self.searchResultPage = QWidget()
+        self.descriptionPage = QWidget()
         #---------------------------------------------------
 
         #----------------------------------------------------
@@ -370,6 +353,7 @@ class MainWindow(QWidget, Link):
         self.loadNoInternetDisplay()
         self.loadNoSearchResult()
         self.loadSearchResultPage()
+        self.loadDescriptionPage()
 
         #---------------------------------------------------
 
@@ -377,13 +361,12 @@ class MainWindow(QWidget, Link):
         self.homeTabStack.addWidget(self.noInternetDisplay)
         self.homeTabStack.addWidget(self.noSearchResult)
         self.homeTabStack.addWidget(self.searchResultPage)
-
-    
-    def loadHomeDisplay(self):
+        self.homeTabStack.addWidget(self.descriptionPage)
+  
+    def loadHomeDisplay(self):# More Work
         self.homeDisplayLayout = QGridLayout()
 
         self.homeDisplay.setLayout(self.homeDisplayLayout)
-
 
     def loadNoInternetDisplay(self):
         self.noInternetDisplayLayout = QVBoxLayout()
@@ -424,8 +407,6 @@ class MainWindow(QWidget, Link):
 
         self.noInternetDisplay.setLayout(self.noInternetDisplayLayout)
 
-
-
     def loadNoSearchResult(self):
         self.noSearchResultLayout = QVBoxLayout()
 
@@ -465,31 +446,69 @@ class MainWindow(QWidget, Link):
 
         self.noSearchResult.setLayout(self.noSearchResultLayout)
 
-    def viewTypeGridAction(self):
-        if self.toggleGridView.isChecked():
-            self.toggleListView.setIcon(self.toggleListDisabledIcon)
-            #self.toggleGridView.isChecked = True
-        else:
-            self.toggleGridView.setIcon(self.toggleGridIcon)
-            self.toggleListView.setIcon(self.toggleListDisabledIcon)
-            #self.toggleGridView.isChecked = False
-
-        print(self.toggleGridView.isChecked())
-
-    def viewTypeListAction(self):
-        if self.toggleListView.isChecked():
-            self.toggleListView.setIcon(self.toggleListIcon)
-            self.toggleGridView.setIcon(self.toggleGridDisabledIcon)
-            #self.toggleListView.isChecked = True
-        else:
-            self.toggleGridView.setIcon(self.toggleGridIcon)
-            #self.toggleListView.isChecked = False
-
-        print(self.toggleListView.isChecked())
-
-
     def loadSearchResultPage(self):
         self.resultLayout = QGridLayout()
+
+    def loadDescriptionPage(self):
+        self.descriptionLayout = QHBoxLayout()
+        pass
+
+    def viewTypeAction(self, gridView):
+        if gridView == True:
+            self.toggleGridIcon = QIcon()
+            self.toggleGridIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleGridView.setIcon(self.toggleGridIcon)
+            self.toggleGridView.setIconSize(self.icon_size * 0.75)
+            #--------------------------------------------
+            self.toggleListDisabledIcon =QIcon()
+            self.toggleListDisabledIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleListView.setIcon(self.toggleListDisabledIcon)
+            self.toggleListView.setIconSize(self.icon_size * 0.75)
+
+            self.view.setText("Grid View")
+            self.viewOptionIndex = 0
+            return self.viewOptionIndex, self.previousViewOptionIndex
+
+        else:
+            self.toggleListIcon = QIcon()
+            self.toggleListIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleListView.setIcon(self.toggleListIcon)
+            self.toggleListView.setIconSize(self.icon_size * 0.75)
+            #--------------------------------------------
+            self.toggleGridDisabledIcon = QIcon()
+            self.toggleGridDisabledIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleGridView.setIcon(self.toggleGridDisabledIcon)
+            self.toggleGridView.setIconSize(self.icon_size * 0.75)
+
+            self.view.setText("List View")
+            self.viewOptionIndex = 1
+            return self.viewOptionIndex, self.previousViewOptionIndex
+
+    def selectViewType(self, viewsIndex):
+        self.selectView(viewsIndex)
+        self.previousViewOptionIndex = viewsIndex
+        return self.previousViewOptionIndex
+    
+    def selectViewTypeByObj(self, objName):
+        self.previousViewOptionIndex = self.viewOptionIndex
+        if objName == "toggleGrid":
+            self.selectView(0)
+        else:
+            self.selectView(1)
+
+    def selectView(self, view_index):
+        if view_index == 0:
+            self.viewIsGrid = True
+            self.viewTypeAction(self.viewIsGrid)
+        else:
+            self.viewIsGrid = False
+            self.viewTypeAction(self.viewIsGrid)
+
+        if self.previousViewOptionIndex != view_index:
+            self.changeViewType(self.viewOptionIndex)
+
+    def changeViewType(self, newViewIndex): # More work
+        print('Changing view to', self.toggleViewValue[newViewIndex])
 
 
 class Preference(QWidget, Link):
