@@ -1,4 +1,6 @@
+from distutils import text_file
 import sys
+from typing_extensions import Self
 from PyQt6.QtWidgets import (
     QApplication,
     QStackedWidget,
@@ -12,8 +14,12 @@ from PyQt6.QtWidgets import (
     QSizePolicy,
     QListView,
     QPushButton,
+    QFileDialog,
 )
-from PyQt6.QtCore import QSize, Qt
+
+import os
+
+from PyQt6.QtCore import QSize, Qt, QUrl
 from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
 
 
@@ -27,9 +33,11 @@ class MainWindow(QWidget, Link):
     def __init__(self):
         super().__init__()
 
-        self.max_button_size = QSize(50, 50)
+        self.max_button_size = QSize(36, 36)
         self.min_button_size = QSize(16, 16)
-        self.icon_size = QSize(35, 35)
+        self.icon_size = QSize(20, 20)
+        self.initPath = "C:\\"
+
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.create_widgets()
@@ -68,8 +76,8 @@ class MainWindow(QWidget, Link):
         self.lineEdit.setPlaceholderText("Enter Search keyword here... e.g 'Shinkeji no Kyojin', 'Bleach', 'Kimetsu no yaiba' etc...")
         
         self.lineEdit.setSizePolicy(self.sizePolicy)
-        self.lineEdit.setMinimumSize(QSize(0, 50))
-        self.lineEdit.setMaximumSize(QSize(1366, 50))
+        self.lineEdit.setMinimumSize(QSize(0, 36))
+        self.lineEdit.setMaximumSize(QSize(1366, 36))
         self.lineEdit.setMaxLength(36)
         self.lineEdit.setClearButtonEnabled(True)
      
@@ -97,9 +105,23 @@ class MainWindow(QWidget, Link):
         self.localSearchButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         localSearchIcon = QIcon()
-        localSearchIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-plus-math-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        localSearchIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-add-folder-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.localSearchButton.setIcon(localSearchIcon)
         self.localSearchButton.setIconSize(self.icon_size)
+
+
+        self.localSearchButtonSingleFormat = QPushButton()
+        self.localSearchButtonSingleFormat.setCheckable(True)
+        
+        self.localSearchButtonSingleFormat.setSizePolicy(self.sizePolicy)
+        self.localSearchButtonSingleFormat.setMinimumSize(self.min_button_size)
+        self.localSearchButtonSingleFormat.setMaximumSize(self.max_button_size)
+        self.localSearchButtonSingleFormat.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+
+        localSearchIconSingleFormat = QIcon()
+        localSearchIconSingleFormat.addPixmap(QPixmap("MangaReader/resources/icons/icons8-cbr-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.localSearchButtonSingleFormat.setIcon(localSearchIconSingleFormat)
+        self.localSearchButtonSingleFormat.setIconSize(self.icon_size)
 
 
         self.refreshButton = QPushButton()
@@ -117,15 +139,17 @@ class MainWindow(QWidget, Link):
         # Add Widgets to searchLayout
         self.searchLayout.addWidget(self.menuButton)
         self.searchLayout.addWidget(self.refreshButton)
+        self.searchLayout.addWidget(self.localSearchButton)
+        self.searchLayout.addWidget(self.localSearchButtonSingleFormat)
         self.searchLayout.addWidget(self.lineEdit)
         self.searchLayout.addWidget(self.searchButton)
-        self.searchLayout.addWidget(self.localSearchButton)
         
         self.searchLayout.setStretch(0, 1)
         self.searchLayout.setStretch(1, 1)
-        self.searchLayout.setStretch(2, 7)
+        self.searchLayout.setStretch(2, 1)
         self.searchLayout.setStretch(3, 1)
-        self.searchLayout.setStretch(4, 1)
+        self.searchLayout.setStretch(4, 6)
+        self.searchLayout.setStretch(5, 1)
 
         #------------------------------------------------
         # Create another horizontal layout to hold objects of focus
@@ -229,7 +253,7 @@ class MainWindow(QWidget, Link):
     
         self.style = """
                 QPushButton{
-                    border-radius:25px;
+                    border-radius:18px;
                 }
                 QPushButton:hover {
                     background-color: rgba(0,0,0,40);
@@ -237,8 +261,8 @@ class MainWindow(QWidget, Link):
                 }
                 QLineEdit{
                     border: 1px solid rgba(0,0,0,40);
-                    border-radius: 25px;
-                    padding-left: 25px;
+                    border-radius: 18px;
+                    padding-left: 15px;
                     font: 13px;
                 }
                 QStatusBar{
@@ -265,6 +289,11 @@ class MainWindow(QWidget, Link):
         self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj('toggleGrid'))
 
         self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj('toggleList'))
+
+        self.localSearchButton.clicked.connect(self.localSearchAction)
+        self.localSearchButtonSingleFormat.clicked.connect(self.localSearchSingleFormatAction)
+
+
         
     def create_home_widgets(self):
         self.tabWidget = QTabWidget()
@@ -511,13 +540,23 @@ class MainWindow(QWidget, Link):
         print('Changing view to', self.toggleViewValue[newViewIndex])
 
 
+    def localSearchAction(self):
+        self.loaclDirPath = QFileDialog.getExistingDirectory(self,"Select Manhua Bundle",self.initPath)
+        print(self.loaclDirPath)
+
+    def localSearchSingleFormatAction(self):
+        print("cbx")
+        pass
+
+
+
 class Preference(QWidget, Link):
     def __init__(self):
         super().__init__()
 
-        self.max_button_size = QSize(50, 50)
+        self.max_button_size = QSize(36, 36)
         self.min_button_size = QSize(16, 16)
-        self.icon_size = QSize(50, 50)
+        self.icon_size = QSize(20, 20)
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -544,7 +583,7 @@ class Preference(QWidget, Link):
         self.backButton.setMinimumSize(self.min_button_size)
         self.backButton.setMaximumSize(self.max_button_size)
         self.backButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.backButton.setGeometry(0, 0, 50, 50)
+        self.backButton.setGeometry(0, 0, 36, 36)
 
         # Set backIcon to backButton
         backIcon = QIcon()
@@ -556,7 +595,7 @@ class Preference(QWidget, Link):
         #-----------------------------------------------
         self.headerLabel = QLabel("Preference | Settings")
         self.headerLabel.setSizePolicy(self.sizePolicy)
-        self.headerLabel.setMaximumHeight(50)
+        self.headerLabel.setMaximumHeight(42)
         headerLabelFont = QFont()
         headerLabelFont.setPointSize(16)
         headerLabelFont.setBold(True)
@@ -601,7 +640,7 @@ class Preference(QWidget, Link):
         self.buttonsLayout.setStretch(0, 1)
         self.buttonsLayout.setStretch(1, 1)
         self.buttonsLayout.setStretch(2, 1)
-        self.buttonsLayout.setStretch(3, 7)
+        self.buttonsLayout.setStretch(3, 12)
 
 
         #-----------------------------------------------
@@ -638,7 +677,7 @@ class Preference(QWidget, Link):
 
         self.style = """
                 QPushButton{
-                    border-radius: 25px;
+                    border-radius: 18px;
                 }
                 QPushButton:hover {
                     background-color: rgba(0,0,0,40);
@@ -647,10 +686,10 @@ class Preference(QWidget, Link):
                 QLabel{
                     padding: 1px;
                     background-color: rgba(0,0,0,40);
-                    border-radius: 25px;
+                    border-radius: 21px;
                 }
                 #settingsButton, #downloadButton, #themesButton{
-                    border-radius: 15px;
+                    border-radius: 18px;
                 }
         """
 
