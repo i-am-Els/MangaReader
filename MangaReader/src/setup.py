@@ -1,5 +1,8 @@
-from distutils import text_file
+from pathlib import Path
 import sys
+import os
+import ctypes
+
 from typing_extensions import Self
 from PyQt6.QtWidgets import (
     QApplication,
@@ -13,6 +16,7 @@ from PyQt6.QtWidgets import (
     QLabel,
     QSizePolicy,
     QListView,
+    QMessageBox,
     QPushButton,
     QFileDialog,
 )
@@ -37,6 +41,9 @@ class MainWindow(QWidget, Link):
         self.min_button_size = QSize(16, 16)
         self.icon_size = QSize(20, 20)
         self.initPath = "C:\\"
+        self.newPath = self.initPath
+        self.localDirImport = []
+        self.localSingleImport = []
 
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -182,15 +189,15 @@ class MainWindow(QWidget, Link):
         #---------------------------------------------------
         
         self.toggleGridView.setSizePolicy(self.sizePolicy)
-        self.toggleGridView.setMinimumSize(self.min_button_size * 1.5)
-        self.toggleGridView.setMaximumSize(self.min_button_size * 1.5)
+        self.toggleGridView.setMinimumSize(self.min_button_size * 1.75)
+        self.toggleGridView.setMaximumSize(self.min_button_size * 1.75)
         self.toggleGridView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #----------------------------------------------------
         
         self.toggleListView.setSizePolicy(self.sizePolicy)
-        self.toggleListView.setMinimumSize(self.min_button_size * 1.5)
-        self.toggleListView.setMaximumSize(self.min_button_size * 1.5)
+        self.toggleListView.setMinimumSize(self.min_button_size * 1.75)
+        self.toggleListView.setMaximumSize(self.min_button_size * 1.75)
         self.toggleListView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         #--------------------------------------------------------
@@ -276,6 +283,10 @@ class MainWindow(QWidget, Link):
                 #toggleGridView:hover, #toggleListView:hover{
                     background-color: rgba(0,0,0,40);
                     border-radius: 5px;
+                }
+
+                QMessageBox > QPushButton:hover {
+                    background-color: orange;
                 }
             """
         self.setStyleSheet(self.style)
@@ -487,12 +498,12 @@ class MainWindow(QWidget, Link):
             self.toggleGridIcon = QIcon()
             self.toggleGridIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleGridView.setIcon(self.toggleGridIcon)
-            self.toggleGridView.setIconSize(self.icon_size * 0.75)
+            self.toggleGridView.setIconSize(self.icon_size * 1.1)
             #--------------------------------------------
             self.toggleListDisabledIcon =QIcon()
             self.toggleListDisabledIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleListView.setIcon(self.toggleListDisabledIcon)
-            self.toggleListView.setIconSize(self.icon_size * 0.75)
+            self.toggleListView.setIconSize(self.icon_size * 1.1)
 
             self.view.setText("Grid View")
             self.viewOptionIndex = 0
@@ -502,12 +513,12 @@ class MainWindow(QWidget, Link):
             self.toggleListIcon = QIcon()
             self.toggleListIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleListView.setIcon(self.toggleListIcon)
-            self.toggleListView.setIconSize(self.icon_size * 0.75)
+            self.toggleListView.setIconSize(self.icon_size * 1.1)
             #--------------------------------------------
             self.toggleGridDisabledIcon = QIcon()
             self.toggleGridDisabledIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleGridView.setIcon(self.toggleGridDisabledIcon)
-            self.toggleGridView.setIconSize(self.icon_size * 0.75)
+            self.toggleGridView.setIconSize(self.icon_size * 1.1)
 
             self.view.setText("List View")
             self.viewOptionIndex = 1
@@ -541,12 +552,73 @@ class MainWindow(QWidget, Link):
 
 
     def localSearchAction(self):
-        self.loaclDirPath = QFileDialog.getExistingDirectory(self,"Select Manhua Bundle",self.initPath)
-        print(self.loaclDirPath)
+        self.localDirDialog = QFileDialog.getExistingDirectory(self,"Select Manhua Bundle",self.newPath)
+
+        self.localDirPath = self.convertToPath(self.localDirDialog)
+        dir = os.listdir(self.localDirPath)
+        if dir != []:
+            rightStructure = self.correctDirStructure(self.localDirPath)
+            if rightStructure == True:
+                self.newPath = self.extractParentFolderPath(self.localDirPath)
+                pass
+            else:
+                self.popDialog('structure')
+        else:
+            self.popDialog('empty')
+            
+            self.localSearchAction()
+
+    def popDialog(self, type):
+        if type == 'empty':
+            txt, t_txt = "Bundle is empty, Please select a filled directory", "Empty Bundle"
+        elif type == 'structure':
+            txt, t_txt = "Bundle is not properly structured\nSelect a Parent folder that has chapters arranged in sub-folders", "Incorrect Structure"
+        
+        messageBox = QMessageBox()
+        messageBox.setIcon(QMessageBox.Icon.Information)
+        messageBox.setText(txt)
+        messageBox.setWindowTitle(t_txt)
+        messageBox.setStandardButtons(QMessageBox.StandardButton.Ok)
+        messageBox.setWindowIcon(windowIcon)
+        messageBox.exec()
 
     def localSearchSingleFormatAction(self):
-        print("cbx")
-        pass
+        self.localSingleDialog = QFileDialog().getOpenFileName(
+        self, self.tr('Open Archived Manhua File'),
+        self.newPath,
+        self.tr(
+            'Archive Files (*.zip *.cbz *.rar *.cbr)'))
+        self.localSinglePath = self.convertToPath(self.localSingleDialog[0])
+
+        if os.path.isfile(self.localSinglePath):   
+            self.localFileName = self.extractFileName(self.localSinglePath)
+
+            self.parentLocalSinglePath = self.extractParentFolderPath(self.localSinglePath)
+
+            self.localSingleImport = [self.localSinglePath, self.localFileName, self.parentLocalSinglePath]
+            self.newPath = self.parentLocalSinglePath
+
+            return self.localSingleImport
+
+        else:
+            print("no file selected")
+
+
+    def convertToPath(self, path):
+        path_n = Path(path)
+        return path_n
+
+    def extractParentFolderPath(self, path):
+        path_n = os.path.dirname(path)
+        return path_n
+
+    def extractFileName(self, path):
+        file_n = os.path.basename(path)
+        return file_n
+
+    def correctDirStructure(self, path):
+        return True
+
 
 
 
@@ -684,12 +756,11 @@ class Preference(QWidget, Link):
                     color: white;
                 }
                 QLabel{
-                    padding: 1px;
                     background-color: rgba(0,0,0,40);
                     border-radius: 21px;
                 }
                 #settingsButton, #downloadButton, #themesButton{
-                    border-radius: 18px;
+                    border-radius: 15px;
                 }
         """
 
@@ -738,8 +809,19 @@ class Window(QStackedWidget):
         window.setCurrentIndex(w_index)
 
 
+
+def setTaskBarIcon():
+    myappid = u'mycompany.myproduct.subproduct.version' # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
+
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    setTaskBarIcon()
+
     window = Window()
     window.showMaximized()
     windowIcon = QIcon()
