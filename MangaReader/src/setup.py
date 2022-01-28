@@ -556,7 +556,7 @@ class MainWindow(QWidget, Link):
 
         self.localDirPath = self.convertToPath(self.localDirDialog)
         dir = list(os.listdir(self.localDirPath))
-        # print(dir, self.localDirDialog)
+        print(dir, self.localDirDialog)
         
 
         if len(dir) == 0:
