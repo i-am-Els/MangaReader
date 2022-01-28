@@ -556,16 +556,16 @@ class MainWindow(QWidget, Link):
 
         self.localDirPath = self.convertToPath(self.localDirDialog)
         dir = os.listdir(self.localDirPath)
-        if dir != []:
+        print(self.localDirPath.parent)
+        if not(len(dir) == 0) and not(self.localDirPath.parent != '.'):
             rightStructure = self.correctDirStructure(self.localDirPath)
             if rightStructure == True:
                 self.newPath = self.extractParentFolderPath(self.localDirPath)
                 pass
             else:
                 self.popDialog('structure')
-        else:
+        elif len(dir) == 0:
             self.popDialog('empty')
-            
             self.localSearchAction()
 
     def popDialog(self, type):
@@ -617,7 +617,10 @@ class MainWindow(QWidget, Link):
         return file_n
 
     def correctDirStructure(self, path):
-        return True
+        if type(path) == list:
+            return True
+        else:
+            return False
 
 
 
