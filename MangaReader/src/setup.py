@@ -555,8 +555,18 @@ class MainWindow(QWidget, Link):
         self.localDirDialog = QFileDialog.getExistingDirectory(self,"Select Manhua Bundle",self.newPath)
 
         self.localDirPath = self.convertToPath(self.localDirDialog)
-        dir = os.listdir(self.localDirPath)
-        if not(len(dir) == 0) and not(self.localDirPath.parent == '.'):
+        dir = list(os.listdir(self.localDirPath))
+        # print(dir, self.localDirDialog)
+        
+
+        if len(dir) == 0:
+            self.popDialog('empty')
+            self.localSearchAction()
+
+        elif self.localDirDialog == '':
+            pass
+
+        elif self.localDirDialog != '' and len(dir) != 0:
             rightStructure = self.correctDirStructure(self.localDirPath)
             print(rightStructure)
             if rightStructure == True:
@@ -564,9 +574,7 @@ class MainWindow(QWidget, Link):
                 self.newPath = self.extractParentFolderPath(self.localDirPath)
             else:
                 self.popDialog('structure')
-        elif len(dir) == 0:
-            self.popDialog('empty')
-            self.localSearchAction()
+        
 
     def popDialog(self, type):
         if type == 'empty':
