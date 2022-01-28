@@ -556,12 +556,12 @@ class MainWindow(QWidget, Link):
 
         self.localDirPath = self.convertToPath(self.localDirDialog)
         dir = os.listdir(self.localDirPath)
-        print(self.localDirPath.parent)
-        if not(len(dir) == 0) and not(self.localDirPath.parent != '.'):
+        if not(len(dir) == 0) and not(self.localDirPath.parent == '.'):
             rightStructure = self.correctDirStructure(self.localDirPath)
+            print(rightStructure)
             if rightStructure == True:
+                print("voila")
                 self.newPath = self.extractParentFolderPath(self.localDirPath)
-                pass
             else:
                 self.popDialog('structure')
         elif len(dir) == 0:
@@ -617,10 +617,7 @@ class MainWindow(QWidget, Link):
         return file_n
 
     def correctDirStructure(self, path):
-        if type(path) == list:
-            return True
-        else:
-            return False
+        return True
 
 
 
@@ -828,6 +825,6 @@ if __name__ == "__main__":
     window = Window()
     window.showMaximized()
     windowIcon = QIcon()
-    windowIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+    windowIcon.addPixmap(QPixmap("MangaReader/resources/logo/owlly.png"), QIcon.Mode.Normal, QIcon.State.Off)
     window.setWindowIcon(windowIcon)
     sys.exit(app.exec())
