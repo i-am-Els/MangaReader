@@ -312,7 +312,7 @@ class MainWindow(QWidget):
 
         self.loadHomeTab()
 
-        self.homeTabStack.setCurrentIndex(3)
+        self.homeTabStack.setCurrentIndex(0)
 
         #----------------------------------------------------
         self.homeTabStackLayout.addWidget(self.homeTabStack)
@@ -406,7 +406,7 @@ class MainWindow(QWidget):
 
 
         self.noInternetDisplayLabelpix.setSizePolicy(self.sizePolicy) 
-        pixPixmap = QPixmap('MangaReader/resources/icons/icons8-without-internet.png')
+        pixPixmap = QPixmap('MangaReader/resources/icons/icons8-without-internet-100.png')
         self.noInternetDisplayLabelpix.setPixmap(pixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
         self.noInternetDisplayLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
