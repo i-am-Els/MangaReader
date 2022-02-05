@@ -1,6 +1,6 @@
 # import sys, ctypes
 
-# 
+from themes import Themes
 
 from PyQt6.QtWidgets import (
     QStackedWidget,
@@ -22,14 +22,6 @@ class Window(QStackedWidget):
         super().__init__()
         #self.screen_width = 1366
         #self.screen_height = 768
-        self.min_screen_width = 915
-        self.min_screen_height = 515
-        self.resize_width = 1092
-        self.resize_height = 614
-        self.appWindowTitle = "Manhua Reader"
-        self.resize(QSize(self.resize_width, self.resize_height))
-        self.setMinimumSize(QSize(self.min_screen_width, self.min_screen_height))
-        self.setWindowTitle(self.appWindowTitle)
 
         self.windowIcon = QIcon()
         self.windowIcon.addPixmap(QPixmap("MangaReader/resources/logo/owlly.png"), QIcon.Mode.Normal, QIcon.State.Off)
@@ -43,20 +35,23 @@ class Window(QStackedWidget):
         self.addWidget(self.objReader)
         self.addWidget(self.objPref)
 
+        self.objMainWindow.setObjectName("objMainWindow")
+        self.objReader.setObjectName("objReader")
+        self.objPref.setObjectName("objPref")
+
+        self.stylesIndex = 0
+
+        self.setTheme(self.stylesIndex)
+
     def changeStackIndex(self, obj, w_index):
         obj.setCurrentIndex(w_index)
 
+    def setTheme(self, s_index):
+        if s_index == 0:
+            theme = Themes.lightMode(self)
+        else:
+            theme = Themes.darkMode(self)
 
-# def setTaskBarIcon():
-#     myappid = u"mycompany.myproduct.subproduct.version" # arbitrary string
-#     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        Themes.declareTheme(self, s_index)
 
-
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-
-#     setTaskBarIcon()
-
-#     window = Window()
-#     window.showMaximized()
-#     sys.exit(app.exec())
+        

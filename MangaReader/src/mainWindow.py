@@ -1,7 +1,10 @@
 from pathlib import Path
 import os
 
+from themes import Themes
+
 from PyQt6.QtWidgets import (
+    QTabBar,
     QStackedWidget,
     QHBoxLayout,
     QVBoxLayout,
@@ -36,6 +39,8 @@ class MainWindow(QWidget):
         self.newPath = self.initPath
         self.localDirImport = []
         self.localSingleImport = []
+        self.themeIndex = 0
+        self.tabIndex = 0
 
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -65,10 +70,9 @@ class MainWindow(QWidget):
         self.menuButton.setMaximumSize(self.max_button_size)
         self.menuButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        menuIcon = QIcon()
-        menuIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-menu-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        self.menuButton.setIcon(menuIcon)
+        self.menuIcon = QIcon()
         self.menuButton.setIconSize(self.icon_size)
+        self.menuButton.setObjectName("menuButton")
 
         # TextBox
         self.lineEdit = QLineEdit()
@@ -79,7 +83,8 @@ class MainWindow(QWidget):
         self.lineEdit.setMaximumSize(QSize(1366, 36))
         self.lineEdit.setMaxLength(36)
         self.lineEdit.setClearButtonEnabled(True)
-     
+        self.lineEdit.setObjectName("lineEdit") 
+
         # Search Button
         self.searchButton = QPushButton()
         self.searchButton.setCheckable(True)
@@ -89,10 +94,9 @@ class MainWindow(QWidget):
         self.searchButton.setMaximumSize(self.max_button_size)
         self.searchButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        searchIcon = QIcon()
-        searchIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-search-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        self.searchButton.setIcon(searchIcon)
+        self.searchIcon = QIcon()
         self.searchButton.setIconSize(self.icon_size)
+        self.searchButton.setObjectName("searchButton")
 
         # Local Search
         self.localSearchButton = QPushButton()
@@ -103,24 +107,21 @@ class MainWindow(QWidget):
         self.localSearchButton.setMaximumSize(self.max_button_size)
         self.localSearchButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        localSearchIcon = QIcon()
-        localSearchIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-add-folder-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        self.localSearchButton.setIcon(localSearchIcon)
+        self.localSearchIcon = QIcon()
         self.localSearchButton.setIconSize(self.icon_size)
+        self.localSearchButton.setObjectName("localSearchButton")
 
 
         self.localSearchButtonSingleFormat = QPushButton()
         self.localSearchButtonSingleFormat.setCheckable(True)
-        
         self.localSearchButtonSingleFormat.setSizePolicy(self.sizePolicy)
         self.localSearchButtonSingleFormat.setMinimumSize(self.min_button_size)
         self.localSearchButtonSingleFormat.setMaximumSize(self.max_button_size)
         self.localSearchButtonSingleFormat.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        localSearchIconSingleFormat = QIcon()
-        localSearchIconSingleFormat.addPixmap(QPixmap("MangaReader/resources/icons/icons8-cbr-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        self.localSearchButtonSingleFormat.setIcon(localSearchIconSingleFormat)
+        self.localSearchIconSingleFormat = QIcon()
         self.localSearchButtonSingleFormat.setIconSize(self.icon_size)
+        self.localSearchButtonSingleFormat.setObjectName("localSearcButtonSingleFormat")
 
 
         self.refreshButton = QPushButton()
@@ -130,10 +131,9 @@ class MainWindow(QWidget):
         self.refreshButton.setMaximumSize(self.max_button_size)
         self.refreshButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         
-        refreshIcon = QIcon()
-        refreshIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        self.refreshButton.setIcon(refreshIcon)
+        self.refreshIcon = QIcon()
         self.refreshButton.setIconSize(self.icon_size)
+        self.refreshButton.setObjectName("refreshButton")
 
         # Add Widgets to searchLayout
         self.searchLayout.addWidget(self.menuButton)
@@ -162,7 +162,7 @@ class MainWindow(QWidget):
         # Create widgets for the historyLayout
         self.historyLabel = QLabel()
         self.historyLabel.setText("Recent Manhua")
-        self.historyLabel.setStyleSheet("background-color: rgb(145, 145, 145); font: 15px;")
+        self.historyLabel.setObjectName("historyLabel")
         self.historyLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.historyListView = QListView()
@@ -247,41 +247,6 @@ class MainWindow(QWidget):
         self.gridLayout.addLayout(self.centralLayout, 0, 0, 1, 1)
 
         self.setLayout(self.gridLayout)
-
-        #------------------------------------------------
-    
-        self.style = """
-                QPushButton{
-                    border-radius:18px;
-                }
-                QPushButton:hover {
-                    background-color: rgba(0,0,0,40);
-                    color: white;
-                }
-                QLineEdit{
-                    border: 1px solid rgba(0,0,0,40);
-                    border-radius: 18px;
-                    padding-left: 15px;
-                    font: 13px;
-                }
-                QStatusBar{
-                    background-color: rgba(0,0,0,40);
-                }
-                QLabel{
-                    padding: 10px;
-                    border-radius: 10px;
-                }
-
-                #toggleGridView:hover, #toggleListView:hover{
-                    background-color: rgba(0,0,0,40);
-                    border-radius: 5px;
-                }
-
-                QMessageBox > QPushButton:hover {
-                    background-color: orange;
-                }
-            """
-        self.setStyleSheet(self.style)
         #-----------------------------------------------
         self.searchButton.clicked.connect(self.search)
         self.lineEdit.returnPressed.connect(self.searchButton.click)
@@ -295,16 +260,19 @@ class MainWindow(QWidget):
 
         self.localSearchButton.clicked.connect(self.localSearchAction)
         self.localSearchButtonSingleFormat.clicked.connect(self.localSearchSingleFormatAction)
-      
+        self.tabBar.currentChanged.connect(lambda:self.changeTabBarIcon())
+
+        
+
     def create_home_widgets(self):
         self.tabWidget = QTabWidget()
-        
+        self.tabBar = QTabBar(self.tabWidget)
         #---------------------------------------------------
 
         self.home = QWidget()
 
-        homeIcon = QIcon()
-        homeIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-home-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.homeIcon = QIcon()
+        # self.homeIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-home-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
 
         self.homeTabStackLayout = QVBoxLayout()
 
@@ -321,13 +289,22 @@ class MainWindow(QWidget):
         #---------------------------------------------------
 
         self.library = QWidget()
-        libraryIcon = QIcon()
-        libraryIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)   
+        self.libraryIcon = QIcon()
+        # self.libraryIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)   
 
         #---------------------------------------------------     
         
-        self.tabWidget.addTab(self.home, homeIcon, "Home")
-        self.tabWidget.addTab(self.library, libraryIcon, "Library")
+        # self.tabWidget.addTab(self.home)
+        # self.tabWidget.addTab(self.library)
+
+        self.tabBar.addTab(self.homeIcon, "Home")
+        self.tabBar.addTab(self.libraryIcon, "Library")
+        if self.themeIndex == 0:
+            Themes.changeTabBarIconLight(self) # Changes selected tabbar icon
+        else:
+            Themes.changeTabBarIconDark(self)
+
+        self.tabWidget.setTabBar(self.tabBar)
         #---------------------------------------------------
 
         self.tabWidget.setSizePolicy(self.sizePolicy)
@@ -336,10 +313,19 @@ class MainWindow(QWidget):
         self.tabWidget.setTabsClosable(False)
         self.tabWidget.setMovable(False)
         self.tabWidget.setIconSize(QSize(64, 24))
+
         #---------------------------------------------------
 
         self.homeLayout.addWidget(self.tabWidget)
 
+
+    def changeTabBarIcon(self):
+        self.tabIndex = self.tabBar.currentIndex()
+        if self.themeIndex == 0:
+            Themes.changeTabBarIconLight(self)
+        else:
+            Themes.changeTabBarIconDark(self)
+    
     def loadHomeItems(self):# More Work 'Online Mode'
         pass
 
@@ -406,16 +392,16 @@ class MainWindow(QWidget):
 
 
         self.noInternetDisplayLabelpix.setSizePolicy(self.sizePolicy) 
-        pixPixmap = QPixmap('MangaReader/resources/icons/icons8-without-internet-100.png')
-        self.noInternetDisplayLabelpix.setPixmap(pixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
+        self.pixPixmap = QPixmap('MangaReader/resources/icons/icons8-without-internet-100.png')
+        self.noInternetDisplayLabelpix.setPixmap(self.pixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
         self.noInternetDisplayLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.noInternetDisplayLabeltxt.setSizePolicy(self.sizePolicy)
         #self.noInternetDisplayLabeltxt.setMaximumHeight(50)
-        noInternetDisplayLabelFont = QFont()
-        noInternetDisplayLabelFont.setPointSize(16)
-        noInternetDisplayLabelFont.setBold(False)
-        self.noInternetDisplayLabeltxt.setFont(noInternetDisplayLabelFont)
+        self.noInternetDisplayLabelFont = QFont()
+        self.noInternetDisplayLabelFont.setPointSize(16)
+        self.noInternetDisplayLabelFont.setBold(False)
+        self.noInternetDisplayLabeltxt.setFont(self.noInternetDisplayLabelFont)
         self.noInternetDisplayLabeltxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.spaceEater1 = QWidget()
@@ -445,16 +431,16 @@ class MainWindow(QWidget):
 
 
         self.noSearchResultLabelpix.setSizePolicy(self.sizePolicy) 
-        pixPixmap = QPixmap('MangaReader/resources/icons/page-not-found.png')
-        self.noSearchResultLabelpix.setPixmap(pixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
+        self.spixPixmap = QPixmap('MangaReader/resources/icons/page-not-found.png')
+        self.noSearchResultLabelpix.setPixmap(self.spixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
         self.noSearchResultLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.noSearchResultLabeltxt.setSizePolicy(self.sizePolicy)
         #self.noInternetDisplayLabeltxt.setMaximumHeight(50)
-        noSearchResultLabelFont = QFont()
-        noSearchResultLabelFont.setPointSize(16)
-        noSearchResultLabelFont.setBold(False)
-        self.noSearchResultLabeltxt.setFont(noSearchResultLabelFont)
+        self.noSearchResultLabelFont = QFont()
+        self.noSearchResultLabelFont.setPointSize(16)
+        self.noSearchResultLabelFont.setBold(False)
+        self.noSearchResultLabeltxt.setFont(self.noSearchResultLabelFont)
         self.noSearchResultLabeltxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.spaceEater1 = QWidget()
