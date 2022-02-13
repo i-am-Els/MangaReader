@@ -13,6 +13,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
 
+from themes import Themes
+
 
 class Preference(QWidget):
     def __init__(self, obj, win_dow):
@@ -23,6 +25,8 @@ class Preference(QWidget):
         self.max_button_size = QSize(36, 36)
         self.min_button_size = QSize(16, 16)
         self.icon_size = QSize(20, 20)
+        self.active = 0
+        self.themeIndex = 0
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -52,20 +56,21 @@ class Preference(QWidget):
         self.backButton.setGeometry(0, 0, 36, 36)
 
         # Set backIcon to backButton
-        backIcon = QIcon()
-        backIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-go-back-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        self.backButton.setIcon(backIcon)
+        self.backIcon = QIcon()
+        self.backIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-go-back-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.backButton.setIcon(self.backIcon)
         self.backButton.setIconSize(self.icon_size)
         self.backButton.setCheckable(True)
 
         #-----------------------------------------------
         self.headerLabel = QLabel("Preference | Settings")
+        self.headerLabel.setObjectName("headerLabel")
         self.headerLabel.setSizePolicy(self.sizePolicy)
         self.headerLabel.setMaximumHeight(42)
-        headerLabelFont = QFont()
-        headerLabelFont.setPointSize(16)
-        headerLabelFont.setBold(True)
-        self.headerLabel.setFont(headerLabelFont)
+        self.headerLabelFont = QFont()
+        self.headerLabelFont.setPointSize(16)
+        self.headerLabelFont.setBold(True)
+        self.headerLabel.setFont(self.headerLabelFont)
         self.headerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         #-----------------------------------------------
@@ -79,16 +84,19 @@ class Preference(QWidget):
         self.buttonsLayout.setSpacing(5)
 
         self.settingsButton = QPushButton("Settings")
+        self.settingsButton.setCheckable(True)
         self.settingsButton.setSizePolicy(self.sizePolicy)
         self.settingsButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.settingsButton.setObjectName("settingsButton")
 
         self.downloadButton = QPushButton("Downloads")
+        self.downloadButton.setCheckable(True)
         self.downloadButton.setSizePolicy(self.sizePolicy)
         self.downloadButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.downloadButton.setObjectName("downloadButton")
 
         self.themesButton = QPushButton("Themes")
+        self.themesButton.setCheckable(True)
         self.themesButton.setSizePolicy(self.sizePolicy)
         self.themesButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.themesButton.setObjectName("themesButton")
@@ -114,8 +122,22 @@ class Preference(QWidget):
         self.stackedWidget = QStackedWidget()
 
         self.settingsWidget = QWidget()
+        self.settingsLayout = QVBoxLayout()
+        self.settings = QLabel("Settings")
+        self.settingsLayout.addWidget(self.settings)
+        self.settingsWidget.setLayout(self.settingsLayout)
+
         self.downloadsWidget = QWidget()
+        self.downloadsLayout = QVBoxLayout()
+        self.downloads = QLabel("Downloads")
+        self.downloadsLayout.addWidget(self.downloads)
+        self.downloadsWidget.setLayout(self.downloadsLayout)
+
         self.themesWidget = QWidget()
+        self.themesLayout = QVBoxLayout()
+        self.themes = QLabel("Themes")
+        self.themesLayout.addWidget(self.themes)
+        self.themesWidget.setLayout(self.themesLayout)
 
         self.stackedWidget.addWidget(self.settingsWidget)
         self.stackedWidget.addWidget(self.downloadsWidget)
@@ -140,32 +162,27 @@ class Preference(QWidget):
         self.gridLayout.addLayout(self.baseLayout, 0, 0, 1, 1)
 
         self.setLayout(self.gridLayout)
-
-        self.style = """
-                QPushButton{
-                    border-radius: 18px;
-                }
-                QPushButton:hover {
-                    background-color: rgba(0,0,0,40);
-                    color: white;
-                }
-                QLabel{
-                    background-color: rgba(0,0,0,40);
-                    border-radius: 21px;
-                }
-                #settingsButton, #downloadButton, #themesButton{
-                    border-radius: 15px;
-                }
-        """
-
-        self.setStyleSheet(self.style)
-
         #-----------------------------------------------
 
         self.backButton.clicked.connect(self.backAction)
+
+        self.settingsButton.clicked.connect(lambda: self.setActive(self.settingsButton, 0))
+
+        self.downloadButton.clicked.connect(lambda: self.setActive(self.downloadButton, 1))
+        
+        self.themesButton.clicked.connect(lambda: self.setActive(self.themesButton, 2))
 
     def backAction(self):
         self.obj.talkToStackWidgetIndex(0, self.win_dow)
 
     def changeStackIndex(self, obj, w_index):
         obj.setCurrentIndex(w_index)
+
+    def setActive(self, cButton, activeIndex):
+        self.active = activeIndex
+
+        if self.themeIndex == 0:
+            self.themeObj.prefButtonActiveLight(self, cButton)
+        else:
+            self.themeObj.prefButtonActiveDark(self, cButton)
+        self.stackedWidget.setCurrentIndex(self.active)

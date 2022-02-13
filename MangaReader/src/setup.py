@@ -47,11 +47,13 @@ class Window(QStackedWidget):
         obj.setCurrentIndex(w_index)
 
     def setTheme(self, s_index):
+        theme = Themes(self)
+        obj = self
         if s_index == 0:
-            theme = Themes.lightMode(self)
+            theme.lightMode(obj=obj)
         else:
-            theme = Themes.darkMode(self)
+            theme.darkMode(obj=obj)
 
-        Themes.declareTheme(self, s_index)
+        theme.declareTheme(self, s_index, theme)
 
         

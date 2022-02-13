@@ -1,17 +1,44 @@
 # from PyQt6.QtCore import QSize, Qt
+import PyQt6
 from PyQt6.QtGui import  QIcon, QPixmap, QFont
 
-class Themes(object):
-    def __init__(self) -> None:
-        pass
-    def lightMode(obj):
+
+class Themes:
+    def __init__(self, obj):
+        self.obj = obj        
+        self.prevObjButton = 0;
+        print(self.prevObjButton)
+
+    def prefButtonActiveLight(self, obj, objButton):
+        print(type(self.prevObjButton))
+        if type(self.prevObjButton) == PyQt6.QtWidgets.QPushButton:
+            print(self.prevObjButton.objectName())
+            self.prevObjButton.setStyleSheet(
+                "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250,250,250);} QPushButton:hover { color:white; background-color:rgb(210,211,219);}"
+            )
+        else:
+            pass
+
+        obj.setStyleSheet(
+            "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210,211,219);}"
+        )
+        objButton.setStyleSheet(
+            "QPushButton { color:white;background-color:rgb(147,148,165); } "
+        )
+
+        self.prevObjButton = objButton
+        print(type(self.prevObjButton))
+        print('done')
+
+
+    def lightMode(self, obj):
         style ="""
         *{
             color: Black;
             background-color: rgb(250,250,250);
         }
         QPushButton{
-            border-radius:18px;
+            border-radius: 18px;
         }
         QPushButton:hover {
             background-color: rgb(147,148,165);
@@ -49,6 +76,9 @@ class Themes(object):
         obj.setStyleSheet(style)
 
         objM = obj.objMainWindow
+        objP = obj.objPref
+        objR = obj.objReader
+        
         objM.tabBar.setStyleSheet("QTabBar::tab  { background: rgb(250,250,250); width: 200px; border-radius: 3px; padding: 3px;} QTabBar::tab:bottom:selected  {       background-color: rgb(72,75,106); color: rgb(250,250,250); } ")
 
         
@@ -67,12 +97,26 @@ class Themes(object):
         objM.refreshIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.refreshButton.setIcon(objM.refreshIcon)
 
-        
+        objP.style = """   
+            #headerLabel{
+                background-color: rgb(147,148,165);
+                color: white;
+                border-radius: 21px;
+            }
+            #settingsButton, #downloadButton, #themesButton{
+                border-radius: 15px;
+            }
+            #settingsButton:hover, #downloadButton:hover, #themesButton:hover{
+                color:white;
+                background-color:rgb(210,211,219);
+            }
+        """
+        objP.setStyleSheet(objP.style)
+
+        self.prefButtonActiveLight(objP, objP.settingsButton)
     
     def changeTabBarIconLight(obj):
         obj.tabIndex = obj.tabBar.currentIndex()
-        print("Current Tab:", obj.tabIndex)
-        print("Current Theme:", obj.themeIndex)
         if obj.tabIndex == 0:
             obj.homeIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-home-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabBar.setTabIcon(obj.tabIndex, obj.homeIcon)
@@ -87,6 +131,12 @@ class Themes(object):
             obj.tabBar.setTabIcon(obj.tabIndex, obj.libraryIcon)
 
 
+
+#-------------------------------------------------------
+
+    def prefButtonActiveDark(obj, objButton):
+        pass
+
     def darkMode():
         pass
 
@@ -94,7 +144,7 @@ class Themes(object):
         pass
 
 
-    def declareTheme(obj, themeIndex):
+    def declareTheme(self, obj, themeIndex, themeObj):
         if themeIndex == 0:
             obj.objMainWindow.themeIndex = themeIndex
             obj.objReader.themeIndex = themeIndex
@@ -104,3 +154,8 @@ class Themes(object):
             obj.objMainWindow.themeIndex = themeIndex
             obj.objReader.themeIndex = themeIndex
             obj.objPref.themeIndex = themeIndex
+
+        obj.objMainWindow.themeObj = themeObj
+        obj.objReader.themeObj = themeObj
+        obj.objPref.themeObj = themeObj
+        

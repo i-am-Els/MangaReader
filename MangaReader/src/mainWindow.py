@@ -262,8 +262,6 @@ class MainWindow(QWidget):
         self.localSearchButtonSingleFormat.clicked.connect(self.localSearchSingleFormatAction)
         self.tabBar.currentChanged.connect(lambda:self.changeTabBarIcon())
 
-        
-
     def create_home_widgets(self):
         self.tabWidget = QTabWidget()
         self.tabBar = QTabBar(self.tabWidget)
@@ -318,14 +316,13 @@ class MainWindow(QWidget):
 
         self.homeLayout.addWidget(self.tabWidget)
 
-
     def changeTabBarIcon(self):
         self.tabIndex = self.tabBar.currentIndex()
         if self.themeIndex == 0:
             Themes.changeTabBarIconLight(self)
         else:
             Themes.changeTabBarIconDark(self)
-    
+
     def loadHomeItems(self):# More Work 'Online Mode'
         pass
 
