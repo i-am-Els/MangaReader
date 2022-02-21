@@ -7,28 +7,23 @@ class Themes:
     def __init__(self, obj):
         self.obj = obj        
         self.prevObjButton = 0;
-        print(self.prevObjButton)
 
     def prefButtonActiveLight(self, obj, objButton):
-        print(type(self.prevObjButton))
         if type(self.prevObjButton) == PyQt6.QtWidgets.QPushButton:
-            print(self.prevObjButton.objectName())
             self.prevObjButton.setStyleSheet(
-                "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250,250,250);} QPushButton:hover { color:white; background-color:rgb(210,211,219);}"
+                "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250,250,250);} QPushButton:hover { color:white; background-color:rgb(210,211,219);} #backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
             )
         else:
             pass
 
         obj.setStyleSheet(
-            "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210,211,219);}"
+            "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210,211,219);}#backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
         )
         objButton.setStyleSheet(
-            "QPushButton { color:white;background-color:rgb(147,148,165); } "
+            "QPushButton { color:white;background-color:rgb(147,148,165); } #backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
         )
 
         self.prevObjButton = objButton
-        print(type(self.prevObjButton))
-        print('done')
 
 
     def lightMode(self, obj):
@@ -71,6 +66,11 @@ class Themes:
             background-color: rgb(72,75,106); 
             font: 15px;
         }
+        QListView{
+            background-color: rgb(210, 211, 219);
+            border: 1px solid rgb(210, 211, 219);
+            border-radius: 10px;
+        }
         """
 
         obj.setStyleSheet(style)
@@ -80,6 +80,8 @@ class Themes:
         objR = obj.objReader
         
         objM.tabBar.setStyleSheet("QTabBar::tab  { background: rgb(250,250,250); width: 200px; border-radius: 3px; padding: 3px;} QTabBar::tab:bottom:selected  {       background-color: rgb(72,75,106); color: rgb(250,250,250); } ")
+
+        objM.tabWidget.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 0px;")
 
         
         objM.menuIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-menu-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
@@ -98,11 +100,6 @@ class Themes:
         objM.refreshButton.setIcon(objM.refreshIcon)
 
         objP.style = """   
-            #headerLabel{
-                background-color: rgb(147,148,165);
-                color: white;
-                border-radius: 21px;
-            }
             #settingsButton, #downloadButton, #themesButton{
                 border-radius: 15px;
             }
@@ -112,6 +109,18 @@ class Themes:
             }
         """
         objP.setStyleSheet(objP.style)
+
+        objP.headerLabel.setMaximumHeight(48)
+        
+        objP.stackedWidget.setStyleSheet("background-color: rgb(210,211,219); border-radius: 10px;")
+        
+        objP.headerBackgroundWidget.setMaximumHeight(65)
+        objP.headerBackgroundWidget.setStyleSheet("background-color: rgb(147, 148, 165); border-radius: 25px; color: white; padding-top: 0px;")
+        
+        objP.backIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-go-back-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objP.backButton.setIcon(objP.backIcon)
+        
+        objP.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
         self.prefButtonActiveLight(objP, objP.settingsButton)
     

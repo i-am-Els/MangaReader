@@ -150,6 +150,8 @@ class MainWindow(QWidget):
         self.searchLayout.setStretch(4, 6)
         self.searchLayout.setStretch(5, 1)
 
+        self.searchLayout.setContentsMargins(7, 10, 7, 10)
+
         #------------------------------------------------
         # Create another horizontal layout to hold objects of focus
         self.containerLayout = QHBoxLayout()

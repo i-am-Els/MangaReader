@@ -1,3 +1,4 @@
+from email.charset import QP
 from PyQt6.QtWidgets import (
     QStackedWidget,
     QHBoxLayout,
@@ -57,8 +58,7 @@ class Preference(QWidget):
 
         # Set backIcon to backButton
         self.backIcon = QIcon()
-        self.backIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-go-back-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        self.backButton.setIcon(self.backIcon)
+        
         self.backButton.setIconSize(self.icon_size)
         self.backButton.setCheckable(True)
 
@@ -66,7 +66,7 @@ class Preference(QWidget):
         self.headerLabel = QLabel("Preference | Settings")
         self.headerLabel.setObjectName("headerLabel")
         self.headerLabel.setSizePolicy(self.sizePolicy)
-        self.headerLabel.setMaximumHeight(42)
+        
         self.headerLabelFont = QFont()
         self.headerLabelFont.setPointSize(16)
         self.headerLabelFont.setBold(True)
@@ -120,23 +120,31 @@ class Preference(QWidget):
         #-----------------------------------------------
         self.stackLayout = QVBoxLayout()
         self.stackedWidget = QStackedWidget()
+        self.stackedWidget.setSizePolicy(self.sizePolicy)
+        self.stackedWidget.setObjectName(u"prefStacked")
 
         self.settingsWidget = QWidget()
+        self.settingsWidget.setObjectName("settingsWidget")
         self.settingsLayout = QVBoxLayout()
-        self.settings = QLabel("Settings")
-        self.settingsLayout.addWidget(self.settings)
+        
+        self.settingsWidgetObj()
+
         self.settingsWidget.setLayout(self.settingsLayout)
 
         self.downloadsWidget = QWidget()
+        self.downloadsWidget.setObjectName("downloadsWidget")
         self.downloadsLayout = QVBoxLayout()
-        self.downloads = QLabel("Downloads")
-        self.downloadsLayout.addWidget(self.downloads)
+
+        self.downloadWidgetObj()
+        
         self.downloadsWidget.setLayout(self.downloadsLayout)
 
         self.themesWidget = QWidget()
+        self.themesWidget.setObjectName("themesWidget")
         self.themesLayout = QVBoxLayout()
-        self.themes = QLabel("Themes")
-        self.themesLayout.addWidget(self.themes)
+
+        self.themesWidgetObj()
+        
         self.themesWidget.setLayout(self.themesLayout)
 
         self.stackedWidget.addWidget(self.settingsWidget)
@@ -152,11 +160,16 @@ class Preference(QWidget):
         self.bodyLayout.setStretch(0, 2)
         self.bodyLayout.setStretch(1, 8)
         #-----------------------------------------------
-        self.baseLayout.addLayout(self.headerLayout)
+        self.headerBackgroundWidget = QWidget()
+        self.headerBackgroundLayout = QVBoxLayout()
+        self.headerBackgroundWidget.setLayout(self.headerLayout)
+        self.headerBackgroundLayout.addWidget(self.headerBackgroundWidget)
+
+        self.baseLayout.addLayout(self.headerBackgroundLayout)
         self.baseLayout.addLayout(self.bodyLayout)
 
-        self.baseLayout.setStretch(0, 2)
-        self.baseLayout.setStretch(1, 12)
+        self.baseLayout.setStretch(0, 1)
+        self.baseLayout.setStretch(1, 11)
         #-----------------------------------------------
 
         self.gridLayout.addLayout(self.baseLayout, 0, 0, 1, 1)
@@ -186,3 +199,21 @@ class Preference(QWidget):
         else:
             self.themeObj.prefButtonActiveDark(self, cButton)
         self.stackedWidget.setCurrentIndex(self.active)
+
+    def settingsWidgetObj(self):
+        self.libraryLabel = QLabel("Library")
+        self.libraryLabel.set
+        self.libraryLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        self.settingsLayout.addWidget(self.libraryLabel)
+        pass
+
+    def downloadWidgetObj(self):
+        self.dowBut = QLabel("Downloads")
+        self.downloadsLayout.addWidget(self.dowBut)
+        pass
+
+    def themesWidgetObj(self):
+        self.theBut = QLabel("Themes")
+        self.themesLayout.addWidget(self.theBut)
+        pass
