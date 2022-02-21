@@ -1,6 +1,9 @@
 # from PyQt6.QtCore import QSize, Qt
 import PyQt6
-from PyQt6.QtGui import  QIcon, QPixmap, QFont
+
+from PyQt6.QtCore import Qt, QRect
+from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush
+from PyQt6.QtWidgets import QPushButton
 
 
 class Themes:
@@ -107,6 +110,7 @@ class Themes:
                 color:white;
                 background-color:rgb(210,211,219);
             }
+            
         """
         objP.setStyleSheet(objP.style)
 
@@ -168,3 +172,35 @@ class Themes:
         obj.objReader.themeObj = themeObj
         obj.objPref.themeObj = themeObj
         
+
+class ToggleSwitch(QPushButton):
+    def __init__(self, parent = None):
+        super().__init__(parent)
+        self.setCheckable(True)
+        self.setMinimumWidth(66)
+        self.setMinimumHeight(22)
+
+    def paintEvent(self, event):
+        label = "on" if self.isChecked() else "off"
+        bg_color = QColor(72, 75, 106) if self.isChecked() else QColor(147, 148, 165)
+
+        radius = 10
+        width = 24
+        center = self.rect().center()
+
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.translate(center)
+        painter.setBrush(QColor(228, 229, 241))
+
+        pen = QPen(Qt.GlobalColor.lightGray)
+        pen.setWidth(2)
+        painter.setPen(pen)
+
+        painter.drawRoundedRect(QRect(-width, -radius, 2*width, 2*radius), radius, radius)
+        painter.setBrush(QBrush(bg_color))
+        sw_rect = QRect(-radius, -radius, width + radius, 2*radius)
+        if not self.isChecked():
+            sw_rect.moveLeft(-width)
+        painter.drawRoundedRect(sw_rect, radius, radius)
+        painter.drawText(sw_rect, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop, label)

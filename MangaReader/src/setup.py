@@ -24,7 +24,8 @@ class Window(QStackedWidget):
         #self.screen_height = 768
 
         self.windowIcon = QIcon()
-        self.windowIcon.addPixmap(QPixmap("MangaReader/resources/logo/owlly.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.windowIcon.addPixmap(QPixmap("MangaReader/resources/logo/mrlogo.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.windowIcon.actualSize(QSize(36, 36), QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.windowIcon)
         
         self.objMainWindow = mainWindow.MainWindow(Link, self, self.windowIcon)
