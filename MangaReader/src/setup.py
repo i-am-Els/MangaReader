@@ -3,11 +3,11 @@
 from themes import Themes
 
 from PyQt6.QtWidgets import (
-    QStackedWidget,
+    QStackedWidget, QWidget
 )
 
 import mainWindow, pref, reader
-from PyQt6.QtCore import QSize
+from PyQt6.QtCore import QPointF
 from PyQt6.QtGui import QIcon, QPixmap
 
 
@@ -24,8 +24,7 @@ class Window(QStackedWidget):
         #self.screen_height = 768
 
         self.windowIcon = QIcon()
-        self.windowIcon.addPixmap(QPixmap("MangaReader/resources/logo/mrlogo.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        self.windowIcon.actualSize(QSize(36, 36), QIcon.Mode.Normal, QIcon.State.Off)
+        self.windowIcon.addPixmap(QPixmap("MangaReader/resources/logo/mrlogoRound.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.windowIcon)
         
         self.objMainWindow = mainWindow.MainWindow(Link, self, self.windowIcon)
@@ -48,13 +47,26 @@ class Window(QStackedWidget):
         obj.setCurrentIndex(w_index)
 
     def setTheme(self, s_index):
-        theme = Themes(self)
+        self.theme = Themes(self)
         obj = self
         if s_index == 0:
-            theme.lightMode(obj=obj)
+            self.theme.lightMode(obj=obj)
         else:
-            theme.darkMode(obj=obj)
+            self.theme.darkMode(obj=obj)
 
-        theme.declareTheme(self, s_index, theme)
+        self.theme.declareTheme(self, s_index, self.theme)
+    
 
+class MoveableWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+    def mousePressEvent(self, event):
+        self.oldPosition = event.globalPosition()
+
+
+    def mouseMoveEvent(self, event):
+        delta = QPointF(event.globalPosition() - self.oldPosition)
+        self.move(self.x() + delta.x(), self.y() + delta.y())
+        self.oldPosition = event.globalPosition()
         

@@ -1,9 +1,11 @@
 # from PyQt6.QtCore import QSize, Qt
 import PyQt6
 
-from PyQt6.QtCore import Qt, QRect
+from PyQt6.QtCore import Qt, QRect, QSize
+
 from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush
-from PyQt6.QtWidgets import QPushButton
+
+from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QWidget, QSizePolicy
 
 
 class Themes:
@@ -191,9 +193,9 @@ class ToggleSwitch(QPushButton):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
         painter.translate(center)
-        painter.setBrush(QColor(228, 229, 241))
+        painter.setBrush(QColor(250, 250, 250))
 
-        pen = QPen(Qt.GlobalColor.lightGray)
+        pen = QPen(Qt.GlobalColor.white)
         pen.setWidth(2)
         painter.setPen(pen)
 
@@ -204,3 +206,113 @@ class ToggleSwitch(QPushButton):
             sw_rect.moveLeft(-width)
         painter.drawRoundedRect(sw_rect, radius, radius)
         painter.drawText(sw_rect, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop, label)
+
+
+
+class WindowTitleBar(QHBoxLayout):
+    def __init__(self, obj, widgetTitle, widgetIcon):
+        super().__init__()
+        
+        self.obj = obj
+        self.widgetTitle = widgetTitle
+        self.widgetIcon = widgetIcon
+        widIcon = 28
+        iconsize = 30
+        iconsizew = 40
+
+        self.resize_width = 1092
+        self.resize_height = 614
+
+        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+        # self.majorLayout = QHBoxLayout()
+        self.logoLayout = QHBoxLayout()
+        self.buttonsLayout = QHBoxLayout()
+        self.sE = QWidget()
+        self.sE.setSizePolicy(self.sizePolicy)
+
+        self.customWindowIcon = QPushButton()
+        self.customWindowIcon.setIcon(self.widgetIcon)
+        self.customWindowIcon.setIconSize(QSize(iconsize, iconsize))
+        self.customWindowIcon.setCheckable(False)
+        self.customWindowIcon.setFixedSize(widIcon, widIcon)
+        self.customWindowIcon.setStyleSheet("QPushButton {background-color: rgba(72, 75, 106, 0.8); border: none;}")
+
+        self.customWindowTitle = QLabel(widgetTitle)
+        self.customWindowTitle.setSizePolicy(self.sizePolicy)
+
+        self.minimizeIcon = QPushButton()
+        self.minimizeIcon.setSizePolicy(self.sizePolicy)
+        self.minimizeIcon.setCheckable(True)
+
+        self.restoreIcon = QPushButton()
+        self.restoreIcon.setSizePolicy(self.sizePolicy)
+        self.restoreIcon.setCheckable(True)
+
+        self.closeIcon = QPushButton()
+        self.closeIcon.setSizePolicy(self.sizePolicy)
+        self.closeIcon.setCheckable(True)
+
+        self.minimizeIcon.setFixedSize(iconsizew, iconsize)
+
+        self.minimizeIconIcon = QIcon()
+        self.minimizeIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-minimize-dark-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.minimizeIcon.setIcon(self.minimizeIconIcon)
+
+        self.minimizeIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgb(210, 211, 219); }")
+
+
+        self.restoreIcon.setFixedSize(iconsizew, iconsize)
+
+        self.restoreIconIcon = QIcon()
+        self.restoreIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.restoreIcon.setIcon(self.restoreIconIcon)
+
+        self.restoreIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
+
+        self.closeIcon.setFixedSize(iconsizew, iconsize)
+
+        self.closeIconIcon = QIcon()
+        self.closeIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-close-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.closeIcon.setIcon(self.closeIconIcon)
+
+        self.closeIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgba(247,10,15,1);}")
+
+        self.logoLayout.addWidget(self.customWindowIcon)
+        self.logoLayout.addWidget(self.customWindowTitle)
+        self.logoLayout.setSpacing(3)
+        self.logoLayout.setContentsMargins(3,3,0,3)
+
+        self.buttonsLayout.addWidget(self.minimizeIcon)
+        self.buttonsLayout.addWidget(self.restoreIcon)
+        self.buttonsLayout.addWidget(self.closeIcon)
+        self.buttonsLayout.setSpacing(0)
+
+        self.addLayout(self.logoLayout)
+        self.addWidget(self.sE)
+        self.addLayout(self.buttonsLayout)
+        self.setStretch(0, 1)
+        self.setStretch(1, 7)
+        self.setStretch(2, 1)
+        self.setSpacing(0)
+        self.setContentsMargins(0, 0, 0, 0)
+
+        self.minimizeIcon.clicked.connect(lambda: self.obj.showMinimized())
+        self.restoreIcon.clicked.connect(lambda: self.toggleRestore())
+        self.closeIcon.clicked.connect(self.obj.close)
+
+    def toggleRestore(self):
+        if self.obj.windowState() == Qt.WindowState.WindowMaximized:
+            self.obj.resize(QSize(self.resize_width, self.resize_height))
+            self.obj.setWindowState(Qt.WindowState.WindowActive)
+            self.restoreIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.restoreIcon.setIcon(self.restoreIconIcon)
+
+        else:
+            self.obj.showMaximized()
+            self.obj.setWindowState(Qt.WindowState.WindowMaximized)
+
+            self.restoreIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.restoreIcon.setIcon(self.restoreIconIcon)
+        
+        pass
