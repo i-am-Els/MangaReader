@@ -37,7 +37,6 @@ if __name__ == "__main__":
     cWidget.setMaximumHeight(30)
     cWidget.setStyleSheet("QWidget{background-color: rgba(72, 75, 106, 0.65); color: white;}")
     cLayout.addWidget(cWidget)
-    # cLayout.setStretch(0, 1)
     cLayout.setSpacing(0)
     cLayout.setContentsMargins(0,0,0,0)
     
@@ -56,7 +55,6 @@ if __name__ == "__main__":
     
     
     appWindow.setCentralWidget(appWidget)
-    # appWindow.setLayout(appLayout)
 
     appWindow.min_screen_width = 1092
     appWindow.min_screen_height = 614

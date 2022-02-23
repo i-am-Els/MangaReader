@@ -1,5 +1,3 @@
-# import sys, ctypes
-
 from themes import Themes
 
 from PyQt6.QtWidgets import (
@@ -19,8 +17,6 @@ class Link(object):
 class Window(QStackedWidget):
     def __init__(self):
         super().__init__()
-        #self.screen_width = 1366
-        #self.screen_height = 768
 
         self.windowIcon = QIcon()
         self.windowIcon.addPixmap(QPixmap("MangaReader/resources/logo/mrlogoRound.png"), QIcon.Mode.Normal, QIcon.State.Off)

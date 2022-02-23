@@ -301,15 +301,12 @@ class WindowTitleBar(QHBoxLayout):
         self.setSpacing(0)
         self.setContentsMargins(0, 0, 0, 0)
 
-        # print(self.sE.geometry())
-
         self.minimizeIcon.clicked.connect(lambda: self.obj.showMinimized())
         self.restoreIcon.clicked.connect(lambda: self.toggleRestore())
         self.closeIcon.clicked.connect(self.obj.close)
 
     def toggleRestore(self):
         if self.obj.windowState() == Qt.WindowState.WindowMaximized:
-            print("Before Restore, State is:", self.obj.windowState())
             self.obj.resize(QSize(self.resize_width, self.resize_height))
             self.obj.setWindowState(Qt.WindowState.WindowActive)
             
@@ -317,7 +314,6 @@ class WindowTitleBar(QHBoxLayout):
             self.restoreIcon.setIcon(self.restoreIconIcon)
 
         else:
-            print("Before Restore, State is:", self.obj.windowState())
             self.obj.showMaximized()
             self.obj.setWindowState(Qt.WindowState.WindowMaximized)
 
@@ -341,28 +337,23 @@ class MoveableWindow(QWidget):
     def mouseDoubleClickEvent(self, event):
         self.obj.oldPosition = event.globalPosition()
         if self.obj.windowState() == Qt.WindowState.WindowMaximized or self.obj.windowState() == Qt.WindowState.WindowFullScreen:
-            print("Before Double Clicking, State is:", self.obj.windowState())
             self.obj.setWindowState(Qt.WindowState.WindowNoState)
             self.obj.resize(QSize(1092, 614))
             self.refIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
 
         elif self.obj.windowState() == Qt.WindowState.WindowNoState or self.obj.windowState() == Qt.WindowState.WindowActive:
-            print("Before Double Clicking, State is:", self.obj.windowState())
             self.obj.showMaximized()
             self.obj.setWindowState(Qt.WindowState.WindowMaximized)
 
             self.refIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
-        
-        # self.setGeometry(QRect(168, 57, 1092, 614))
 
     def mouseMoveEvent(self, event):
         delta = QPointF(event.globalPosition() - self.obj.oldPosition)
         self.obj.move(self.obj.x() + delta.x(), self.obj.y() + delta.y())
         self.obj.oldPosition = event.globalPosition()
 
-        print("Before Moving, State is:", self.obj.windowState())
         self.obj.resize(QSize(1092, 614))
         self.obj.setWindowState(Qt.WindowState.WindowActive)
 
