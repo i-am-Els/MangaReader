@@ -86,7 +86,7 @@ class Themes:
         
         objM.tabBar.setStyleSheet("QTabBar::tab  { background: rgb(250,250,250); width: 200px; border-radius: 3px; padding: 3px;} QTabBar::tab:bottom:selected  {       background-color: rgb(72,75,106); color: rgb(250,250,250); } ")
 
-        objM.tabWidget.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 0px;")
+        objM.tabWidget.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
         
         objM.menuIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-menu-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
@@ -127,6 +127,20 @@ class Themes:
         objP.backButton.setIcon(objP.backIcon)
         
         objP.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+
+        objP.radioButtonOne.setStyleSheet("QRadioButton::indicator { width: 30px; height: 30px;}")
+
+        objP.radioButtonTwo.setStyleSheet("QRadioButton::indicator { width: 30px; height: 30px; }")
+
+        objP.radioButtonThree.setStyleSheet("QRadioButton::indicator { width: 30px; height: 30px;}")
+
+        objP.downloadQueue.setStyleSheet("background-color: white;")
+
+
+        # objP.spaceE.setPixmap(QPixmap("MangaReader/resources/icons/lightModeTheme.png"))
+
+
+        objP.compressArchiveBtn.setStyleSheet("background: rgb(147, 148, 165); margin-top: 5px; margin-right: 5px;")
 
         self.prefButtonActiveLight(objP, objP.settingsButton)
     
