@@ -1,8 +1,7 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QSizeGrip
-from PyQt6.QtCore import QSize, Qt, QPoint
+from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QMainWindow, QSizePolicy
+from PyQt6.QtCore import QSize
 import sys, setup, ctypes
-from themes import WindowTitleBar
-from setup import MoveableWindow
+from themes import WindowTitleBar, MoveableWindow
 
 def setTaskBarIcon():
     myappid = u"mycompany.myproduct.subproduct.version" # arbitrary string
@@ -13,8 +12,10 @@ def setTaskBarIcon():
 if __name__ == "__main__":
     app = QApplication([])
     setTaskBarIcon()
-    appWindow = MoveableWindow()
+    appWindow = QMainWindow()
     appWindowTitleCustom = appWindow.appWindowTitle = "Manhua Reader"
+
+    sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
     appLayout = QVBoxLayout()
     appWidget = QWidget()
@@ -26,13 +27,20 @@ if __name__ == "__main__":
     customTitleBar = WindowTitleBar(appWindow, appWindowTitleCustom, stWindow.windowIcon)
 
     cLayout = QVBoxLayout()
-    cWidget = QWidget()
+    cWidget = MoveableWindow(appWindow)
+    cWidget.setSizePolicy(sizePolicy)
+    cWidget.setFixedHeight(30)
+    cWidget.refIcon = customTitleBar.restoreIcon
+    cWidget.refIconIcon = customTitleBar.restoreIconIcon
     
     cWidget.setLayout(customTitleBar)
+    cWidget.setMaximumHeight(30)
+    cWidget.setStyleSheet("QWidget{background-color: rgba(72, 75, 106, 0.65); color: white;}")
     cLayout.addWidget(cWidget)
-
+    # cLayout.setStretch(0, 1)
     cLayout.setSpacing(0)
-    cWidget.setStyleSheet("QWidget{background-color: rgba(72, 75, 106, 1); color: white;}")
+    cLayout.setContentsMargins(0,0,0,0)
+    
     appLayout.addLayout(cLayout)
     appLayout.addLayout(stWindowLayout)
 
@@ -42,14 +50,13 @@ if __name__ == "__main__":
 
     appLayout.setContentsMargins(0,0,0,0)
 
-    # appWidget.setLayout(appLayout)
+    appWidget.setLayout(appLayout)
 
     appWindow.setWindowIcon(stWindow.windowIcon)
     
     
-    # appWindow.setCentralWidget(appWidget)
-    appWindow.setLayout(appLayout)
-    appWindow.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+    appWindow.setCentralWidget(appWidget)
+    # appWindow.setLayout(appLayout)
 
     appWindow.min_screen_width = 1092
     appWindow.min_screen_height = 614

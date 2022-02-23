@@ -1,11 +1,11 @@
 # from PyQt6.QtCore import QSize, Qt
 import PyQt6
 
-from PyQt6.QtCore import Qt, QRect, QSize
+from PyQt6.QtCore import QPointF, Qt, QRect, QSize
 
 from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush
 
-from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QWidget, QSizePolicy
+from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QWidget, QSizePolicy, QVBoxLayout
 
 
 class Themes:
@@ -216,9 +216,9 @@ class WindowTitleBar(QHBoxLayout):
         self.obj = obj
         self.widgetTitle = widgetTitle
         self.widgetIcon = widgetIcon
-        widIcon = 28
+        widIcon = 30
         iconsize = 30
-        iconsizew = 40
+        iconsizew = 48
 
         self.resize_width = 1092
         self.resize_height = 614
@@ -229,17 +229,21 @@ class WindowTitleBar(QHBoxLayout):
         self.logoLayout = QHBoxLayout()
         self.buttonsLayout = QHBoxLayout()
         self.sE = QWidget()
-        self.sE.setSizePolicy(self.sizePolicy)
+        self.sE.setMaximumHeight(30)
+        self.sEL = QVBoxLayout()
+        self.sEL.addWidget(self.sE)
 
         self.customWindowIcon = QPushButton()
         self.customWindowIcon.setIcon(self.widgetIcon)
         self.customWindowIcon.setIconSize(QSize(iconsize, iconsize))
         self.customWindowIcon.setCheckable(False)
-        self.customWindowIcon.setFixedSize(widIcon, widIcon)
-        self.customWindowIcon.setStyleSheet("QPushButton {background-color: rgba(72, 75, 106, 0.8); border: none;}")
+        self.customWindowIcon.setMaximumSize(widIcon, widIcon)
+        self.customWindowIcon.setStyleSheet("QPushButton { padding-left: 2px; border: none;}")
 
         self.customWindowTitle = QLabel(widgetTitle)
+        self.customWindowTitle.setFixedHeight(30)
         self.customWindowTitle.setSizePolicy(self.sizePolicy)
+        self.customWindowTitle.setStyleSheet("padding-left: 8px;")
 
         self.minimizeIcon = QPushButton()
         self.minimizeIcon.setSizePolicy(self.sizePolicy)
@@ -253,7 +257,7 @@ class WindowTitleBar(QHBoxLayout):
         self.closeIcon.setSizePolicy(self.sizePolicy)
         self.closeIcon.setCheckable(True)
 
-        self.minimizeIcon.setFixedSize(iconsizew, iconsize)
+        self.minimizeIcon.setMaximumSize(iconsizew, iconsize)
 
         self.minimizeIconIcon = QIcon()
         self.minimizeIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-minimize-dark-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
@@ -262,7 +266,7 @@ class WindowTitleBar(QHBoxLayout):
         self.minimizeIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgb(210, 211, 219); }")
 
 
-        self.restoreIcon.setFixedSize(iconsizew, iconsize)
+        self.restoreIcon.setMaximumSize(iconsizew, iconsize)
 
         self.restoreIconIcon = QIcon()
         self.restoreIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
@@ -270,7 +274,7 @@ class WindowTitleBar(QHBoxLayout):
 
         self.restoreIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
 
-        self.closeIcon.setFixedSize(iconsizew, iconsize)
+        self.closeIcon.setMaximumSize(iconsizew, iconsize)
 
         self.closeIconIcon = QIcon()
         self.closeIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-close-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
@@ -280,8 +284,8 @@ class WindowTitleBar(QHBoxLayout):
 
         self.logoLayout.addWidget(self.customWindowIcon)
         self.logoLayout.addWidget(self.customWindowTitle)
-        self.logoLayout.setSpacing(3)
-        self.logoLayout.setContentsMargins(3,3,0,3)
+        self.logoLayout.setSpacing(0)
+        self.logoLayout.setContentsMargins(0,0,0,0)
 
         self.buttonsLayout.addWidget(self.minimizeIcon)
         self.buttonsLayout.addWidget(self.restoreIcon)
@@ -289,7 +293,7 @@ class WindowTitleBar(QHBoxLayout):
         self.buttonsLayout.setSpacing(0)
 
         self.addLayout(self.logoLayout)
-        self.addWidget(self.sE)
+        self.addLayout(self.sEL)
         self.addLayout(self.buttonsLayout)
         self.setStretch(0, 1)
         self.setStretch(1, 7)
@@ -297,22 +301,72 @@ class WindowTitleBar(QHBoxLayout):
         self.setSpacing(0)
         self.setContentsMargins(0, 0, 0, 0)
 
+        # print(self.sE.geometry())
+
         self.minimizeIcon.clicked.connect(lambda: self.obj.showMinimized())
         self.restoreIcon.clicked.connect(lambda: self.toggleRestore())
         self.closeIcon.clicked.connect(self.obj.close)
 
     def toggleRestore(self):
         if self.obj.windowState() == Qt.WindowState.WindowMaximized:
+            print("Before Restore, State is:", self.obj.windowState())
             self.obj.resize(QSize(self.resize_width, self.resize_height))
             self.obj.setWindowState(Qt.WindowState.WindowActive)
+            
             self.restoreIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.restoreIcon.setIcon(self.restoreIconIcon)
 
         else:
+            print("Before Restore, State is:", self.obj.windowState())
             self.obj.showMaximized()
             self.obj.setWindowState(Qt.WindowState.WindowMaximized)
 
             self.restoreIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.restoreIcon.setIcon(self.restoreIconIcon)
+
+class MoveableWindow(QWidget):
+    def __init__(self, obj):
+        super().__init__()
+        self.refIcon = QPushButton()
+        self.refIconIcon = QIcon()
+        self.obj = obj
+        self.obj.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         
-        pass
+        self.obj.oldPosition = self.obj.pos()
+
+
+    def mousePressEvent(self, event):
+        self.obj.oldPosition = event.globalPosition()
+
+    def mouseDoubleClickEvent(self, event):
+        self.obj.oldPosition = event.globalPosition()
+        if self.obj.windowState() == Qt.WindowState.WindowMaximized or self.obj.windowState() == Qt.WindowState.WindowFullScreen:
+            print("Before Double Clicking, State is:", self.obj.windowState())
+            self.obj.setWindowState(Qt.WindowState.WindowNoState)
+            self.obj.resize(QSize(1092, 614))
+            self.refIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.refIcon.setIcon(self.refIconIcon)
+
+        elif self.obj.windowState() == Qt.WindowState.WindowNoState or self.obj.windowState() == Qt.WindowState.WindowActive:
+            print("Before Double Clicking, State is:", self.obj.windowState())
+            self.obj.showMaximized()
+            self.obj.setWindowState(Qt.WindowState.WindowMaximized)
+
+            self.refIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.refIcon.setIcon(self.refIconIcon)
+        
+        # self.setGeometry(QRect(168, 57, 1092, 614))
+
+    def mouseMoveEvent(self, event):
+        delta = QPointF(event.globalPosition() - self.obj.oldPosition)
+        self.obj.move(self.obj.x() + delta.x(), self.obj.y() + delta.y())
+        self.obj.oldPosition = event.globalPosition()
+
+        print("Before Moving, State is:", self.obj.windowState())
+        self.obj.resize(QSize(1092, 614))
+        self.obj.setWindowState(Qt.WindowState.WindowActive)
+
+        self.refIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.refIcon.setIcon(self.refIconIcon)
+        
+  

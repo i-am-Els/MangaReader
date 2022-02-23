@@ -3,11 +3,10 @@
 from themes import Themes
 
 from PyQt6.QtWidgets import (
-    QStackedWidget, QWidget
+    QStackedWidget
 )
 
 import mainWindow, pref, reader
-from PyQt6.QtCore import QPointF
 from PyQt6.QtGui import QIcon, QPixmap
 
 
@@ -57,16 +56,5 @@ class Window(QStackedWidget):
         self.theme.declareTheme(self, s_index, self.theme)
     
 
-class MoveableWindow(QWidget):
-    def __init__(self):
-        super().__init__()
-
-    def mousePressEvent(self, event):
-        self.oldPosition = event.globalPosition()
-
-
-    def mouseMoveEvent(self, event):
-        delta = QPointF(event.globalPosition() - self.oldPosition)
-        self.move(self.x() + delta.x(), self.y() + delta.y())
-        self.oldPosition = event.globalPosition()
+      
         
