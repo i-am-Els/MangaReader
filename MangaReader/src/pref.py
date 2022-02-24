@@ -26,7 +26,7 @@ class Preference(QWidget):
         self.win_dow = win_dow
 
         self.max_button_size = QSize(36, 36)
-        self.min_button_size = QSize(16, 16)
+        self.min_button_size = QSize(36, 36)
         self.icon_size = QSize(20, 20)
         self.active = 0
         self.themeIndex = 0

@@ -11,6 +11,11 @@ def setTaskBarIcon():
 
 if __name__ == "__main__":
     app = QApplication([])
+
+    app.setOrganizationName("El's")
+    app.setOrganizationDomain("els.ng")
+    app.setApplicationName("Manhua Reader")
+
     setTaskBarIcon()
     appWindow = QMainWindow()
     appWindowTitleCustom = appWindow.appWindowTitle = "Manhua Reader"

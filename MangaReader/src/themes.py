@@ -1,7 +1,7 @@
 # from PyQt6.QtCore import QSize, Qt
 import PyQt6
 
-from PyQt6.QtCore import QPointF, Qt, QRect, QSize
+from PyQt6.QtCore import QPoint, QPointF, Qt, QRect, QSize
 
 from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush
 
@@ -342,17 +342,19 @@ class MoveableWindow(QWidget):
         self.obj = obj
         self.obj.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         
-        self.obj.oldPosition = self.obj.pos()
+        self.oldPosition = self.pos()
 
 
     def mousePressEvent(self, event):
-        self.obj.oldPosition = event.globalPosition()
+        self.oldPosition = event.globalPosition()
 
     def mouseDoubleClickEvent(self, event):
-        self.obj.oldPosition = event.globalPosition()
+        
+        self.oldPosition = event.globalPosition()
         if self.obj.windowState() == Qt.WindowState.WindowMaximized or self.obj.windowState() == Qt.WindowState.WindowFullScreen:
             self.obj.setWindowState(Qt.WindowState.WindowNoState)
-            self.obj.resize(QSize(1092, 614))
+            # self.obj.resize(QSize(1092, 614))
+            self.obj.setGeometry(200, 0, 1092, 614)
             self.refIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
 
@@ -364,14 +366,16 @@ class MoveableWindow(QWidget):
             self.refIcon.setIcon(self.refIconIcon)
 
     def mouseMoveEvent(self, event):
-        delta = QPointF(event.globalPosition() - self.obj.oldPosition)
+        delta = QPointF(event.globalPosition() - self.oldPosition)
         self.obj.move(self.obj.x() + delta.x(), self.obj.y() + delta.y())
-        self.obj.oldPosition = event.globalPosition()
+        
 
         self.obj.resize(QSize(1092, 614))
         self.obj.setWindowState(Qt.WindowState.WindowActive)
 
         self.refIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.refIcon.setIcon(self.refIconIcon)
+
+        self.oldPosition = event.globalPosition()
         
   
