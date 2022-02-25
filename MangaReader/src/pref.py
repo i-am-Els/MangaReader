@@ -43,6 +43,10 @@ class Preference(QWidget):
         self.updateOther = bool()
         self.hideNav = bool()
         self.fsState = bool()
+        self.readerDisplayIndex = int()
+        self.readerDisplayList = []
+        self.settingsToggleIndex = int()
+        self.settingsToggleList = []
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -338,7 +342,6 @@ class Preference(QWidget):
         self.radioButtonOne.setSizePolicy(self.sizePolicy)
 
         self.radioButtonTwo = QRadioButton("Webtoon/Vertical")
-        self.radioButtonTwo.setChecked(True)
         self.radioButtonTwo.setSizePolicy(self.sizePolicy)
         
         self.radioButtonThree = QRadioButton("Right-to-Left")
@@ -350,6 +353,8 @@ class Preference(QWidget):
         self.radioButtonTwo.adjustSize()
         
         self.radioButtonThree.adjustSize()
+
+        self.readerDisplayList = [self.radioButtonOne, self.radioButtonTwo, self.radioButtonThree]
 
         self.radioButtonLayout = QVBoxLayout()
 
@@ -425,10 +430,15 @@ class Preference(QWidget):
         self.readerFSLayout.setStretch(0, 10)
         self.readerFSLayout.setStretch(1, 1)
 
+
+
+        self.settingsToggleList = [self.toggleOne, self.toggleTwo, self.readerNavtoggle, self.readerFStoggle]
+
         #----------------------------------------------
     
         self.spaceEaterForSettings = QWidget()
         self.spaceEaterForSettings.setSizePolicy(self.sizePolicy)
+
 
         # self.spaceEaterForLayout = QVBoxLayout()
         # self.spaceEaterForLayout.addWidget(self.spaceEaterForSettings)
@@ -460,26 +470,36 @@ class Preference(QWidget):
 
     def onRadioClicked(self, radioIndex):
         radioBtn = self.sender()
-        self.radioIndex = radioIndex
+        self.readerDisplayIndex = radioIndex
         if radioBtn.isChecked():
-            print(self.radioIndex)
+            self.setting.readerDisplayIndex = radioIndex
+            print(self.setting.readerDisplayIndex, self.readerDisplayIndex)
+        
 
     def onToggleClicked(self, btnIndex, btn):
         self.toggleBtnState = btn.isChecked()
         self.btnIndex = btnIndex
         if self.toggleBtnState:
-            print(self.btnIndex, self.toggleBtnState, 0)
+            if self.btnIndex == 0:
+                self.setting.updateChapter = self.toggleBtnState
+            elif self.btnIndex == 1:
+                self.setting.updateOther = self.toggleBtnState
+            elif self.btnIndex == 2:
+                self.setting.hideNav = self.toggleBtnState
+            else:
+                self.setting.fsState = self.toggleBtnState
+                
         else:
-            print(self.btnIndex, self.toggleBtnState, 1)
-        if self.btnIndex == 0:
-            # btnState is returned to the manager settings
-            ...
-        elif self.btnIndex == 1:
-            ...
-        elif self.btnIndex == 2:
-            ...
-        else:
-            ...
+            if self.btnIndex == 0:
+                self.setting.updateChapter = self.toggleBtnState
+            elif self.btnIndex == 1:
+                self.setting.updateOther = self.toggleBtnState
+            elif self.btnIndex == 2:
+                self.setting.hideNav = self.toggleBtnState
+            else:
+                self.setting.fsState = self.toggleBtnState
+
+        
   
     def downloadWidgetObj(self):
         self.downloadOverWifiLabel = QLabel("Download over wifi only")

@@ -1,5 +1,4 @@
 
-
 class Settings(object):
     def __init__(self, obj):
         super().__init__()
@@ -8,12 +7,16 @@ class Settings(object):
         self.objP = self.obj.objPref
         self.objR = self.obj.objReader
 
-        self.themeIndex = 0
-        self.compressionState = True
         self.updateChapter = True
         self.updateOther = True
         self.hideNav = True
         self.fsState = True
+        self.readerDisplayIndex = 1
+
+        self.compressionState = True
+        
+        self.themeIndex = 0
+        
 
     def setStates(self):
         self.objP.compressionState = self.compressionState
@@ -26,6 +29,8 @@ class Settings(object):
 
         self.objP.fsState = self.fsState
 
+        self.objP.readerDisplayIndex = self.readerDisplayIndex
+
         self.objP.compressArchiveToggleBtn.setChecked(self.objP.compressionState)
 
         self.objP.toggleOne.setChecked(self.objP.updateChapter)
@@ -35,4 +40,6 @@ class Settings(object):
         self.objP.readerNavtoggle.setChecked(self.objP.hideNav)
 
         self.objP.readerFStoggle.setChecked(self.objP.fsState)
+
+        self.objP.readerDisplayList[self.objP.readerDisplayIndex].setChecked(True)
         

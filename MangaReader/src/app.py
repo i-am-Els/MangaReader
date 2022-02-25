@@ -71,7 +71,4 @@ if __name__ == "__main__":
     appWindow.showMaximized()
     
 
-
-
-
     sys.exit(app.exec())
