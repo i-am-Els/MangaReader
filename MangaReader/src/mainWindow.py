@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 
 from themes import Themes
+from settings import Settings
 
 from PyQt6.QtWidgets import (
     QTabBar,
@@ -20,11 +21,8 @@ from PyQt6.QtWidgets import (
     QFileDialog,
 )
 
-
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
-
-
 
 class MainWindow(QWidget):
     def __init__(self, obj, win_dow, window_Icon):
@@ -34,14 +32,17 @@ class MainWindow(QWidget):
         self.window_Icon = window_Icon
         self.max_button_size = QSize(36, 36)
         self.min_button_size = QSize(16, 16)
+
+        self.themeObj = object()
+        self.setting = object()
+        
         self.icon_size = QSize(20, 20)
         self.initPath = "C:\\"
         self.newPath = self.initPath
         self.localDirImport = []
         self.localSingleImport = []
-        self.themeIndex = 0
+        self.themeIndex = object()
         self.tabIndex = 0
-
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.create_widgets()
@@ -293,10 +294,6 @@ class MainWindow(QWidget):
         # self.libraryIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)   
 
         #---------------------------------------------------     
-        
-        # self.tabWidget.addTab(self.home)
-        # self.tabWidget.addTab(self.library)
-
         self.tabBar.addTab(self.homeIcon, "Home")
         self.tabBar.addTab(self.libraryIcon, "Library")
         if self.themeIndex == 0:

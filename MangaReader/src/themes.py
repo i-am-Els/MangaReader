@@ -1,7 +1,6 @@
-# from PyQt6.QtCore import QSize, Qt
 import PyQt6
 
-from PyQt6.QtCore import QPoint, QPointF, Qt, QRect, QSize
+from PyQt6.QtCore import QPointF, Qt, QRect, QSize
 
 from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush
 
@@ -12,8 +11,10 @@ class Themes:
     def __init__(self, obj):
         self.obj = obj        
         self.prevObjButton = 0;
+        self.prefSelectedButtonIndex = 0
+        self.prefButtonList = [self.obj.objPref.settingsButton, self.obj.objPref.downloadButton, self.obj.objPref.themesButton]
 
-    def prefButtonActiveLight(self, obj, objButton):
+    def prefButtonActiveLight(self, obj, indexB):
         if type(self.prevObjButton) == PyQt6.QtWidgets.QPushButton:
             self.prevObjButton.setStyleSheet(
                 "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250,250,250);} QPushButton:hover { color:white; background-color:rgb(210,211,219);} #backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
@@ -24,11 +25,11 @@ class Themes:
         obj.setStyleSheet(
             "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210,211,219);}#backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
         )
-        objButton.setStyleSheet(
+        self.prefButtonList[indexB].setStyleSheet(
             "QPushButton { color:white;background-color:rgb(147,148,165); } #backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
         )
 
-        self.prevObjButton = objButton
+        self.prevObjButton = self.prefButtonList[indexB]
 
 
     def lightMode(self, obj):
@@ -140,9 +141,12 @@ class Themes:
         # objP.spaceE.setPixmap(QPixmap("MangaReader/resources/icons/lightModeTheme.png"))
 
 
-        objP.compressArchiveBtn.setStyleSheet("background: rgb(147, 148, 165); margin-top: 5px; margin-right: 5px;")
+        # objP.compressArchiveBtn.setStyleSheet("background: rgb(147, 148, 165); margin-top: 5px; margin-right: 5px;")
 
-        self.prefButtonActiveLight(objP, objP.settingsButton)
+        objP.pixPixmap = QPixmap("MangaReader/resources/icons/lightModeTheme.png")
+        objP.spaceE.setPixmap(objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
+
+        self.prefButtonActiveLight(objP, self.prefSelectedButtonIndex)
     
     def changeTabBarIconLight(obj):
         obj.tabIndex = obj.tabBar.currentIndex()
@@ -163,14 +167,30 @@ class Themes:
 
 #-------------------------------------------------------
 
-    def prefButtonActiveDark(obj, objButton):
+    def prefButtonActiveDark(self, obj, indexB):
         pass
 
-    def darkMode():
-        pass
+    def darkMode(self, obj):
+        print("Dark Mode Activated")
+
+        objM = obj.objMainWindow
+        objP = obj.objPref
+        objR = obj.objReader
+
+        objP.pixPixmap = QPixmap("MangaReader/resources/icons/darkModeTheme.png")
+        objP.spaceE.setPixmap(objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
 
     def changeTabBarIconDark(obj):
         pass
+
+
+    def prefButtonActive(self, indexB, themeIndex):
+        self.prefSelectedButtonIndex = indexB
+        if themeIndex == 0:
+            self.prefButtonActiveLight(self.obj.objPref, indexB)
+        else:
+            self.prefButtonActiveDark(self.obj.objPref, indexB)
+
 
 
     def declareTheme(self, obj, themeIndex, themeObj):
@@ -178,11 +198,13 @@ class Themes:
             obj.objMainWindow.themeIndex = themeIndex
             obj.objReader.themeIndex = themeIndex
             obj.objPref.themeIndex = themeIndex
+            obj.setting.themeIndex = themeIndex
 
         else:
             obj.objMainWindow.themeIndex = themeIndex
             obj.objReader.themeIndex = themeIndex
             obj.objPref.themeIndex = themeIndex
+            obj.setting.themeIndex = themeIndex
 
         obj.objMainWindow.themeObj = themeObj
         obj.objReader.themeObj = themeObj

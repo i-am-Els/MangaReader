@@ -11,13 +11,10 @@ from PyQt6.QtWidgets import (
     QListWidget
 )
 
-
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QCursor, QIcon, QFont, QPixmap
-
+from PyQt6.QtGui import QCursor, QIcon, QFont
 
 from themes import ToggleSwitch
-
 
 class Preference(QWidget):
     def __init__(self, obj, win_dow):
@@ -25,16 +22,27 @@ class Preference(QWidget):
         self.obj = obj
         self.win_dow = win_dow
 
+        self.themeObj = object()
+        self.setting = object()
+        
+        # self.themeObj = self.win_dow.theme
+        # self.setting = self.win_dow.setting
+
         self.max_button_size = QSize(36, 36)
         self.min_button_size = QSize(36, 36)
         self.icon_size = QSize(20, 20)
         self.active = 0
-        self.themeIndex = 0
+        self.themeIndex = object()
 
         self.fontSize1 = 11
         self.fontSize2 = 9
         self.fontSize3 = 8
 
+        self.compressionState = bool()
+        self.updateChapter = bool()
+        self.updateOther = bool()
+        self.hideNav = bool()
+        self.fsState = bool()
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -190,11 +198,11 @@ class Preference(QWidget):
 
         self.backButton.clicked.connect(self.backAction)
 
-        self.settingsButton.clicked.connect(lambda: self.setActive(self.settingsButton, 0))
+        self.settingsButton.clicked.connect(lambda: self.setActive(0))
 
-        self.downloadButton.clicked.connect(lambda: self.setActive(self.downloadButton, 1))
+        self.downloadButton.clicked.connect(lambda: self.setActive(1))
         
-        self.themesButton.clicked.connect(lambda: self.setActive(self.themesButton, 2))
+        self.themesButton.clicked.connect(lambda: self.setActive(2))
 
     def backAction(self):
         self.obj.talkToStackWidgetIndex(0, self.win_dow)
@@ -202,13 +210,11 @@ class Preference(QWidget):
     def changeStackIndex(self, obj, w_index):
         obj.setCurrentIndex(w_index)
 
-    def setActive(self, cButton, activeIndex):
+    def setActive(self, activeIndex):
         self.active = activeIndex
+        
+        self.themeObj.prefButtonActive(self.active, self.themeIndex)
 
-        if self.themeIndex == 0:
-            self.themeObj.prefButtonActiveLight(self, cButton)
-        else:
-            self.themeObj.prefButtonActiveDark(self, cButton)
         self.stackedWidget.setCurrentIndex(self.active)
 
     def settingsWidgetObj(self):
@@ -249,7 +255,6 @@ class Preference(QWidget):
         
         self.toggleOne = ToggleSwitch()
         self.toggleOne.setCheckable(True)
-        # self.toggleOne.setChecked(True)
         self.toggleOne.setSizePolicy(self.sizePolicy)
 
         self.autoUpdateLabelOneLayout.addWidget(self.autoUpdateLabelOne)
@@ -386,6 +391,7 @@ class Preference(QWidget):
 
         self.readerNavtoggle = ToggleSwitch()
         self.readerNavtoggle.setCheckable(True)
+        
         self.readerNavtoggle.setSizePolicy(self.sizePolicy)
 
         self.readerNavLayout = QHBoxLayout()
@@ -408,6 +414,7 @@ class Preference(QWidget):
 
         self.readerFStoggle = ToggleSwitch()
         self.readerFStoggle.setCheckable(True)
+        
         self.readerFStoggle.setSizePolicy(self.sizePolicy)
 
         self.readerFSLayout = QHBoxLayout()
@@ -451,7 +458,6 @@ class Preference(QWidget):
         self.readerNavtoggle.clicked.connect(lambda: self.onToggleClicked(2, self.readerNavtoggle))
         self.readerFStoggle.clicked.connect(lambda: self.onToggleClicked(3, self.readerFStoggle))
 
-
     def onRadioClicked(self, radioIndex):
         radioBtn = self.sender()
         self.radioIndex = radioIndex
@@ -475,8 +481,6 @@ class Preference(QWidget):
         else:
             ...
   
-
-
     def downloadWidgetObj(self):
         self.downloadOverWifiLabel = QLabel("Download over wifi only")
         self.downloadOverWifiLabel.setSizePolicy(self.sizePolicy)
@@ -546,9 +550,11 @@ class Preference(QWidget):
         self.radioCbr = QRadioButton("To CBR")
         self.radioCbr.setSizePolicy(self.sizePolicy)
         
-        self.compressArchiveBtn = QPushButton("Compress")
-        self.compressArchiveBtn.setSizePolicy(self.sizePolicy)
-        self.compressArchiveBtn.setObjectName("compressButton")
+        self.compressArchiveToggleBtn = ToggleSwitch()
+        self.compressArchiveToggleBtn.setCheckable(True)
+        
+        self.compressArchiveToggleBtn.setSizePolicy(self.sizePolicy)
+        self.compressArchiveToggleBtn.setObjectName("compressButton")
         
 
         self.compressArchiveLayout = QHBoxLayout()
@@ -556,7 +562,7 @@ class Preference(QWidget):
         self.compressArchiveLayout.addWidget(self.compressArchiveLabel)
         self.compressArchiveLayout.addWidget(self.radioCbz)
         self.compressArchiveLayout.addWidget(self.radioCbr)
-        self.compressArchiveLayout.addWidget(self.compressArchiveBtn)
+        self.compressArchiveLayout.addWidget(self.compressArchiveToggleBtn)
 
         self.compressArchiveLayout.setStretch(0, 7)
         self.compressArchiveLayout.setStretch(1, 1)
@@ -578,6 +584,28 @@ class Preference(QWidget):
         self.downloadsLayout.setSpacing(0)
         self.downloadsLayout.setContentsMargins(0, 0, 0, 5)
 
+        self.compressArchiveToggleBtn.clicked.connect(lambda: self.compressSelect(self.compressArchiveToggleBtn))
+
+    def compressSelect(self, btn):
+        if btn.isChecked():
+            self.compressionState = True
+            print("Compression Allowed", self.compressionState)
+            self.radioCbr.setDisabled(False)
+            self.radioCbz.setDisabled(False)
+            
+        else:
+            self.compressionState = False
+            print("Compression Allowed", self.compressionState)
+            self.radioCbr.setDisabled(True)
+            self.radioCbz.setDisabled(True)
+
+
+    def setWindowTheme(self, btn):
+            if btn.isChecked():
+                self.win_dow.setTheme(1)
+            else:
+                self.win_dow.setTheme(0)
+
     def themesWidgetObj(self):
         self.themesLabel = QLabel("Dark Theme")
         self.themesBtn = ToggleSwitch()
@@ -593,8 +621,6 @@ class Preference(QWidget):
 
         self.spaceE = QLabel()
 
-        self.pixPixmap = QPixmap("MangaReader/resources/icons/lightModeTheme.png")
-        self.spaceE.setPixmap(self.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
 
         self.spaceEL = QVBoxLayout()
         self.spaceEL.addWidget(self.spaceE, alignment=Qt.AlignmentFlag.AlignCenter)
@@ -602,3 +628,8 @@ class Preference(QWidget):
         self.themesLayout.addLayout(self.themeLabelLayout)
         self.themesLayout.addLayout(self.spaceEL)
 
+        self.themesBtn.clicked.connect(lambda: self.setWindowTheme(self.themesBtn))
+
+    def makeEffective(self):
+        pass
+        

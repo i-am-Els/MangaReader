@@ -8,13 +8,13 @@ def setTaskBarIcon():
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 
-
 if __name__ == "__main__":
     app = QApplication([])
 
     app.setOrganizationName("El's")
     app.setOrganizationDomain("els.ng")
     app.setApplicationName("Manhua Reader")
+    
 
     setTaskBarIcon()
     appWindow = QMainWindow()
@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     appWidget.setLayout(appLayout)
 
-    appWindow.setWindowIcon(stWindow.windowIcon)
+    # appWindow.setWindowIcon(stWindow.windowIcon)
     
     
     appWindow.setCentralWidget(appWidget)
@@ -66,6 +66,8 @@ if __name__ == "__main__":
 
     appWindow.setMinimumSize(QSize(appWindow.min_screen_width, appWindow.min_screen_height))
     appWindow.setWindowTitle(appWindow.appWindowTitle)
+
+    app.setWindowIcon(stWindow.windowIcon)
     appWindow.showMaximized()
     
 
