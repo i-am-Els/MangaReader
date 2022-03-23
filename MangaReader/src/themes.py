@@ -2,7 +2,7 @@ import PyQt6
 
 from PyQt6.QtCore import QPointF, Qt, QRect, QSize
 
-from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush
+from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush, QCursor
 
 from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QWidget, QSizePolicy, QVBoxLayout
 
@@ -105,6 +105,13 @@ class Themes:
         objM.refreshIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.refreshButton.setIcon(objM.refreshIcon)
 
+        objM.apiButtonWidget.setStyleSheet("#apiWidget { background-color: rgb(210, 211, 219); border: 2px solid rgb(72,75,106); border-radius: 18px;} QPushButton{ background-color: rgb(210, 211, 219); margin: 5px;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
+
+        objM.apiCombo.setStyleSheet(" QComboBox{  border: 0px; background-color: rgb(210, 211, 219);} QComboBox::drop-down{ border: 0px; width: 70px;} QComboBox:selected{ background-color: white;}")
+
+
+        # QComboBox::down-arrow{ border: 0px; image:url(MangaReader/resources/icons/icons8-next-96.png); margin-top: 7px; margin-bottom: 7px;}
+
         objP.style = """   
             #settingsButton, #downloadButton, #themesButton{
                 border-radius: 15px;
@@ -129,11 +136,11 @@ class Themes:
         
         objP.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
-        objP.radioButtonOne.setStyleSheet("QRadioButton::indicator { width: 30px; height: 30px;}")
+        objP.radioButtonOne.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px;}")
 
-        objP.radioButtonTwo.setStyleSheet("QRadioButton::indicator { width: 30px; height: 30px; }")
+        objP.radioButtonTwo.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px; }")
 
-        objP.radioButtonThree.setStyleSheet("QRadioButton::indicator { width: 30px; height: 30px;}")
+        objP.radioButtonThree.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px;}")
 
         objP.downloadQueue.setStyleSheet("background-color: white;")
 
@@ -141,7 +148,8 @@ class Themes:
         # objP.spaceE.setPixmap(QPixmap("MangaReader/resources/icons/lightModeTheme.png"))
 
 
-        # objP.compressArchiveBtn.setStyleSheet("background: rgb(147, 148, 165); margin-top: 5px; margin-right: 5px;")
+        objP.downloadDirPathBtn.setStyleSheet("background: rgb(147, 148, 165); margin-top: 5px; margin-right: 5px; color: white;")
+        objP.downloadDirPathBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         objP.pixPixmap = QPixmap("MangaReader/resources/icons/lightModeTheme.png")
         objP.spaceE.setPixmap(objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
@@ -193,22 +201,24 @@ class Themes:
 
 
 
-    def declareTheme(self, obj, themeIndex, themeObj):
+    def declareTheme(self, obj, themeIndex):
         if themeIndex == 0:
             obj.objMainWindow.themeIndex = themeIndex
             obj.objReader.themeIndex = themeIndex
             obj.objPref.themeIndex = themeIndex
             obj.setting.themeIndex = themeIndex
+            obj.setting.themeButtonState = False
 
         else:
             obj.objMainWindow.themeIndex = themeIndex
             obj.objReader.themeIndex = themeIndex
             obj.objPref.themeIndex = themeIndex
             obj.setting.themeIndex = themeIndex
+            obj.setting.themeButtonState = True
 
-        obj.objMainWindow.themeObj = themeObj
-        obj.objReader.themeObj = themeObj
-        obj.objPref.themeObj = themeObj
+        # obj.objMainWindow.themeObj = themeObj
+        # obj.objReader.themeObj = themeObj
+        # obj.objPref.themeObj = themeObj
         
 
 class ToggleSwitch(QPushButton):

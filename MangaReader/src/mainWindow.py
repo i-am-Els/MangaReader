@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 
 from themes import Themes
-from settings import Settings
+# from settings import Settings
 
 from PyQt6.QtWidgets import (
     QTabBar,
@@ -19,6 +19,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QFileDialog,
+    QComboBox
 )
 
 from PyQt6.QtCore import QSize, Qt
@@ -35,16 +36,22 @@ class MainWindow(QWidget):
 
         self.themeObj = object()
         self.setting = object()
-        
+
+        self.initPath = object()
+        self.newPath = object()
+        self.themeIndex = int()
+        self.tabIndex = 0
+        self.apiIndex = int()
+
         self.icon_size = QSize(20, 20)
-        self.initPath = "C:\\"
-        self.newPath = self.initPath
         self.localDirImport = []
         self.localSingleImport = []
-        self.themeIndex = object()
-        self.tabIndex = 0
+
+        self.apiName = []
+
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
         self.create_widgets()
 
     def create_widgets(self):
@@ -136,6 +143,36 @@ class MainWindow(QWidget):
         self.refreshButton.setIconSize(self.icon_size)
         self.refreshButton.setObjectName("refreshButton")
 
+        
+        self.apiButton = QPushButton()
+        # self.apiButton.addItems(self.apiName)
+
+        self.apiButton.setCheckable(True)
+        self.apiButton.setSizePolicy(self.sizePolicy)
+        self.apiButton.setFixedHeight(36)
+        self.apiButton.setFixedWidth(90)
+        
+        self.apiCombo = QComboBox()
+        
+        self.apiCombo.setSizePolicy(self.sizePolicy)
+        self.apiCombo.setFixedHeight(3)
+        self.apiCombo.setFixedWidth(3)
+
+        self.apiButtonLayout = QHBoxLayout()
+        self.apiButtonLayout.addWidget(self.apiButton)
+        self.apiButtonLayout.addWidget(self.apiCombo)
+
+        self.apiButtonLayout.setSpacing(0)
+        self.apiButtonLayout.setContentsMargins(0,0, 0, 0)
+        self.apiButtonLayout.setStretch(0, 2)
+        self.apiButtonLayout.setStretch(1, 1)
+
+        self.apiButtonWidget = QWidget()
+        self.apiButtonWidget.setObjectName("apiWidget")
+        self.apiButtonWidget.setLayout(self.apiButtonLayout)
+        self.apiButtonWidget.setFixedSize(QSize(120, 36))
+
+
         # Add Widgets to searchLayout
         self.searchLayout.addWidget(self.menuButton)
         self.searchLayout.addWidget(self.refreshButton)
@@ -143,6 +180,7 @@ class MainWindow(QWidget):
         self.searchLayout.addWidget(self.localSearchButtonSingleFormat)
         self.searchLayout.addWidget(self.lineEdit)
         self.searchLayout.addWidget(self.searchButton)
+        self.searchLayout.addWidget(self.apiButtonWidget)
         
         self.searchLayout.setStretch(0, 1)
         self.searchLayout.setStretch(1, 1)
@@ -150,8 +188,9 @@ class MainWindow(QWidget):
         self.searchLayout.setStretch(3, 1)
         self.searchLayout.setStretch(4, 6)
         self.searchLayout.setStretch(5, 1)
+        self.searchLayout.setStretch(6, 1)
 
-        self.searchLayout.setContentsMargins(7, 10, 7, 10)
+        self.searchLayout.setContentsMargins(3, 5, 0, 5)
 
         #------------------------------------------------
         # Create another horizontal layout to hold objects of focus
@@ -257,6 +296,10 @@ class MainWindow(QWidget):
         self.menuButton.clicked.connect(self.menuAction)
         self.refreshButton.clicked.connect(self.refreshAction)
 
+        self.apiButton.clicked.connect(lambda:self.apiComboPopUp())
+
+        # self.apiCombo.currentIndexChanged.connect(self.setIndex)
+
         self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj('toggleGrid'))
 
         self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj('toggleList'))
@@ -264,6 +307,19 @@ class MainWindow(QWidget):
         self.localSearchButton.clicked.connect(self.localSearchAction)
         self.localSearchButtonSingleFormat.clicked.connect(self.localSearchSingleFormatAction)
         self.tabBar.currentChanged.connect(lambda:self.changeTabBarIcon())
+
+    def setIndex(self, intIndex):
+        self.apiIndex = intIndex
+        # self.apiButton.setText(self.apiName[self.apiIndex])
+
+        self.setting.setObjMState()
+        self.loadApi(self.apiIndex)
+        # print('p', self.apiIndex, self.setting.apiIndex)
+
+    def apiComboPopUp(self):
+        self.apiCombo.showPopup()
+        self.apiCombo.currentIndexChanged.connect(self.setIndex)
+
 
     def create_home_widgets(self):
         self.tabWidget = QTabWidget()
@@ -273,13 +329,12 @@ class MainWindow(QWidget):
         self.home = QWidget()
 
         self.homeIcon = QIcon()
-        # self.homeIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-home-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
 
         self.homeTabStackLayout = QVBoxLayout()
 
         self.homeTabStack = QStackedWidget()
 
-        self.loadHomeTab()
+        # self.loadHomeTab()
 
         self.homeTabStack.setCurrentIndex(0)
 
@@ -290,8 +345,9 @@ class MainWindow(QWidget):
         #---------------------------------------------------
 
         self.library = QWidget()
-        self.libraryIcon = QIcon()
-        # self.libraryIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)   
+        self.libraryIcon = QIcon() 
+
+        # self.loadLibraryTab()
 
         #---------------------------------------------------     
         self.tabBar.addTab(self.homeIcon, "Home")
@@ -322,8 +378,12 @@ class MainWindow(QWidget):
         else:
             Themes.changeTabBarIconDark(self)
 
+    def loadApi(self, api_Index):
+        print("Loading api", self.apiName[api_Index])
+
     def loadHomeItems(self):# More Work 'Online Mode'
-        pass
+        # self.loadApi(self.apiIndex)
+        ...
 
     def loadHomeLocalItems(self):# More Work 'Offline Mode'
         pass
@@ -346,8 +406,9 @@ class MainWindow(QWidget):
         self.refresh(pageToRefreshIndex)
 
     def refresh(self, refreshPgIndex):# Much More work
-        if (refreshPgIndex == 0) or (refreshPgIndex == 3) or (refreshPgIndex == 4):
+        if (refreshPgIndex == 0) or (refreshPgIndex == 3):
             print(refreshPgIndex)
+            self.loadApi(self.apiIndex)
 
     def changeStackIndex(self, obj, w_index):
         obj.setCurrentIndex(w_index)
@@ -357,7 +418,7 @@ class MainWindow(QWidget):
         self.noInternetDisplay = QWidget()
         self.noSearchResult = QWidget()
         self.searchResultPage = QWidget()
-        self.descriptionPage = QWidget()
+        # self.descriptionPage = QWidget()
         #---------------------------------------------------
 
         #----------------------------------------------------
@@ -365,7 +426,7 @@ class MainWindow(QWidget):
         self.loadNoInternetDisplay()
         self.loadNoSearchResult()
         self.loadSearchResultPage()
-        self.loadDescriptionPage()
+        # self.loadDescriptionPage()
 
         #---------------------------------------------------
 
@@ -373,10 +434,12 @@ class MainWindow(QWidget):
         self.homeTabStack.addWidget(self.noInternetDisplay)
         self.homeTabStack.addWidget(self.noSearchResult)
         self.homeTabStack.addWidget(self.searchResultPage)
-        self.homeTabStack.addWidget(self.descriptionPage)
+        # self.homeTabStack.addWidget(self.descriptionPage)
+        pass
   
     def loadHomeDisplay(self):# More Work
         self.homeDisplayLayout = QGridLayout()
+        self.loadApi(self.apiIndex)
 
         self.homeDisplay.setLayout(self.homeDisplayLayout)
 
@@ -521,6 +584,12 @@ class MainWindow(QWidget):
 
     def changeViewType(self, newViewIndex): # More work
         print('Changing view to', self.toggleViewValue[newViewIndex])
+
+
+
+    def loadLibraryTab(self):
+        
+        pass
         
     def popDialog(self, type):
         if type == 'empty':
@@ -557,6 +626,7 @@ class MainWindow(QWidget):
             if rightStructure == True:
                 print("voila")
                 self.newPath = self.extractParentFolderPath(self.localDirPath)
+                self.setting.libraryNewPath = self.newPath
             else:
                 self.popDialog('structure')
 
@@ -576,11 +646,15 @@ class MainWindow(QWidget):
             self.localSingleImport = [self.localSinglePath, self.localFileName, self.parentLocalSinglePath]
             self.newPath = self.parentLocalSinglePath
 
+            self.setting.libraryNewPath = self.newPath
+
+            print(self.localSingleImport)
+
             return self.localSingleImport
 
         else:
             print("no file selected")
-
+    
     def convertToPath(self, path):
         path_n = Path(path)
         return path_n

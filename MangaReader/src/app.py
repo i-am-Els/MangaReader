@@ -9,7 +9,8 @@ def setTaskBarIcon():
 
 
 if __name__ == "__main__":
-    app = QApplication([])
+    app = QApplication(sys.argv)
+    app.setStyle('Fusion')
 
     app.setOrganizationName("El's")
     app.setOrganizationDomain("els.ng")

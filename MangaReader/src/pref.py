@@ -8,11 +8,15 @@ from PyQt6.QtWidgets import (
     QSizePolicy,
     QPushButton,
     QRadioButton,
-    QListWidget
+    QListWidget,
+    QFileDialog
 )
 
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QFont
+
+from pathlib import Path
+# import os
 
 from themes import ToggleSwitch
 
@@ -32,13 +36,14 @@ class Preference(QWidget):
         self.min_button_size = QSize(36, 36)
         self.icon_size = QSize(20, 20)
         self.active = 0
-        self.themeIndex = object()
+        self.themeIndex = int()
 
         self.fontSize1 = 11
         self.fontSize2 = 9
         self.fontSize3 = 8
 
         self.compressionState = bool()
+        self.themeButtonState = bool()
         self.updateChapter = bool()
         self.updateOther = bool()
         self.hideNav = bool()
@@ -47,6 +52,12 @@ class Preference(QWidget):
         self.readerDisplayList = []
         self.settingsToggleIndex = int()
         self.settingsToggleList = []
+
+        self.downloadDirPath = object()
+        self.initPath = object()
+        self.newPath = object()
+        
+        
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -209,6 +220,7 @@ class Preference(QWidget):
         self.themesButton.clicked.connect(lambda: self.setActive(2))
 
     def backAction(self):
+        self.setting.setPrefVariables()
         self.obj.talkToStackWidgetIndex(0, self.win_dow)
 
     def changeStackIndex(self, obj, w_index):
@@ -473,52 +485,57 @@ class Preference(QWidget):
         self.readerDisplayIndex = radioIndex
         if radioBtn.isChecked():
             self.setting.readerDisplayIndex = radioIndex
-            print(self.setting.readerDisplayIndex, self.readerDisplayIndex)
+            # print(self.setting.readerDisplayIndex, self.readerDisplayIndex)
+        # self.setting.setPrefVariables()
         
-
     def onToggleClicked(self, btnIndex, btn):
         self.toggleBtnState = btn.isChecked()
         self.btnIndex = btnIndex
-        if self.toggleBtnState:
-            if self.btnIndex == 0:
-                self.setting.updateChapter = self.toggleBtnState
-            elif self.btnIndex == 1:
-                self.setting.updateOther = self.toggleBtnState
-            elif self.btnIndex == 2:
-                self.setting.hideNav = self.toggleBtnState
-            else:
-                self.setting.fsState = self.toggleBtnState
-                
+        if self.btnIndex == 0:
+            self.setting.updateChapter = self.toggleBtnState
+        elif self.btnIndex == 1:
+            self.setting.updateOther = self.toggleBtnState
+        elif self.btnIndex == 2:
+            self.setting.hideNav = self.toggleBtnState
         else:
-            if self.btnIndex == 0:
-                self.setting.updateChapter = self.toggleBtnState
-            elif self.btnIndex == 1:
-                self.setting.updateOther = self.toggleBtnState
-            elif self.btnIndex == 2:
-                self.setting.hideNav = self.toggleBtnState
-            else:
-                self.setting.fsState = self.toggleBtnState
+            self.setting.fsState = self.toggleBtnState
 
-        
-  
+        print(self.setting.updateChapter, self.setting.updateOther, self.setting.hideNav, self.setting.fsState)
+        # self.setting.setPrefVariables()
+
+    def selectDownloadDir(self):
+        self.downloadDirDialog = QFileDialog.getExistingDirectory(self,"Select Download Location", self.newPath)
+
+        self.downloadDirPath = self.convertToPath(self.downloadDirDialog)
+        self.setting.downloadNewPath = str(self.downloadDirPath)
+        self.newPath = self.setting.downloadNewPath
+
+        self.downloadDirPathDisplay.setText(str(self.newPath))
+                     
     def downloadWidgetObj(self):
-        self.downloadOverWifiLabel = QLabel("Download over wifi only")
-        self.downloadOverWifiLabel.setSizePolicy(self.sizePolicy)
+        self.downloadDirPathLabel = QLabel("Select Download Location")
         
+        self.downloadDirPathLabel.setSizePolicy(self.sizePolicy)
+        
+
+        self.downloadDirPathDisplay = QLabel(str(self.newPath))
+        self.downloadDirPathDisplay.setSizePolicy(self.sizePolicy)
+        # self.downloadDirPathDisplay.setAlignment(Qt.AlignmentFlag.AlignCenter)
         # self.downloadOverWifiLabel.setMaximumHeight(60)
+        self.downloadDirPathBtn = QPushButton("Choose")
+        self.downloadDirPathBtn.setSizePolicy(self.sizePolicy)
 
-        self.downloadOverWifiBtn = ToggleSwitch()
-        self.downloadOverWifiBtn.setSizePolicy(self.sizePolicy)
-
-        self.downloadOverWifiLayout = QHBoxLayout()
+        self.downloadDirPathLayout = QHBoxLayout()
         
-        self.downloadOverWifiLayout.addWidget(self.downloadOverWifiLabel)
-        self.downloadOverWifiLayout.addWidget(self.downloadOverWifiBtn)
-        self.downloadOverWifiLayout.setStretch(0, 8)
-        self.downloadOverWifiLayout.setStretch(1, 1)
+        self.downloadDirPathLayout.addWidget(self.downloadDirPathLabel)
+        self.downloadDirPathLayout.addWidget(self.downloadDirPathDisplay)
+        self.downloadDirPathLayout.addWidget(self.downloadDirPathBtn)
+        self.downloadDirPathLayout.setStretch(0, 3)
+        self.downloadDirPathLayout.setStretch(1, 6)
+        self.downloadDirPathLayout.setStretch(2, 1)
 
         
-        self.downloadOverWifiLayout.setContentsMargins(0, 5, 0, 0)
+        self.downloadDirPathLayout.setContentsMargins(0, 5, 0, 0)
 
         self.downloadQueueHeadLabel = QLabel("Download Queue")
         self.downloadQueueHeadLabel.setSizePolicy(self.sizePolicy)
@@ -592,7 +609,7 @@ class Preference(QWidget):
 
         self.compressArchiveLayout.setContentsMargins(3, 3, 10, 3)
 
-        self.downloadsLayout.addLayout(self.downloadOverWifiLayout)
+        self.downloadsLayout.addLayout(self.downloadDirPathLayout)
         self.downloadsLayout.addLayout(self.downloadQueueLayout)
         self.downloadsLayout.addLayout(self.compressArchiveLayout)
         
@@ -603,28 +620,33 @@ class Preference(QWidget):
 
         self.downloadsLayout.setSpacing(0)
         self.downloadsLayout.setContentsMargins(0, 0, 0, 5)
+        
+        self.downloadDirPathBtn.clicked.connect(lambda: self.selectDownloadDir())
 
         self.compressArchiveToggleBtn.clicked.connect(lambda: self.compressSelect(self.compressArchiveToggleBtn))
 
     def compressSelect(self, btn):
         if btn.isChecked():
-            self.compressionState = True
-            print("Compression Allowed", self.compressionState)
+            self.setting.compressionState = True
+            print("Compression Allowed", self.setting.compressionState)
             self.radioCbr.setDisabled(False)
             self.radioCbz.setDisabled(False)
             
         else:
-            self.compressionState = False
-            print("Compression Allowed", self.compressionState)
+            self.setting.compressionState = False
+            print("Compression Allowed", self.setting.compressionState)
             self.radioCbr.setDisabled(True)
             self.radioCbz.setDisabled(True)
 
+        # self.setting.setPrefVariables()
 
     def setWindowTheme(self, btn):
-            if btn.isChecked():
-                self.win_dow.setTheme(1)
-            else:
-                self.win_dow.setTheme(0)
+        if btn.isChecked():
+            self.win_dow.setTheme(1)
+        else:
+            self.win_dow.setTheme(0)
+        self.setting.setPrefVariables()
+            
 
     def themesWidgetObj(self):
         self.themesLabel = QLabel("Dark Theme")
@@ -650,6 +672,10 @@ class Preference(QWidget):
 
         self.themesBtn.clicked.connect(lambda: self.setWindowTheme(self.themesBtn))
 
-    def makeEffective(self):
-        pass
+    # def makeEffective(self):
+    #     pass
+
+    def convertToPath(self, path):
+        path_n = Path(path)
+        return path_n
         

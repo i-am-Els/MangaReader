@@ -42,6 +42,15 @@ class Window(QStackedWidget):
 
         self.setTheme(self.setting.themeIndex)
 
+        self.objMainWindow.themeObj = self.theme
+        self.objReader.themeObj = self.theme
+        self.objPref.themeObj = self.theme
+
+        self.objMainWindow.loadLibraryTab()
+        self.objMainWindow.loadHomeTab()
+        
+        
+
     def changeStackIndex(self, obj, w_index):
         obj.setCurrentIndex(w_index)
 
@@ -52,7 +61,8 @@ class Window(QStackedWidget):
         else:
             self.theme.darkMode(obj=obj)
 
-        self.theme.declareTheme(self, s_index, self.theme)
+        self.theme.declareTheme(self, s_index)
+
 
     def setSetting(self):
         self.objMainWindow.setting = self.setting
