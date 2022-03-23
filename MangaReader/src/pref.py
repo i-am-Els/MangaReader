@@ -1,3 +1,22 @@
+# Manhua Reader,  An application for reading mangas and manhuas online and offline
+# Copyright (C) 2022  Eniola Emmanuel Olawale
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+
+
 from PyQt6.QtWidgets import (
     QStackedWidget,
     QHBoxLayout,
@@ -507,10 +526,13 @@ class Preference(QWidget):
         self.downloadDirDialog = QFileDialog.getExistingDirectory(self,"Select Download Location", self.newPath)
 
         self.downloadDirPath = self.convertToPath(self.downloadDirDialog)
-        self.setting.downloadNewPath = str(self.downloadDirPath)
-        self.newPath = self.setting.downloadNewPath
+        if self.downloadDirDialog != "":
+            # print('Not empty::', self.downloadDirDialog) 
+            self.setting.downloadNewPath = str(self.downloadDirPath)
 
-        self.downloadDirPathDisplay.setText(str(self.newPath))
+            self.newPath = self.setting.downloadNewPath
+
+            self.downloadDirPathDisplay.setText(str(self.newPath))
                      
     def downloadWidgetObj(self):
         self.downloadDirPathLabel = QLabel("Select Download Location")
