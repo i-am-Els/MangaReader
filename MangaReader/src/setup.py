@@ -27,7 +27,6 @@ from PyQt6.QtGui import QIcon, QPixmap
 from settings import Settings
 
 class Link(object):
-
     def talkToStackWidgetIndex(w_index, obj):
         obj.changeStackIndex(obj, w_index)
 
@@ -64,11 +63,10 @@ class Window(QStackedWidget):
         self.objReader.themeObj = self.theme
         self.objPref.themeObj = self.theme
 
+
         self.objMainWindow.loadLibraryTab()
         self.objMainWindow.loadHomeTab()
         
-        
-
     def changeStackIndex(self, obj, w_index):
         obj.setCurrentIndex(w_index)
 
@@ -76,11 +74,12 @@ class Window(QStackedWidget):
         obj = self
         if s_index == 0:
             self.theme.lightMode(obj=obj)
+            self.objPref.themesBtn.setChecked(False)
         else:
             self.theme.darkMode(obj=obj)
+            self.objPref.themesBtn.setChecked(True)
 
         self.theme.declareTheme(self, s_index)
-
 
     def setSetting(self):
         self.objMainWindow.setting = self.setting

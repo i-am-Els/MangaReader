@@ -58,7 +58,6 @@ class Settings(object):
         self.apiName = ['Asura Scan', 'Mangabat']
         self.apiIndex = 1
         
-
     def setMainWindowVariables(self):
         self.objM.initPath = self.libraryInitPath
 
@@ -66,7 +65,6 @@ class Settings(object):
 
         self.objM.apiName = self.apiName
         self.objM.apiIndex = self.apiIndex
-
 
     def setPrefVariables(self):
         self.objP.compressionState = self.compressionState
@@ -120,5 +118,4 @@ class Settings(object):
 
         self.objP.themesBtn.setChecked(self.objP.themeButtonState)
         
-
     

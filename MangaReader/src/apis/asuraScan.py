@@ -15,9 +15,9 @@ class AsuraScan(object):
 
         self.apiDict = dict()
 
-        self.sendRequest()
+        self.sendRequestAll()
 
-    def sendRequest(self):
+    def sendRequestAll(self):
         response = requests.request("GET", self.url, headers=self.headers)
 
         #print(response.text)

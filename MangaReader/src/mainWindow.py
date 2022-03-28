@@ -339,7 +339,6 @@ class MainWindow(QWidget):
         self.apiCombo.showPopup()
         self.apiCombo.currentIndexChanged.connect(self.setIndex)
 
-
     def create_home_widgets(self):
         self.tabWidget = QTabWidget()
         self.tabBar = QTabBar(self.tabWidget)
@@ -604,8 +603,6 @@ class MainWindow(QWidget):
     def changeViewType(self, newViewIndex): # More work
         print('Changing view to', self.toggleViewValue[newViewIndex])
 
-
-
     def loadLibraryTab(self):
         
         pass
@@ -625,7 +622,7 @@ class MainWindow(QWidget):
         messageBox.exec()
 
     def localSearchAction(self):
-        self.localDirDialog = QFileDialog.getExistingDirectory(self,"Select Manhua Bundle",self.newPath)
+        self.localDirDialog = QFileDialog.getExistingDirectory(self,"Select Manhua Title",self.newPath)
 
         self.localDirPath = self.convertToPath(self.localDirDialog)
         dir = list(os.listdir(self.localDirPath))
@@ -687,5 +684,5 @@ class MainWindow(QWidget):
         return file_n
 
     def correctDirStructure(self, path):
-
+        
         return True

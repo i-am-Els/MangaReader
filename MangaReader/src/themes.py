@@ -23,7 +23,6 @@ from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush, QCursor
 
 from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QWidget, QSizePolicy, QVBoxLayout
 
-
 class Themes:
     def __init__(self, obj):
         self.obj = obj        
@@ -47,7 +46,6 @@ class Themes:
         )
 
         self.prevObjButton = self.prefButtonList[indexB]
-
 
     def lightMode(self, obj):
         style ="""
@@ -188,10 +186,6 @@ class Themes:
             obj.libraryIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabBar.setTabIcon(obj.tabIndex, obj.libraryIcon)
 
-
-
-#-------------------------------------------------------
-
     def prefButtonActiveDark(self, obj, indexB):
         pass
 
@@ -208,15 +202,12 @@ class Themes:
     def changeTabBarIconDark(obj):
         pass
 
-
     def prefButtonActive(self, indexB, themeIndex):
         self.prefSelectedButtonIndex = indexB
         if themeIndex == 0:
             self.prefButtonActiveLight(self.obj.objPref, indexB)
         else:
             self.prefButtonActiveDark(self.obj.objPref, indexB)
-
-
 
     def declareTheme(self, obj, themeIndex):
         if themeIndex == 0:
@@ -393,7 +384,6 @@ class MoveableWindow(QWidget):
         
         self.oldPosition = self.pos()
 
-
     def mousePressEvent(self, event):
         self.oldPosition = event.globalPosition()
 
@@ -426,5 +416,4 @@ class MoveableWindow(QWidget):
         self.refIcon.setIcon(self.refIconIcon)
 
         self.oldPosition = event.globalPosition()
-        
-  
+         

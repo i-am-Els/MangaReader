@@ -22,7 +22,7 @@ import sys, setup, ctypes
 from themes import WindowTitleBar, MoveableWindow
 
 def setTaskBarIcon():
-    myappid = u"mycompany.myproduct.subproduct.version" # arbitrary string
+    myappid = u"El's.native_app.manhua_reader.v1.0.01" # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 

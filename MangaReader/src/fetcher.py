@@ -14,3 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+
+
+import apis.asuraScan as asuraScan
+
+class ApiLauncher:
+    def __init__(self):
+        self.asuraObj = asuraScan.AsuraScan()
+        self.mng_dict = self.asuraObj.sendRequestAll()
+        print(self.mng_dict)

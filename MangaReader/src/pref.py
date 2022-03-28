@@ -659,7 +659,6 @@ class Preference(QWidget):
             print("Compression Allowed", self.setting.compressionState)
             self.radioCbr.setDisabled(True)
             self.radioCbz.setDisabled(True)
-
         # self.setting.setPrefVariables()
 
     def setWindowTheme(self, btn):
