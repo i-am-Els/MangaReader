@@ -55,7 +55,7 @@ class Settings(object):
 
         self.downloadNewPath = self.downloadInitPath
 
-        self.apiName = ['Asura Scan', 'Mangabat']
+        self.apiName = ['Asura Scan', 'Mangabat', 'HolyManga']
         self.apiIndex = 1
         
     def setMainWindowVariables(self):
@@ -94,13 +94,15 @@ class Settings(object):
     def setStates(self):
         self.setMainWindowVariables()
         self.setPrefVariables()
-        
+
         self.objM.apiCombo.addItems(self.apiName)
 
         self.objM.apiIndex = self.apiIndex
-        self.objM.apiCombo.setCurrentIndex(self.objM.apiIndex)
-
         self.setObjMState()
+
+        self.objM.apiCombo.setCurrentIndex(self.objM.apiIndex)
+        if self.apiIndex == 0:
+            self.objM.setApiIndex(self.apiIndex)
         
         self.objP.downloadDirPathDisplay.setText(str(self.downloadNewPath))
 

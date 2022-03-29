@@ -100,24 +100,25 @@ class Themes:
         objP = obj.objPref
         objR = obj.objReader
         
-        objM.tabBar.setStyleSheet("QTabBar::tab  { background: rgb(250,250,250); width: 200px; border-radius: 3px; padding: 3px;} QTabBar::tab:bottom:selected  {       background-color: rgb(72,75,106); color: rgb(250,250,250); } ")
+        objM.tabBar.setStyleSheet("QTabBar::tab  { background: rgba(250,250,250,0.3); width: 200px; border-radius: 3px; padding: 3px;} QTabBar::tab:bottom:selected  {       background-color: rgb(72,75,106); color: rgb(250,250,250); } ")
 
         objM.tabWidget.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
+        objM.apiButton.setStyleSheet("QPushButton{ border-radius: 18px;}")
         
-        objM.menuIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-menu-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objM.menuIcon.addPixmap(QPixmap("resources/icons/icons8-menu-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.menuButton.setIcon(objM.menuIcon)
 
-        objM.searchIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-search-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objM.searchIcon.addPixmap(QPixmap("resources/icons/icons8-search-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.searchButton.setIcon(objM.searchIcon)
 
-        objM.localSearchIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-add-folder-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objM.localSearchIcon.addPixmap(QPixmap("resources/icons/icons8-add-folder-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.localSearchButton.setIcon(objM.localSearchIcon)
 
-        objM.localSearchIconSingleFormat.addPixmap(QPixmap("MangaReader/resources/icons/icons8-cbr-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objM.localSearchIconSingleFormat.addPixmap(QPixmap("resources/icons/icons8-cbr-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.localSearchButtonSingleFormat.setIcon(objM.localSearchIconSingleFormat)
         
-        objM.refreshIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objM.refreshIcon.addPixmap(QPixmap("resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.refreshButton.setIcon(objM.refreshIcon)
 
         objM.apiButtonWidget.setStyleSheet("#apiWidget { background-color: rgb(210, 211, 219); border: 2px solid rgb(72,75,106); border-radius: 18px;} QPushButton{ background-color: rgb(210, 211, 219); margin: 5px;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
@@ -146,7 +147,7 @@ class Themes:
         objP.headerBackgroundWidget.setMaximumHeight(65)
         objP.headerBackgroundWidget.setStyleSheet("background-color: rgb(147, 148, 165); border-radius: 25px; color: white; padding-top: 0px;")
         
-        objP.backIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-go-back-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objP.backIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objP.backButton.setIcon(objP.backIcon)
         
         objP.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
@@ -160,13 +161,13 @@ class Themes:
         objP.downloadQueue.setStyleSheet("background-color: white;")
 
 
-        # objP.spaceE.setPixmap(QPixmap("MangaReader/resources/icons/lightModeTheme.png"))
+        # objP.spaceE.setPixmap(QPixmap("resources/icons/lightModeTheme.png"))
 
 
         objP.downloadDirPathBtn.setStyleSheet("background: rgb(147, 148, 165); margin-top: 5px; margin-right: 5px; color: white;")
         objP.downloadDirPathBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        objP.pixPixmap = QPixmap("MangaReader/resources/icons/lightModeTheme.png")
+        objP.pixPixmap = QPixmap("resources/icons/lightModeTheme.png")
         objP.spaceE.setPixmap(objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
 
         self.prefButtonActiveLight(objP, self.prefSelectedButtonIndex)
@@ -174,16 +175,16 @@ class Themes:
     def changeTabBarIconLight(obj):
         obj.tabIndex = obj.tabBar.currentIndex()
         if obj.tabIndex == 0:
-            obj.homeIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-home-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.homeIcon.addPixmap(QPixmap("resources/icons/icons8-home-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabBar.setTabIcon(obj.tabIndex, obj.homeIcon)
 
-            obj.libraryIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.libraryIcon.addPixmap(QPixmap("resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabBar.setTabIcon(1, obj.libraryIcon)
         else:
-            obj.homeIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-home-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.homeIcon.addPixmap(QPixmap("resources/icons/icons8-home-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabBar.setTabIcon(0, obj.homeIcon)
 
-            obj.libraryIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-library-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.libraryIcon.addPixmap(QPixmap("resources/icons/icons8-library-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabBar.setTabIcon(obj.tabIndex, obj.libraryIcon)
 
     def prefButtonActiveDark(self, obj, indexB):
@@ -196,7 +197,7 @@ class Themes:
         objP = obj.objPref
         objR = obj.objReader
 
-        objP.pixPixmap = QPixmap("MangaReader/resources/icons/darkModeTheme.png")
+        objP.pixPixmap = QPixmap("resources/icons/darkModeTheme.png")
         objP.spaceE.setPixmap(objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
 
     def changeTabBarIconDark(obj):
@@ -314,7 +315,7 @@ class WindowTitleBar(QHBoxLayout):
         self.minimizeIcon.setMaximumSize(iconsizew, iconsize)
 
         self.minimizeIconIcon = QIcon()
-        self.minimizeIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-minimize-dark-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.minimizeIconIcon.addPixmap(QPixmap("resources/icons/icons8-minimize-dark-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.minimizeIcon.setIcon(self.minimizeIconIcon)
 
         self.minimizeIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgb(210, 211, 219); }")
@@ -323,7 +324,7 @@ class WindowTitleBar(QHBoxLayout):
         self.restoreIcon.setMaximumSize(iconsizew, iconsize)
 
         self.restoreIconIcon = QIcon()
-        self.restoreIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.restoreIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.restoreIcon.setIcon(self.restoreIconIcon)
 
         self.restoreIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
@@ -331,7 +332,7 @@ class WindowTitleBar(QHBoxLayout):
         self.closeIcon.setMaximumSize(iconsizew, iconsize)
 
         self.closeIconIcon = QIcon()
-        self.closeIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-close-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.closeIconIcon.addPixmap(QPixmap("resources/icons/icons8-close-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.closeIcon.setIcon(self.closeIconIcon)
 
         self.closeIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgba(247,10,15,1);}")
@@ -364,14 +365,14 @@ class WindowTitleBar(QHBoxLayout):
             self.obj.resize(QSize(self.resize_width, self.resize_height))
             self.obj.setWindowState(Qt.WindowState.WindowActive)
             
-            self.restoreIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.restoreIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.restoreIcon.setIcon(self.restoreIconIcon)
 
         else:
             self.obj.showMaximized()
             self.obj.setWindowState(Qt.WindowState.WindowMaximized)
 
-            self.restoreIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.restoreIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.restoreIcon.setIcon(self.restoreIconIcon)
 
 class MoveableWindow(QWidget):
@@ -394,14 +395,14 @@ class MoveableWindow(QWidget):
             self.obj.setWindowState(Qt.WindowState.WindowNoState)
             # self.obj.resize(QSize(1092, 614))
             self.obj.setGeometry(200, 0, 1092, 614)
-            self.refIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
 
         elif self.obj.windowState() == Qt.WindowState.WindowNoState or self.obj.windowState() == Qt.WindowState.WindowActive:
             self.obj.showMaximized()
             self.obj.setWindowState(Qt.WindowState.WindowMaximized)
 
-            self.refIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
 
     def mouseMoveEvent(self, event):
@@ -412,7 +413,7 @@ class MoveableWindow(QWidget):
         self.obj.resize(QSize(1092, 614))
         self.obj.setWindowState(Qt.WindowState.WindowActive)
 
-        self.refIconIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.refIcon.setIcon(self.refIconIcon)
 
         self.oldPosition = event.globalPosition()

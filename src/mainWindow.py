@@ -67,7 +67,7 @@ class MainWindow(QWidget):
         self.localSingleImport = []
 
         self.apiName = []
-
+        self.firstRun = True
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -165,11 +165,12 @@ class MainWindow(QWidget):
         
         self.apiButton = QPushButton()
         # self.apiButton.addItems(self.apiName)
+        self.apiButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         self.apiButton.setCheckable(True)
         self.apiButton.setSizePolicy(self.sizePolicy)
         self.apiButton.setFixedHeight(36)
-        self.apiButton.setFixedWidth(90)
+        self.apiButton.setFixedWidth(100)
         
         self.apiCombo = QComboBox()
         
@@ -183,7 +184,7 @@ class MainWindow(QWidget):
 
         self.apiButtonLayout.setSpacing(0)
         self.apiButtonLayout.setContentsMargins(0,0, 0, 0)
-        self.apiButtonLayout.setStretch(0, 2)
+        self.apiButtonLayout.setStretch(0, 12)
         self.apiButtonLayout.setStretch(1, 1)
 
         self.apiButtonWidget = QWidget()
@@ -317,7 +318,7 @@ class MainWindow(QWidget):
 
         self.apiButton.clicked.connect(lambda:self.apiComboPopUp())
 
-        # self.apiCombo.currentIndexChanged.connect(self.setIndex)
+        self.apiCombo.currentIndexChanged.connect(self.setApiIndex)
 
         self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj('toggleGrid'))
 
@@ -327,17 +328,19 @@ class MainWindow(QWidget):
         self.localSearchButtonSingleFormat.clicked.connect(self.localSearchSingleFormatAction)
         self.tabBar.currentChanged.connect(lambda:self.changeTabBarIcon())
 
-    def setIndex(self, intIndex):
-        self.apiIndex = intIndex
-        # self.apiButton.setText(self.apiName[self.apiIndex])
+    def setApiIndex(self, intIndex):
+        clickedIndex = intIndex
 
-        self.setting.setObjMState()
-        self.loadApi(self.apiIndex)
-        # print('p', self.apiIndex, self.setting.apiIndex)
+        self.apiIndex = clickedIndex
+    
+        if self.firstRun == True and self.apiIndex == 0:
+            self.firstRun = False
+        else:
+            self.setting.setObjMState()
+            self.loadApi(intIndex)
 
     def apiComboPopUp(self):
         self.apiCombo.showPopup()
-        self.apiCombo.currentIndexChanged.connect(self.setIndex)
 
     def create_home_widgets(self):
         self.tabWidget = QTabWidget()
@@ -457,7 +460,6 @@ class MainWindow(QWidget):
   
     def loadHomeDisplay(self):# More Work
         self.homeDisplayLayout = QGridLayout()
-        self.loadApi(self.apiIndex)
 
         self.homeDisplay.setLayout(self.homeDisplayLayout)
 
@@ -469,7 +471,7 @@ class MainWindow(QWidget):
 
 
         self.noInternetDisplayLabelpix.setSizePolicy(self.sizePolicy) 
-        self.pixPixmap = QPixmap('MangaReader/resources/icons/icons8-without-internet-100.png')
+        self.pixPixmap = QPixmap('resources/icons/icons8-without-internet-100.png')
         self.noInternetDisplayLabelpix.setPixmap(self.pixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
         self.noInternetDisplayLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -508,7 +510,7 @@ class MainWindow(QWidget):
 
 
         self.noSearchResultLabelpix.setSizePolicy(self.sizePolicy) 
-        self.spixPixmap = QPixmap('MangaReader/resources/icons/page-not-found.png')
+        self.spixPixmap = QPixmap('resources/icons/page-not-found.png')
         self.noSearchResultLabelpix.setPixmap(self.spixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
         self.noSearchResultLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -549,12 +551,12 @@ class MainWindow(QWidget):
     def viewTypeAction(self, gridView):
         if gridView == True:
             self.toggleGridIcon = QIcon()
-            self.toggleGridIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleGridIcon.addPixmap(QPixmap("resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleGridView.setIcon(self.toggleGridIcon)
             self.toggleGridView.setIconSize(self.icon_size * 1.1)
             #--------------------------------------------
             self.toggleListDisabledIcon =QIcon()
-            self.toggleListDisabledIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleListDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleListView.setIcon(self.toggleListDisabledIcon)
             self.toggleListView.setIconSize(self.icon_size * 1.1)
 
@@ -564,12 +566,12 @@ class MainWindow(QWidget):
 
         else:
             self.toggleListIcon = QIcon()
-            self.toggleListIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleListIcon.addPixmap(QPixmap("resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleListView.setIcon(self.toggleListIcon)
             self.toggleListView.setIconSize(self.icon_size * 1.1)
             #--------------------------------------------
             self.toggleGridDisabledIcon = QIcon()
-            self.toggleGridDisabledIcon.addPixmap(QPixmap("MangaReader/resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleGridDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleGridView.setIcon(self.toggleGridDisabledIcon)
             self.toggleGridView.setIconSize(self.icon_size * 1.1)
 

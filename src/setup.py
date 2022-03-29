@@ -36,7 +36,7 @@ class Window(QStackedWidget):
         super().__init__()
 
         self.windowIcon = QIcon()
-        self.windowIcon.addPixmap(QPixmap("MangaReader/resources/logo/mrlogoRound.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.windowIcon.addPixmap(QPixmap("resources/logo/mrlogoRound.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.windowIcon)
 
 
