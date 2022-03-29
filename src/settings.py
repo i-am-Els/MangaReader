@@ -35,6 +35,8 @@ class Settings(object):
         
         self.libraryInitPath = "C:\\"
         self.libraryNewPath = self.libraryInitPath
+        self.localMangaTitleList = []
+
 
 
         self.updateChapter = True
@@ -65,6 +67,7 @@ class Settings(object):
 
         self.objM.apiName = self.apiName
         self.objM.apiIndex = self.apiIndex
+        self.objM.localMangaTitleList = self.localMangaTitleList
 
     def setPrefVariables(self):
         self.objP.compressionState = self.compressionState

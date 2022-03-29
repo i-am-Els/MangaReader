@@ -69,6 +69,8 @@ class MainWindow(QWidget):
         self.apiName = []
         self.firstRun = True
 
+        self.localMangaTitleList = object()
+
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         self.create_widgets()
@@ -166,6 +168,7 @@ class MainWindow(QWidget):
         self.apiButton = QPushButton()
         # self.apiButton.addItems(self.apiName)
         self.apiButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.apiButton.setToolTip("Manga plugin dropdown here...")
 
         self.apiButton.setCheckable(True)
         self.apiButton.setSizePolicy(self.sizePolicy)
@@ -628,7 +631,7 @@ class MainWindow(QWidget):
 
         self.localDirPath = self.convertToPath(self.localDirDialog)
         dir = list(os.listdir(self.localDirPath))
-        print(dir, self.localDirDialog)
+        # print(dir, self.localDirDialog)
         
 
         if len(dir) == 0:
@@ -642,11 +645,13 @@ class MainWindow(QWidget):
             rightStructure = self.correctDirStructure(self.localDirPath)
             print(rightStructure)
             if rightStructure == True:
+                print(dir, self.localDirDialog)
                 print("voila")
                 self.newPath = self.extractParentFolderPath(self.localDirPath)
                 self.setting.libraryNewPath = self.newPath
             else:
                 self.popDialog('structure')
+                self.localSearchAction()
 
     def localSearchSingleFormatAction(self):
         self.localSingleDialog = QFileDialog().getOpenFileName(
@@ -666,7 +671,7 @@ class MainWindow(QWidget):
 
             self.setting.libraryNewPath = self.newPath
 
-            print(self.localSingleImport)
+            # print(self.localSingleImport)
 
             return self.localSingleImport
 
@@ -686,5 +691,11 @@ class MainWindow(QWidget):
         return file_n
 
     def correctDirStructure(self, path):
-        
-        return True
+        correct = False
+        for x in os.listdir(path):
+            xPath = os.path.join(path, x)
+            if os.path.isdir(xPath):
+                # correct = True
+                correct = not(any(os.path.isdir(os.path.join(xPath, y)) == True for y in os.listdir(xPath)))
+                
+        return correct
