@@ -715,22 +715,32 @@ class MainWindow(QWidget):
         manhuaMetaDict = dict()
         manhuaChapterList = list()
 
-        manhuaMetaDict['MangaTitle'] = Path(path).stem
-        manhuaMetaDict['MangaPath'] = str(path)
+        manhuaMetaDict["MangaTitle"] = Path(path).stem
+        manhuaMetaDict["MangaPath"] = str(path)
         emptyCover = True
 
         for x in os.listdir(path):
             xPath = os.path.join(path, x)
             if os.path.isdir(xPath):
-                manhuaChapterList.append(Path(xPath).name)
+                chapterInStr = str(Path(xPath).name)
+                manhuaChapterList.append(chapterInStr)
             elif Path(xPath).suffix in ['.jpeg', '.jpg', '.png'] and emptyCover == True:
-                manhuaMetaDict['MangaCover'] = xPath
+                manhuaMetaDict["MangaCover"] = xPath
                 emptyCover = False
         
-        self.sortChapters(manhuaChapterList)
-        manhuaMetaDict['Chapters'] = manhuaChapterList
+        sortedManhuaChapterList = self.sortChapters(manhuaChapterList)
+        manhuaMetaDict["Chapters"] = sortedManhuaChapterList
+        
         print(manhuaMetaDict)
 
-    def sortChapters(self, somelist):
-        ...
+    # def sortChapters(self, someList):
+    #     newSortedList = list()
+    #     for item in someList:
+    #         newitem = item
+    #         newitem.split()
+    #         for x in newitem:
+    #             startIndex = x.casefold().find(' ch'.casefold())
+    # #             # if 
+            
+    #     return newSortedList
                 
