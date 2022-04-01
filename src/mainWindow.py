@@ -18,7 +18,7 @@
 
 
 from pathlib import Path
-import os
+import os, time
 
 from themes import Themes
 # from settings import Settings
@@ -614,9 +614,11 @@ class MainWindow(QWidget):
         
     def popDialog(self, type):
         if type == 'empty':
-            txt, t_txt = "Bundle is empty, Please select a filled directory", "Empty Bundle"
+            txt, t_txt = "Bundle is empty, Please select a filled directory", "Empty Bundle Error"
         elif type == 'structure':
-            txt, t_txt = "Bundle is not properly structured\nSelect a Parent folder that has chapters arranged in sub-folders", "Incorrect Structure"
+            txt, t_txt = "There are 2 scenarios that raise this error: Bundle Structure Error or No Image Found\nTip 1: Select a Parent folder that has chapters arranged in sub-folders.\nTip 2: The chapter sub-folders MUST contain images.", "Structure or File Error"
+        elif type == 'none':
+            txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.cbr' files.", "Not an Archive File"
         
         messageBox = QMessageBox()
         messageBox.setIcon(QMessageBox.Icon.Information)
@@ -645,23 +647,21 @@ class MainWindow(QWidget):
             rightStructure = self.correctDirStructure(self.localDirPath)
             print(rightStructure)
             if rightStructure == True:
-                print(dir, self.localDirDialog)
+                # print(dir, self.localDirDialog)
                 print("voila")
                 self.newPath = self.extractParentFolderPath(self.localDirPath)
                 self.setting.libraryNewPath = self.newPath
+
+                self.addToLibrary(self.localDirPath)
             else:
                 self.popDialog('structure')
                 self.localSearchAction()
 
     def localSearchSingleFormatAction(self):
-        self.localSingleDialog = QFileDialog().getOpenFileName(
-        self, self.tr('Open Archived Manhua File'),
-        self.newPath,
-        self.tr(
-            'Archive Files (*.zip *.cbz *.rar *.cbr)'))
+        self.localSingleDialog = QFileDialog().getOpenFileName(self, 'Open Archived Manhua File', self.newPath, 'Archived Files (*.cbz *.cbr)')
         self.localSinglePath = self.convertToPath(self.localSingleDialog[0])
 
-        if os.path.isfile(self.localSinglePath):   
+        if os.path.isfile(self.localSinglePath) and Path(self.localSinglePath).suffix in ['.cbr', '.cbz']:  
             self.localFileName = self.extractFileName(self.localSinglePath)
 
             self.parentLocalSinglePath = self.extractParentFolderPath(self.localSinglePath)
@@ -672,11 +672,19 @@ class MainWindow(QWidget):
             self.setting.libraryNewPath = self.newPath
 
             # print(self.localSingleImport)
+            print(self.localSingleDialog)
 
             return self.localSingleImport
 
-        else:
+        elif self.localSingleDialog == ('', ''):
             print("no file selected")
+            pass
+
+        elif not(os.path.isfile(self.localSinglePath)):
+            self.popDialog('none')
+            # print(self.localSingleDialog)
+            self.localSearchSingleFormatAction()
+        
     
     def convertToPath(self, path):
         path_n = Path(path)
@@ -692,10 +700,37 @@ class MainWindow(QWidget):
 
     def correctDirStructure(self, path):
         correct = False
+        imageExtList = ['.jpeg', '.jpg', '.png']
+
         for x in os.listdir(path):
             xPath = os.path.join(path, x)
             if os.path.isdir(xPath):
-                # correct = True
-                correct = not(any(os.path.isdir(os.path.join(xPath, y)) == True for y in os.listdir(xPath)))
-                
+                correct = not(any(os.path.isdir(os.path.join(xPath, y)) == True for y in os.listdir(xPath))) and any((Path(os.path.join(xPath, y)).suffix in imageExtList) for y in os.listdir(xPath))
+                if correct == True:
+                    break
+
         return correct
+
+    def addToLibrary(self, path):
+        manhuaMetaDict = dict()
+        manhuaChapterList = list()
+
+        manhuaMetaDict['MangaTitle'] = Path(path).stem
+        manhuaMetaDict['MangaPath'] = str(path)
+        emptyCover = True
+
+        for x in os.listdir(path):
+            xPath = os.path.join(path, x)
+            if os.path.isdir(xPath):
+                manhuaChapterList.append(Path(xPath).name)
+            elif Path(xPath).suffix in ['.jpeg', '.jpg', '.png'] and emptyCover == True:
+                manhuaMetaDict['MangaCover'] = xPath
+                emptyCover = False
+        
+        self.sortChapters(manhuaChapterList)
+        manhuaMetaDict['Chapters'] = manhuaChapterList
+        print(manhuaMetaDict)
+
+    def sortChapters(self, somelist):
+        ...
+                

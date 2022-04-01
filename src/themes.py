@@ -100,7 +100,7 @@ class Themes:
         objP = obj.objPref
         objR = obj.objReader
         
-        objM.tabBar.setStyleSheet("QTabBar::tab  { background: rgba(250,250,250,0.3); width: 200px; border-radius: 3px; padding: 3px;} QTabBar::tab:bottom:selected  {       background-color: rgb(72,75,106); color: rgb(250,250,250); } ")
+        objM.tabBar.setStyleSheet("QTabBar::tab  { background: rgb(235, 235, 235); width: 200px; border-radius: 3px; padding: 3px;} QTabBar::tab:bottom:selected  {       background-color: rgb(72,75,106); color: rgb(250,250,250); } ")
 
         objM.tabWidget.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
