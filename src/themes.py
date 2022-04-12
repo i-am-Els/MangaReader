@@ -30,6 +30,10 @@ class Themes:
         self.prefSelectedButtonIndex = 0
         self.prefButtonList = [self.obj.objPref.settingsButton, self.obj.objPref.downloadButton, self.obj.objPref.themesButton]
 
+        self.defaultCoverImage = "resources/logo/thumbnailCoverless.png"
+        self.defaultCoverPixmap = QPixmap(self.defaultCoverImage)
+        # objP.spaceE.setPixmap(objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
+
     def prefButtonActiveLight(self, obj, indexB):
         if type(self.prevObjButton) == PyQt6.QtWidgets.QPushButton:
             self.prevObjButton.setStyleSheet(
@@ -100,7 +104,7 @@ class Themes:
         objP = obj.objPref
         objR = obj.objReader
         
-        objM.tabBar.setStyleSheet("QTabBar::tab  { background: rgb(235, 235, 235); width: 200px; border-radius: 3px; padding: 3px;} QTabBar::tab:bottom:selected  {       background-color: rgb(72,75,106); color: rgb(250,250,250); } ")
+        objM.tabBar.setStyleSheet("QTabBar::tab { background-color: rgb(250, 250, 250); width: 200px; padding: 1px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }  QTabBar::tab:bottom{ background: rgb(235, 235, 235);}  QTabBar::tab:bottom:selected { background-color: rgb(72,75,106); color: rgb(250,250,250);}")
 
         objM.tabWidget.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
@@ -125,9 +129,6 @@ class Themes:
 
         objM.apiCombo.setStyleSheet(" QComboBox{  border: 0px; background-color: rgb(210, 211, 219);} QComboBox::drop-down{ border: 0px; width: 70px;} QComboBox:selected{ background-color: white;}")
 
-
-        # QComboBox::down-arrow{ border: 0px; image:url(MangaReader/resources/icons/icons8-next-96.png); margin-top: 7px; margin-bottom: 7px;}
-
         objP.style = """   
             #settingsButton, #downloadButton, #themesButton{
                 border-radius: 15px;
@@ -144,7 +145,7 @@ class Themes:
         
         objP.stackedWidget.setStyleSheet("background-color: rgb(210,211,219); border-radius: 10px;")
         
-        objP.headerBackgroundWidget.setMaximumHeight(65)
+        objP.headerBackgroundWidget.setMaximumHeight(60)
         objP.headerBackgroundWidget.setStyleSheet("background-color: rgb(147, 148, 165); border-radius: 25px; color: white; padding-top: 0px;")
         
         objP.backIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)

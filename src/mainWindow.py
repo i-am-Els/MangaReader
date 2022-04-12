@@ -17,8 +17,9 @@
 
 
 
+from mimetypes import init
 from pathlib import Path
-import os, time
+import os, re
 
 from themes import Themes
 # from settings import Settings
@@ -722,25 +723,39 @@ class MainWindow(QWidget):
         for x in os.listdir(path):
             xPath = os.path.join(path, x)
             if os.path.isdir(xPath):
-                chapterInStr = str(Path(xPath).name)
-                manhuaChapterList.append(chapterInStr)
+                sChapterName = str(Path(xPath).name)
+                manhuaChapterList.append(sChapterName)
             elif Path(xPath).suffix in ['.jpeg', '.jpg', '.png'] and emptyCover == True:
                 manhuaMetaDict["MangaCover"] = xPath
                 emptyCover = False
-        
+        if emptyCover == True:
+            manhuaMetaDict["MangaCover"] = self.themeObj.defaultCoverImage
+        # print(manhuaChapterList)
         sortedManhuaChapterList = self.sortChapters(manhuaChapterList)
         manhuaMetaDict["Chapters"] = sortedManhuaChapterList
         
+
         print(manhuaMetaDict)
 
-    # def sortChapters(self, someList):
-    #     newSortedList = list()
-    #     for item in someList:
-    #         newitem = item
-    #         newitem.split()
-    #         for x in newitem:
-    #             startIndex = x.casefold().find(' ch'.casefold())
-    # #             # if 
-            
-    #     return newSortedList
-                
+    def sortChapters(self, someList):
+        newSortedList = list()
+        initIndexHolderList = list()
+        indexHolderList = list()
+        chapterNameList = list()
+        for item in someList:
+            dTxt = re.findall(r"((ch+(ap)?(ter)?)+(\W|_)*(\d+(?:\.\d+)?))", item.casefold())
+            desiredTxt = dTxt[0]
+            initIndexHolderList.append(desiredTxt[-1])
+            if '.' in desiredTxt[-1]:
+                indexHolderList.append(float(desiredTxt[-1]))
+            else:
+                indexHolderList.append(int(desiredTxt[-1]))
+            chapterName = str(desiredTxt[1]).title() + ' ' + str(desiredTxt[-1])
+            chapterNameList.append(chapterName)
+        indexHolderList.sort()
+        for i in indexHolderList:
+            for j in initIndexHolderList:
+                if str(i) == j:
+                    ind = initIndexHolderList.index(j)
+                    newSortedList.append(someList[ind])
+        return newSortedList
