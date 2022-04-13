@@ -17,7 +17,6 @@
 
 
 
-from mimetypes import init
 from pathlib import Path
 import os, re
 
@@ -70,7 +69,7 @@ class MainWindow(QWidget):
         self.apiName = []
         self.firstRun = True
 
-        self.localMangaTitleList = object()
+        self.localMangaTitleDict = dict()
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -620,6 +619,8 @@ class MainWindow(QWidget):
             txt, t_txt = "There are 2 scenarios that raise this error: Bundle Structure Error or No Image Found\nTip 1: Select a Parent folder that has chapters arranged in sub-folders.\nTip 2: The chapter sub-folders MUST contain images.", "Structure or File Error"
         elif type == 'none':
             txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.cbr' files.", "Not an Archive File"
+        elif type == 'duplicate':
+             txt, t_txt = "The manga title already exists in your library, select another title", "Duplicate Action"
         
         messageBox = QMessageBox()
         messageBox.setIcon(QMessageBox.Icon.Information)
@@ -731,14 +732,19 @@ class MainWindow(QWidget):
         if emptyCover == True:
             manhuaMetaDict["MangaCover"] = self.themeObj.defaultCoverImage
         # print(manhuaChapterList)
-        sortedManhuaChapterList = self.sortChapters(manhuaChapterList)
-        manhuaMetaDict["Chapters"] = sortedManhuaChapterList
-        
+        sortedManhuaChapterDict = self.sortChapters(manhuaChapterList)
+        manhuaMetaDict["Chapters"] = sortedManhuaChapterDict
 
-        print(manhuaMetaDict)
+        if not((manhuaMetaDict["MangaTitle"]) in self.localMangaTitleDict):
+            self.localMangaTitleDict.update({manhuaMetaDict["MangaTitle"] : manhuaMetaDict})
+            self.addMangaWidgetsToLibrary(self.localMangaTitleDict[manhuaMetaDict["MangaTitle"]])
+
+        else:
+            self.popDialog('duplicate')
+
 
     def sortChapters(self, someList):
-        newSortedList = list()
+        newSortedDict = dict()
         initIndexHolderList = list()
         indexHolderList = list()
         chapterNameList = list()
@@ -750,12 +756,23 @@ class MainWindow(QWidget):
                 indexHolderList.append(float(desiredTxt[-1]))
             else:
                 indexHolderList.append(int(desiredTxt[-1]))
-            chapterName = str(desiredTxt[1]).title() + ' ' + str(desiredTxt[-1])
+            chapterName = 'Chapter ' + str(desiredTxt[-1])
             chapterNameList.append(chapterName)
         indexHolderList.sort()
         for i in indexHolderList:
             for j in initIndexHolderList:
                 if str(i) == j:
                     ind = initIndexHolderList.index(j)
-                    newSortedList.append(someList[ind])
-        return newSortedList
+                    newSortedDict.update({chapterNameList[ind] : someList[ind]})
+        return newSortedDict
+
+    def addMangaWidgetsToLibrary(self, metadata):
+        print(metadata)
+
+
+class Manga(QWidget):
+    def __init__(self, metadata):
+        super().__init__()
+        self.metadata: dict = metadata
+        
+        
