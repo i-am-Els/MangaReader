@@ -687,7 +687,6 @@ class MainWindow(QWidget):
             # print(self.localSingleDialog)
             self.localSearchSingleFormatAction()
         
-    
     def convertToPath(self, path):
         path_n = Path(path)
         return path_n
@@ -742,7 +741,6 @@ class MainWindow(QWidget):
         else:
             self.popDialog('duplicate')
 
-
     def sortChapters(self, someList):
         newSortedDict = dict()
         initIndexHolderList = list()
@@ -771,8 +769,51 @@ class MainWindow(QWidget):
 
 
 class Manga(QWidget):
-    def __init__(self, metadata):
+    def __init__(self, metadata, objM):
         super().__init__()
         self.metadata: dict = metadata
+        self.obj = objM
+        
+        self.mangaName = metadata["MangaTitle"]
+        self.mangaPath = metadata["MangaPath"]
+        self.mangaCover = metadata["MangaCover"]
+        self.mangaChapters = metadata["Chapters"]
+        self.mangaId = metadata["MangaTitle"]
+        self.isFavorite = bool()
+        self.bookmarkPosition = object()
+
+        self.mangaBg = QWidget()
+        self.mangaBgLayout = QVBoxLayout()
+        self.mangaCoverLabel = QLabel()  #Holds the description page image
+        self.mangaCoverDisplayLabel = QLabel()
+        self.mangaDetailsLayout = QHBoxLayout()
+        self.mangaDetailsWidget = QWidget()
+        self.mangaNameLabel = QLabel()
+        self.mangaFavoriteButton = QPushButton()
+        self.mangaFavoriteButtonIcon = QIcon()
+
+        self.mangaCoverPixmap = QPixmap(self.mangaCover).scaled(60, 80, Qt.AspectRatioMode.KeepAspectRatio)
+        self.mangaCoverDisplayLabel.setPixmap(self.mangaCoverPixmap)
+        self.mangaNameLabel.setText(self.mangaName)
+        self.mangaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.mangaFavoriteButton.setIcon(self.mangaFavoriteButtonIcon)
+
+        self.mangaDetailsLayout.addWidget(self.mangaNameLabel)
+        self.mangaDetailsLayout.addWidget(self.mangaFavoriteButton)
+        self.mangaDetailsWidget.setLayout(self.mangaDetailsLayout)
+
+        self.mangaBgLayout.addWidget(self.mangaCoverLabel)
+        self.mangaBgLayout.addWidget(self.mangaDetailsWidget)
+
+        self.mangaBg.setLayout(self.mangaBgLayout)
+
+        
+    def addToFavorite(self):
+        ...
+
+    def deleteSelf(self):
+        ...
+
+    
         
         

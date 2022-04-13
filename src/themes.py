@@ -31,7 +31,7 @@ class Themes:
         self.prefButtonList = [self.obj.objPref.settingsButton, self.obj.objPref.downloadButton, self.obj.objPref.themesButton]
 
         self.defaultCoverImage = "resources/logo/thumbnailCoverless.png"
-        self.defaultCoverPixmap = QPixmap(self.defaultCoverImage)
+        self.defaultCoverPixmap = QPixmap(self.defaultCoverImage).scaled(60, 80, Qt.AspectRatioMode.KeepAspectRatio)
         # objP.spaceE.setPixmap(objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
 
     def prefButtonActiveLight(self, obj, indexB):
