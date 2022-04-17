@@ -220,7 +220,7 @@ class MainWindow(QWidget):
         self.containerLayout = QHBoxLayout()
         # Create a Vetical layout to hold the tabwidget
         self.homeLayout = QVBoxLayout()
-        self.create_home_widgets()
+        # self.create_home_widgets()***
 
         # Create a vertical layout to hold the list of previously read manhuas
         self.historyLayout = QVBoxLayout()
@@ -279,6 +279,9 @@ class MainWindow(QWidget):
         self.toggleLayout.setStretch(0, 4)
         self.toggleLayout.setStretch(1, 1)
         self.toggleLayout.setStretch(2, 1)
+
+
+        self.create_home_widgets()
 
         self.historySubLayout = QVBoxLayout()
 
@@ -360,7 +363,7 @@ class MainWindow(QWidget):
 
         # self.loadHomeTab()
 
-        self.homeTabStack.setCurrentIndex(0)
+        self.homeTabStack.setCurrentIndex(1)
 
         #----------------------------------------------------
         self.homeTabStackLayout.addWidget(self.homeTabStack)
@@ -376,16 +379,15 @@ class MainWindow(QWidget):
         #---------------------------------------------------     
         self.tabBar.addTab(self.homeIcon, "Home")
         self.tabBar.addTab(self.libraryIcon, "Library")
+        self.tabWidget.setTabBar(self.tabBar)  
+        self.tabWidget.setCurrentIndex(1)
         if self.themeIndex == 0:
             Themes.changeTabBarIconLight(self) # Changes selected tabbar icon
         else:
             Themes.changeTabBarIconDark(self)
-
-        self.tabWidget.setTabBar(self.tabBar)
         #---------------------------------------------------
 
         self.tabWidget.setSizePolicy(self.sizePolicy)
-        self.tabWidget.setCurrentIndex(0)
         self.tabWidget.setTabPosition(QTabWidget.TabPosition.South)
         self.tabWidget.setTabsClosable(False)
         self.tabWidget.setMovable(False)
@@ -459,10 +461,10 @@ class MainWindow(QWidget):
         self.homeTabStack.addWidget(self.noSearchResult)
         self.homeTabStack.addWidget(self.searchResultPage)
         # self.homeTabStack.addWidget(self.descriptionPage)
-        pass
   
     def loadHomeDisplay(self):# More Work
         self.homeDisplayLayout = QGridLayout()
+        
 
         self.homeDisplay.setLayout(self.homeDisplayLayout)
 
@@ -609,8 +611,17 @@ class MainWindow(QWidget):
         print('Changing view to', self.toggleViewValue[newViewIndex])
 
     def loadLibraryTab(self):
-        
-        pass
+        self.libraryGridLayout = QGridLayout()
+        self.libraryListLayout = QVBoxLayout()
+        if self.viewIsGrid:
+            self.library.setLayout(self.libraryGridLayout)   
+            print("I am setting a Grid Layout")
+        else:
+            self.library.setLayout(self.libraryListLayout)
+            print("I am setting a List Layout")
+
+            
+            
         
     def popDialog(self, type):
         if type == 'empty':
@@ -736,8 +747,16 @@ class MainWindow(QWidget):
 
         if not((manhuaMetaDict["MangaTitle"]) in self.localMangaTitleDict):
             self.localMangaTitleDict.update({manhuaMetaDict["MangaTitle"] : manhuaMetaDict})
-            self.addMangaWidgetsToLibrary(self.localMangaTitleDict[manhuaMetaDict["MangaTitle"]])
+            self.mangaObj = Manga(self.localMangaTitleDict[manhuaMetaDict["MangaTitle"]])
+            # self.addMangaWidgetsToLibrary(mangaObj)
 
+            if self.viewIsGrid:
+                self.libraryGridLayout.addWidget(self.mangaObj)
+                print("display me in a Grid")
+            else:
+                self.libraryListLayout.addWidget(self.mangaObj)
+                print("display me in a List")
+            self.tabWidget.setCurrentIndex(1)
         else:
             self.popDialog('duplicate')
 
@@ -764,15 +783,20 @@ class MainWindow(QWidget):
                     newSortedDict.update({chapterNameList[ind] : someList[ind]})
         return newSortedDict
 
-    def addMangaWidgetsToLibrary(self, metadata):
-        print(metadata)
+    def addMangaWidgetsToLibrary(self, obj):
+        if self.viewIsGrid:
+            self.libraryGridLayout.addWidget(obj)
+            print("display me as Grid")
+        else:
+            self.libraryListLayout.addWidget(obj)
+            print("display me as List")
+        self.tabWidget.setCurrentIndex(1)
 
 
 class Manga(QWidget):
-    def __init__(self, metadata, objM):
+    def __init__(self, metadata):
         super().__init__()
         self.metadata: dict = metadata
-        self.obj = objM
         
         self.mangaName = metadata["MangaTitle"]
         self.mangaPath = metadata["MangaPath"]
@@ -782,7 +806,6 @@ class Manga(QWidget):
         self.isFavorite = bool()
         self.bookmarkPosition = object()
 
-        self.mangaBg = QWidget()
         self.mangaBgLayout = QVBoxLayout()
         self.mangaCoverLabel = QLabel()  #Holds the description page image
         self.mangaCoverDisplayLabel = QLabel()
@@ -805,7 +828,11 @@ class Manga(QWidget):
         self.mangaBgLayout.addWidget(self.mangaCoverLabel)
         self.mangaBgLayout.addWidget(self.mangaDetailsWidget)
 
-        self.mangaBg.setLayout(self.mangaBgLayout)
+        self.setLayout(self.mangaBgLayout)
+        self.setObjectName(self.mangaName)
+        self.setFixedSize(QSize(90, 120))
+
+        print("I am now a manga\n My name is", self.mangaName, "\nMy Image is", self.mangaCover)
 
         
     def addToFavorite(self):
