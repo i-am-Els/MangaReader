@@ -70,6 +70,7 @@ class MainWindow(QWidget):
         self.firstRun = True
 
         self.localMangaTitleDict = dict()
+        self.mangaObj = object()
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -295,8 +296,6 @@ class MainWindow(QWidget):
         self.historyLayout.setStretch(1, 1)
         self.historyLayout.setSpacing(5)
 
-
-
         #------------------------------------------------
         # Add homeLayout and historyLayout to containerLayout
         self.containerLayout.addLayout(self.homeLayout)
@@ -380,7 +379,7 @@ class MainWindow(QWidget):
         self.tabBar.addTab(self.homeIcon, "Home")
         self.tabBar.addTab(self.libraryIcon, "Library")
         self.tabWidget.setTabBar(self.tabBar)  
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         if self.themeIndex == 0:
             Themes.changeTabBarIconLight(self) # Changes selected tabbar icon
         else:
@@ -461,6 +460,8 @@ class MainWindow(QWidget):
         self.homeTabStack.addWidget(self.noSearchResult)
         self.homeTabStack.addWidget(self.searchResultPage)
         # self.homeTabStack.addWidget(self.descriptionPage)
+
+        self.homeTabStack.setCurrentIndex(1)
   
     def loadHomeDisplay(self):# More Work
         self.homeDisplayLayout = QGridLayout()
@@ -620,8 +621,6 @@ class MainWindow(QWidget):
             self.library.setLayout(self.libraryListLayout)
             print("I am setting a List Layout")
 
-            
-            
         
     def popDialog(self, type):
         if type == 'empty':
@@ -734,7 +733,8 @@ class MainWindow(QWidget):
         for x in os.listdir(path):
             xPath = os.path.join(path, x)
             if os.path.isdir(xPath):
-                sChapterName = str(Path(xPath).name)
+                # sChapterName = str(Path(xPath).name)
+                sChapterName = Path(xPath).name
                 manhuaChapterList.append(sChapterName)
             elif Path(xPath).suffix in ['.jpeg', '.jpg', '.png'] and emptyCover == True:
                 manhuaMetaDict["MangaCover"] = xPath
@@ -749,13 +749,13 @@ class MainWindow(QWidget):
             self.localMangaTitleDict.update({manhuaMetaDict["MangaTitle"] : manhuaMetaDict})
             self.mangaObj = Manga(self.localMangaTitleDict[manhuaMetaDict["MangaTitle"]])
             # self.addMangaWidgetsToLibrary(mangaObj)
-
             if self.viewIsGrid:
                 self.libraryGridLayout.addWidget(self.mangaObj)
                 print("display me in a Grid")
             else:
                 self.libraryListLayout.addWidget(self.mangaObj)
                 print("display me in a List")
+            self.mangaObj.show()
             self.tabWidget.setCurrentIndex(1)
         else:
             self.popDialog('duplicate')
@@ -766,7 +766,7 @@ class MainWindow(QWidget):
         indexHolderList = list()
         chapterNameList = list()
         for item in someList:
-            dTxt = re.findall(r"((ch+(ap)?(ter)?)+(\W|_)*(\d+(?:\.\d+)?))", item.casefold())
+            dTxt = re.findall(r"((ch+(ap)?(ter)?)+(\W|_)*(\d+(?:\.\d+)?))", str(item).casefold())
             desiredTxt = dTxt[0]
             initIndexHolderList.append(desiredTxt[-1])
             if '.' in desiredTxt[-1]:
@@ -799,8 +799,8 @@ class Manga(QWidget):
         self.metadata: dict = metadata
         
         self.mangaName = metadata["MangaTitle"]
-        self.mangaPath = metadata["MangaPath"]
-        self.mangaCover = metadata["MangaCover"]
+        self.mangaPath = Path(metadata["MangaPath"])
+        self.mangaCover = Path(metadata["MangaCover"])
         self.mangaChapters = metadata["Chapters"]
         self.mangaId = metadata["MangaTitle"]
         self.isFavorite = bool()
@@ -815,7 +815,7 @@ class Manga(QWidget):
         self.mangaFavoriteButton = QPushButton()
         self.mangaFavoriteButtonIcon = QIcon()
 
-        self.mangaCoverPixmap = QPixmap(self.mangaCover).scaled(60, 80, Qt.AspectRatioMode.KeepAspectRatio)
+        self.mangaCoverPixmap = QPixmap(str(self.mangaCover)).scaled(60, 80, Qt.AspectRatioMode.KeepAspectRatio)
         self.mangaCoverDisplayLabel.setPixmap(self.mangaCoverPixmap)
         self.mangaNameLabel.setText(self.mangaName)
         self.mangaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"), QIcon.Mode.Normal, QIcon.State.Off)
@@ -831,8 +831,7 @@ class Manga(QWidget):
         self.setLayout(self.mangaBgLayout)
         self.setObjectName(self.mangaName)
         self.setFixedSize(QSize(90, 120))
-
-        print("I am now a manga\n My name is", self.mangaName, "\nMy Image is", self.mangaCover)
+        print("I am now a manga \nMy name is", self.mangaName, "\nMy Image is", self.mangaCover)
 
         
     def addToFavorite(self):

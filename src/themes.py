@@ -15,6 +15,7 @@
 
 
 
+from pathlib import Path
 import PyQt6
 
 from PyQt6.QtCore import QPointF, Qt, QRect, QSize
