@@ -45,8 +45,8 @@ from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
 
 class MainWindow(QWidget):
-    def __init__(self, obj, win_dow, window_Icon):
-        super().__init__()
+    def __init__(self, obj, win_dow, window_Icon, parent=None):
+        super(MainWindow, self).__init__(parent)
         self.obj = obj
         self.win_dow = win_dow
         self.window_Icon = window_Icon
@@ -68,6 +68,10 @@ class MainWindow(QWidget):
 
         self.apiName = []
         self.firstRun = True
+
+        self.gridX = 0
+        self.gridY = 0
+        self.gridYLimit = 5
 
         self.localMangaTitleDict = dict()
         self.mangaObj = object()
@@ -614,12 +618,12 @@ class MainWindow(QWidget):
     def loadLibraryTab(self):
         self.libraryGridLayout = QGridLayout()
         self.libraryListLayout = QVBoxLayout()
-        if self.viewIsGrid:
-            self.library.setLayout(self.libraryGridLayout)   
-            print("I am setting a Grid Layout")
-        else:
-            self.library.setLayout(self.libraryListLayout)
-            print("I am setting a List Layout")
+        # if self.viewIsGrid:
+        #     self.library.setLayout(self.libraryGridLayout)   
+        #     print("I am setting a Grid Layout")
+        # else:
+        #     self.library.setLayout(self.libraryListLayout)
+        #     print("I am setting a List Layout")
 
         
     def popDialog(self, type):
@@ -747,15 +751,32 @@ class MainWindow(QWidget):
 
         if not((manhuaMetaDict["MangaTitle"]) in self.localMangaTitleDict):
             self.localMangaTitleDict.update({manhuaMetaDict["MangaTitle"] : manhuaMetaDict})
-            self.mangaObj = Manga(self.localMangaTitleDict[manhuaMetaDict["MangaTitle"]])
+            self.mangaObj = Manga(self.localMangaTitleDict[manhuaMetaDict["MangaTitle"]], self.library)
             # self.addMangaWidgetsToLibrary(mangaObj)
+            self.btn = QPushButton("Hi me")
             if self.viewIsGrid:
-                self.libraryGridLayout.addWidget(self.mangaObj)
+                if self.gridYLimit >= self.gridY: 
+                    self.libraryGridLayout.addWidget(self.mangaObj, self.gridX, self.gridY, 1, 1)
+                    # self.libraryGridLayout.addWidget(self.btn, self.gridX, self.gridY, 1, 1)
+                    ...
+                else:
+                    self.gridY = 0
+                    self.gridX += 1
+                    self.libraryGridLayout.addWidget(self.mangaObj, self.gridX, self.gridY, 1, 1)
+                    # self.libraryGridLayout.addWidget(self.btn, self.gridX, self.gridY, 1, 1)
+                self.library.setLayout(self.libraryGridLayout)
+                print("I am setting a Grid Layout")
                 print("display me in a Grid")
+
             else:
                 self.libraryListLayout.addWidget(self.mangaObj)
+                self.library.setLayout(self.libraryListLayout)
+                print("I am setting a List Layout")        
                 print("display me in a List")
+
             self.mangaObj.show()
+            # self.mangaObj.activateWindow()
+            # self.mangaObj.raise_()
             self.tabWidget.setCurrentIndex(1)
         else:
             self.popDialog('duplicate')
@@ -794,8 +815,8 @@ class MainWindow(QWidget):
 
 
 class Manga(QWidget):
-    def __init__(self, metadata):
-        super().__init__()
+    def __init__(self, metadata, parent):
+        super(Manga, self).__init__(parent)
         self.metadata: dict = metadata
         
         self.mangaName = metadata["MangaTitle"]
@@ -807,26 +828,38 @@ class Manga(QWidget):
         self.bookmarkPosition = object()
 
         self.mangaBgLayout = QVBoxLayout()
-        self.mangaCoverLabel = QLabel()  #Holds the description page image
+        # self.mangaCoverLabel = QLabel()  #Holds the description page image
         self.mangaCoverDisplayLabel = QLabel()
+        self.mangaCoverLayout = QVBoxLayout()
         self.mangaDetailsLayout = QHBoxLayout()
-        self.mangaDetailsWidget = QWidget()
+        # self.mangaDetailsWidget = QWidget()
         self.mangaNameLabel = QLabel()
         self.mangaFavoriteButton = QPushButton()
         self.mangaFavoriteButtonIcon = QIcon()
 
         self.mangaCoverPixmap = QPixmap(str(self.mangaCover)).scaled(60, 80, Qt.AspectRatioMode.KeepAspectRatio)
         self.mangaCoverDisplayLabel.setPixmap(self.mangaCoverPixmap)
+        self.mangaCoverLayout.addWidget(self.mangaCoverDisplayLabel)
+
         self.mangaNameLabel.setText(self.mangaName)
         self.mangaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.mangaFavoriteButton.setIcon(self.mangaFavoriteButtonIcon)
 
+        # self.mangaDetailsWidget.setLayout(self.mangaDetailsLayout)
         self.mangaDetailsLayout.addWidget(self.mangaNameLabel)
         self.mangaDetailsLayout.addWidget(self.mangaFavoriteButton)
-        self.mangaDetailsWidget.setLayout(self.mangaDetailsLayout)
+        
+        self.mangaDetailsLayout.setStretch(0, 6)
+        self.mangaDetailsLayout.setStretch(1, 1)
+        self.mangaDetailsLayout.setSpacing(1)
 
-        self.mangaBgLayout.addWidget(self.mangaCoverLabel)
-        self.mangaBgLayout.addWidget(self.mangaDetailsWidget)
+
+        self.mangaBgLayout.addLayout(self.mangaCoverLayout)
+        self.mangaBgLayout.addLayout(self.mangaDetailsLayout)
+
+        self.mangaBgLayout.setStretch(0, 5)
+        self.mangaBgLayout.setStretch(1, 1)
+
 
         self.setLayout(self.mangaBgLayout)
         self.setObjectName(self.mangaName)
