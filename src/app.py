@@ -88,6 +88,5 @@ if __name__ == "__main__":
 
     app.setWindowIcon(stWindow.windowIcon)
     appWindow.showMaximized()
-    
 
     sys.exit(app.exec())

@@ -111,6 +111,8 @@ class Themes:
 
         objM.homeTabStack.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
+        objM.library.setStyleSheet("#libraryOrigin { background: rgb(210, 211, 219);} ")
+
         objM.apiButton.setStyleSheet("QPushButton{ border-radius: 18px;}")
         
         objM.menuIcon.addPixmap(QPixmap("resources/icons/icons8-menu-96.png"), QIcon.Mode.Normal, QIcon.State.Off)

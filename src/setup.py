@@ -64,7 +64,7 @@ class Window(QStackedWidget):
         self.objPref.themeObj = self.theme
 
 
-        self.objMainWindow.loadLibraryTab()
+        # self.objMainWindow.library.loadLibraryTab()
         self.objMainWindow.loadHomeTab()
         
     def changeStackIndex(self, obj, w_index):
