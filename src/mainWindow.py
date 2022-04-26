@@ -41,7 +41,7 @@ from PyQt6.QtWidgets import (
     QComboBox
 )
 
-from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtCore import QSize, Qt, QRect
 from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
 
 class MainWindow(QWidget):
@@ -335,7 +335,7 @@ class MainWindow(QWidget):
 
         self.localSearchButton.clicked.connect(self.localSearchAction)
         self.localSearchButtonSingleFormat.clicked.connect(self.localSearchSingleFormatAction)
-        self.tabBar.currentChanged.connect(lambda:self.changeTabBarIcon())
+        self.tabWidget.currentChanged.connect(lambda:self.changeTabBarIcon())
 
     def setApiIndex(self, intIndex):
         clickedIndex = intIndex
@@ -353,7 +353,7 @@ class MainWindow(QWidget):
 
     def create_home_widgets(self):
         self.tabWidget = QTabWidget()
-        self.tabBar = QTabBar(self.tabWidget)
+        # self.tabBar = QTabBar(self.tabWidget)
         #---------------------------------------------------
 
         self.home = QWidget()
@@ -366,7 +366,7 @@ class MainWindow(QWidget):
 
         # self.loadHomeTab()
 
-        self.homeTabStack.setCurrentIndex(1)
+        self.homeTabStackLayout.setContentsMargins(0, 0, 0, 0)
 
         #----------------------------------------------------
         self.homeTabStackLayout.addWidget(self.homeTabStack)
@@ -374,15 +374,17 @@ class MainWindow(QWidget):
         self.home.setLayout(self.homeTabStackLayout)
         #---------------------------------------------------
 
-        self.library = QWidget()
+        self.library = Library(self)
         self.libraryIcon = QIcon() 
 
         # self.loadLibraryTab()
 
         #---------------------------------------------------     
-        self.tabBar.addTab(self.homeIcon, "Home")
-        self.tabBar.addTab(self.libraryIcon, "Library")
-        self.tabWidget.setTabBar(self.tabBar)  
+        # self.tabBar.addTab(self.homeIcon, "Home")
+        # self.tabBar.addTab(self.libraryIcon, "Library")
+        # self.tabWidget.setTabBar(self.tabBar)  
+        self.tabWidget.addTab(self.home, self.homeIcon, "Home")
+        self.tabWidget.addTab(self.library, self.libraryIcon, "Library")
         self.tabWidget.setCurrentIndex(0)
         if self.themeIndex == 0:
             Themes.changeTabBarIconLight(self) # Changes selected tabbar icon
@@ -401,7 +403,7 @@ class MainWindow(QWidget):
         self.homeLayout.addWidget(self.tabWidget)
 
     def changeTabBarIcon(self):
-        self.tabIndex = self.tabBar.currentIndex()
+        self.tabIndex = self.tabWidget.currentIndex()
         if self.themeIndex == 0:
             Themes.changeTabBarIconLight(self)
         else:
@@ -447,7 +449,7 @@ class MainWindow(QWidget):
         self.noInternetDisplay = QWidget()
         self.noSearchResult = QWidget()
         self.searchResultPage = QWidget()
-        # self.descriptionPage = QWidget()
+        self.descriptionPage = QWidget()
         #---------------------------------------------------
 
         #----------------------------------------------------
@@ -455,7 +457,7 @@ class MainWindow(QWidget):
         self.loadNoInternetDisplay()
         self.loadNoSearchResult()
         self.loadSearchResultPage()
-        # self.loadDescriptionPage()
+        self.loadDescriptionPage()
 
         #---------------------------------------------------
 
@@ -463,7 +465,7 @@ class MainWindow(QWidget):
         self.homeTabStack.addWidget(self.noInternetDisplay)
         self.homeTabStack.addWidget(self.noSearchResult)
         self.homeTabStack.addWidget(self.searchResultPage)
-        # self.homeTabStack.addWidget(self.descriptionPage)
+        self.homeTabStack.addWidget(self.descriptionPage)
 
         self.homeTabStack.setCurrentIndex(1)
   
@@ -753,28 +755,28 @@ class MainWindow(QWidget):
             self.localMangaTitleDict.update({manhuaMetaDict["MangaTitle"] : manhuaMetaDict})
             self.mangaObj = Manga(self.localMangaTitleDict[manhuaMetaDict["MangaTitle"]], self.library)
             # self.addMangaWidgetsToLibrary(mangaObj)
-            self.btn = QPushButton("Hi me")
+            # self.btn = QPushButton("Hi me")
             if self.viewIsGrid:
                 if self.gridYLimit >= self.gridY: 
                     self.libraryGridLayout.addWidget(self.mangaObj, self.gridX, self.gridY, 1, 1)
-                    # self.libraryGridLayout.addWidget(self.btn, self.gridX, self.gridY, 1, 1)
+                    self.gridY += 1
                     ...
                 else:
                     self.gridY = 0
                     self.gridX += 1
                     self.libraryGridLayout.addWidget(self.mangaObj, self.gridX, self.gridY, 1, 1)
-                    # self.libraryGridLayout.addWidget(self.btn, self.gridX, self.gridY, 1, 1)
                 self.library.setLayout(self.libraryGridLayout)
+                print(self.mangaObj.geometry(), self.library.geometry())
                 print("I am setting a Grid Layout")
                 print("display me in a Grid")
 
             else:
                 self.libraryListLayout.addWidget(self.mangaObj)
                 self.library.setLayout(self.libraryListLayout)
-                print("I am setting a List Layout")        
+                print("I am setting a List Layout")
                 print("display me in a List")
 
-            self.mangaObj.show()
+            # self.mangaObj.show()
             # self.mangaObj.activateWindow()
             # self.mangaObj.raise_()
             self.tabWidget.setCurrentIndex(1)
@@ -814,6 +816,13 @@ class MainWindow(QWidget):
         self.tabWidget.setCurrentIndex(1)
 
 
+
+class Library(QWidget):
+    def __init__(self, parent):
+        super(Library, self).__init__(parent)
+        ...
+
+
 class Manga(QWidget):
     def __init__(self, metadata, parent):
         super(Manga, self).__init__(parent)
@@ -835,13 +844,22 @@ class Manga(QWidget):
         # self.mangaDetailsWidget = QWidget()
         self.mangaNameLabel = QLabel()
         self.mangaFavoriteButton = QPushButton()
+        self.mangaFavoriteButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.mangaFavoriteButtonIcon = QIcon()
 
-        self.mangaCoverPixmap = QPixmap(str(self.mangaCover)).scaled(60, 80, Qt.AspectRatioMode.KeepAspectRatio)
+        self.mangaCoverPixmap = QPixmap(str(self.mangaCover)).scaled(70, 100, Qt.AspectRatioMode.KeepAspectRatio)
         self.mangaCoverDisplayLabel.setPixmap(self.mangaCoverPixmap)
         self.mangaCoverLayout.addWidget(self.mangaCoverDisplayLabel)
 
         self.mangaNameLabel.setText(self.mangaName)
+        
+        self.mangaNameLabelFont = QFont()
+        self.mangaNameLabelFont.setPointSize(7)
+        self.mangaNameLabelFont.setBold(False)
+        self.mangaNameLabel.setFont(self.mangaNameLabelFont)
+        self.mangaNameLabel.setAlignment(Qt.AlignmentFlag.AlignLeft)
+
+
         self.mangaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.mangaFavoriteButton.setIcon(self.mangaFavoriteButtonIcon)
 
@@ -863,8 +881,10 @@ class Manga(QWidget):
 
         self.setLayout(self.mangaBgLayout)
         self.setObjectName(self.mangaName)
-        self.setFixedSize(QSize(90, 120))
+        self.setFixedSize(QSize(120, 150))
+        self.setStyleSheet("QWidget{ background-color: rgb(210, 211, 219); }")
         print("I am now a manga \nMy name is", self.mangaName, "\nMy Image is", self.mangaCover)
+        # self.show()
 
         
     def addToFavorite(self):

@@ -105,9 +105,11 @@ class Themes:
         objP = obj.objPref
         objR = obj.objReader
         
-        objM.tabBar.setStyleSheet("QTabBar::tab { background-color: rgb(250, 250, 250); width: 200px; padding: 1px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }  QTabBar::tab:bottom{ background: rgb(235, 235, 235);}  QTabBar::tab:bottom:selected { background-color: rgb(72,75,106); color: rgb(250,250,250);}")
+        objM.tabWidget.tabBar().setStyleSheet("QTabBar::tab { background-color: rgb(250, 250, 250); width: 200px; padding: 1px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }  QTabBar::tab:bottom{ background: rgb(235, 235, 235);}  QTabBar::tab:bottom:selected { background-color: rgb(72,75,106); color: rgb(250,250,250);}")
 
-        objM.tabWidget.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
+        objM.tabWidget.setStyleSheet("QTabWidget::pane { background: rgb(210, 211, 219);} ")
+
+        objM.homeTabStack.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
         objM.apiButton.setStyleSheet("QPushButton{ border-radius: 18px;}")
         
@@ -175,19 +177,19 @@ class Themes:
         self.prefButtonActiveLight(objP, self.prefSelectedButtonIndex)
     
     def changeTabBarIconLight(obj):
-        obj.tabIndex = obj.tabBar.currentIndex()
+        obj.tabIndex = obj.tabWidget.currentIndex()
         if obj.tabIndex == 0:
             obj.homeIcon.addPixmap(QPixmap("resources/icons/icons8-home-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            obj.tabBar.setTabIcon(obj.tabIndex, obj.homeIcon)
+            obj.tabWidget.setTabIcon(obj.tabIndex, obj.homeIcon)
 
             obj.libraryIcon.addPixmap(QPixmap("resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            obj.tabBar.setTabIcon(1, obj.libraryIcon)
+            obj.tabWidget.setTabIcon(1, obj.libraryIcon)
         else:
             obj.homeIcon.addPixmap(QPixmap("resources/icons/icons8-home-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            obj.tabBar.setTabIcon(0, obj.homeIcon)
+            obj.tabWidget.setTabIcon(0, obj.homeIcon)
 
             obj.libraryIcon.addPixmap(QPixmap("resources/icons/icons8-library-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            obj.tabBar.setTabIcon(obj.tabIndex, obj.libraryIcon)
+            obj.tabWidget.setTabIcon(obj.tabIndex, obj.libraryIcon)
 
     def prefButtonActiveDark(self, obj, indexB):
         pass
