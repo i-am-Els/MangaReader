@@ -39,7 +39,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QFileDialog,
     QComboBox, 
-    QSpacerItem
+    QScrollArea
 )
 
 from PyQt6.QtCore import QSize, Qt, QRect
@@ -233,6 +233,7 @@ class MainWindow(QWidget):
         self.historyLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.historyListView = QListView()
+        self.historyListView.setMinimumWidth(320)
         # Add widgets to the historyLayout
 
         #---------------------------------------------------
@@ -769,14 +770,14 @@ class MainWindow(QWidget):
                     newSortedDict.update({chapterNameList[ind] : someList[ind]})
         return newSortedDict
 
-    def addMangaWidgetsToLibrary(self, obj):
-        if self.viewIsGrid:
-            self.libraryGridLayout.addWidget(obj)
-            print("display me as Grid")
-        else:
-            self.libraryListLayout.addWidget(obj)
-            print("display me as List")
-        self.tabWidget.setCurrentIndex(1)
+    # def addMangaWidgetsToLibrary(self, obj):
+    #     if self.viewIsGrid:
+    #         self.libraryShelfGridLayout.addWidget(obj)
+    #         print("display me as Grid")
+    #     else:
+    #         self.libraryShelfListLayout.addWidget(obj)
+    #         print("display me as List")
+    #     self.tabWidget.setCurrentIndex(1)
 
 
 
@@ -799,34 +800,40 @@ class Library(QStackedWidget):
         self.addWidget(self.descriptionPage)
 
         self.setCurrentIndex(0)
-        self.loadLibraryTab()
 
         self.loadLibraryItems()
 
 
     def loadLibraryTab(self):
-        self.libraryShelfGridLayout = QGridLayout()
-        self.libraryShelfListLayout = QVBoxLayout()
+
+        # Check if the lbrary shelf has a layout and remove it first.... PLEASE DO THIS
+
+
+        self.libraryShelfLayout = QVBoxLayout(self.libraryShelf)
+        self.libraryShelfLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.libraryScrollArea = QScrollArea(self.libraryShelf)
+        self.libraryScrollArea.setWidgetResizable(True)
+
+        self.libraryScrollAreaWidget = QWidget()
+
+        if self.obj.viewIsGrid:
+            self.libraryShelfGridLayout = QGridLayout(self.libraryScrollAreaWidget)
+            self.libraryScrollArea.setWidget(self.libraryScrollAreaWidget)
+        else:
+            self.libraryShelfListLayout = QVBoxLayout(self.libraryScrollAreaWidget)
+            self.libraryScrollArea.setWidget(self.libraryScrollAreaWidget)
+        self.libraryShelfLayout.addWidget(self.libraryScrollArea)
 
     def loadLibraryItems(self):
         print("View is", self.obj.viewIsGrid)
-        if self.obj.viewIsGrid:
-            self.libraryShelf.setLayout(self.libraryShelfGridLayout)
-            self.libraryShelfGridLayout.setColumnMinimumWidth(4,4)
-            self.spacerItem = QSpacerItem(1, 1, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-            self.libraryShelfGridLayout.addItem(self.spacerItem, 0, 1, 1, 1)
-            self.spacerItem1 = QSpacerItem(1, 1, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-            self.libraryShelfGridLayout.addItem(self.spacerItem1, 1, 0, 1, 1)
-
-            # self.spacerItem.setAlignment( Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignRight)
-            # self.spacerItem1.setAlignment( Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignRight)
-        else:
-            self.libraryShelf.setLayout(self.libraryShelfListLayout)
+        self.loadLibraryTab()
+        self.libraryShelf.setLayout(self.libraryShelfLayout)
 
     def addToLibraryAction(self, mangaObj):
         if self.obj.viewIsGrid:
             if self.gridYLimit >= self.gridY: 
-                self.libraryShelfGridLayout.addWidget(mangaObj, self.gridX, self.gridY, 1, 1)
+                self.libraryShelfGridLayout.addWidget(mangaObj, self.gridX, self.gridY, 1, 1)#Alignment
             else:
                 self.gridY = 0
                 self.gridX += 1
@@ -836,7 +843,7 @@ class Library(QStackedWidget):
             self.libraryShelfListLayout.addWidget(mangaObj)
         self.obj.tabWidget.setCurrentIndex(1)
         self.setCurrentIndex(1)
-        # print("Current is 1")
+        print("Current is 1")
 
 
 
@@ -912,7 +919,8 @@ class Manga(QPushButton):
         self.mangaBgLayout.setContentsMargins(5, 5, 5, 10)
         
         self.setLayout(self.mangaBgLayout)
-        self.setFixedSize(QSize(120, 170))
+        self.setMaximumSize(QSize(120, 170))
+        self.setMinimumSize(QSize(110, 160))
         self.setStyleSheet(" QLabel#mangaLabel{ padding: 7px; border-radius: 5px;}  QLabel#nameLabel{ padding: 1px; border-radius: 5px;} QPushButton#fav { background: rgb(147,148,165); border-radius: 5px;} QPushButton#fav:hover { background-color: rgb(72,75,106)} .Manga { border-radius: 5px; background-color: rgba(147,148,165,40);} .Manga:hover{ background: rgba(0, 0, 0, 40); }")
         print("I am now a manga \nMy name is", self.mangaName, "\nMy Image is", self.mangaCover)
 

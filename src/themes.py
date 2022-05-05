@@ -107,11 +107,19 @@ class Themes:
         
         objM.tabWidget.tabBar().setStyleSheet("QTabBar::tab { background-color: rgb(250, 250, 250); width: 200px; padding: 1px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }  QTabBar::tab:bottom{ background: rgb(235, 235, 235);}  QTabBar::tab:bottom:selected { background-color: rgb(72,75,106); color: rgb(250,250,250);}")
 
-        objM.tabWidget.setStyleSheet("QTabWidget::pane { background: rgb(210, 211, 219);} ")
+        objM.tabWidget.setStyleSheet("QTabWidget::pane { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
 
         objM.homeTabStack.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
-        objM.library.setStyleSheet("#libraryOrigin { background: rgb(210, 211, 219);} ")
+        objM.library.setStyleSheet("#libraryOrigin { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
+        
+        # objM.library.noItems.setStyleSheet("#libraryOrigin { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
+        
+        # objM.library.descriptionPage.setStyleSheet("#libraryOrigin { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
+
+        objM.library.libraryScrollArea.setStyleSheet("QScrollBar:vertical { width: 7px; background-color: }")
+
+        objM.library.libraryScrollAreaWidget.setStyleSheet("QSCrollArea{ border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } ")
 
         objM.apiButton.setStyleSheet("QPushButton{ border-radius: 18px;}")
         
