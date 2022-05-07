@@ -48,10 +48,10 @@ if __name__ == "__main__":
     stWindowLayout = QVBoxLayout()
     stWindowLayout.addWidget(stWindow)
 
-    customTitleBar = WindowTitleBar(appWindow, appWindowTitleCustom, stWindow.windowIcon)
+    customTitleBar = WindowTitleBar(appWindow, appWindowTitleCustom, stWindow)
 
     cLayout = QVBoxLayout()
-    cWidget = MoveableWindow(appWindow)
+    cWidget = MoveableWindow(appWindow, stWindow)
     cWidget.setSizePolicy(sizePolicy)
     cWidget.setFixedHeight(30)
     cWidget.refIcon = customTitleBar.restoreIcon

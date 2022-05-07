@@ -111,15 +111,19 @@ class Themes:
 
         objM.homeTabStack.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
-        objM.library.setStyleSheet("#libraryOrigin { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
+        objM.library.setStyleSheet("#libraryOrigin { background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
         
-        # objM.library.noItems.setStyleSheet("#libraryOrigin { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
+        objM.library.noItems.setStyleSheet(" background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
         
-        # objM.library.descriptionPage.setStyleSheet("#libraryOrigin { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
+        objM.library.descriptionPage.setStyleSheet("background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
-        objM.library.libraryScrollArea.setStyleSheet("QScrollBar:vertical { width: 7px; background-color: }")
+        objM.library.libraryShelf.setStyleSheet("background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
-        objM.library.libraryScrollAreaWidget.setStyleSheet("QSCrollArea{ border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } ")
+        self.scrollbarStyleLight = "QScrollArea { background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QScrollBar:vertical { width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;} QScrollBar::handle:vertical { background: rgb(128, 128, 128); min-height:0px; border-radius: 3px;} QScrollBar::add-line:vertical { background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical {  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }"
+
+        objM.library.libraryScrollArea.setStyleSheet(self.scrollbarStyleLight)
+
+        # objM.library.libraryScrollAreaWidget.setStyleSheet("QSCrollArea{ border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } ")
 
         objM.apiButton.setStyleSheet("QPushButton{ border-radius: 18px;}")
         
@@ -279,12 +283,15 @@ class ToggleSwitch(QPushButton):
 
 
 class WindowTitleBar(QHBoxLayout):
-    def __init__(self, obj, widgetTitle, widgetIcon):
+    def __init__(self, obj, widgetTitle, widget):
         super().__init__()
         
         self.obj = obj
         self.widgetTitle = widgetTitle
-        self.widgetIcon = widgetIcon
+        self.widget = widget # StsckedWidgetWindow or stWindow
+        self.widgetIcon = widget.windowIcon
+        self.widgetMainW = self.widget.objMainWindow
+        self.widgetLibrary = self.widget.objMainWindow.library
         widIcon = 30
         iconsize = 30
         iconsizew = 48
@@ -378,6 +385,8 @@ class WindowTitleBar(QHBoxLayout):
         if self.obj.windowState() == Qt.WindowState.WindowMaximized:
             self.obj.resize(QSize(self.resize_width, self.resize_height))
             self.obj.setWindowState(Qt.WindowState.WindowActive)
+            if self.widgetMainW.viewIsGrid:
+                self.widgetLibrary.libraryResized()
             
             self.restoreIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.restoreIcon.setIcon(self.restoreIconIcon)
@@ -385,17 +394,22 @@ class WindowTitleBar(QHBoxLayout):
         else:
             self.obj.showMaximized()
             self.obj.setWindowState(Qt.WindowState.WindowMaximized)
+            if self.widgetMainW.viewIsGrid:
+                self.widgetLibrary.libraryMaximized()
 
             self.restoreIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.restoreIcon.setIcon(self.restoreIconIcon)
 
 class MoveableWindow(QWidget):
-    def __init__(self, obj):
+    def __init__(self, obj, widget):
         super().__init__()
         self.refIcon = QPushButton()
         self.refIconIcon = QIcon()
         self.obj = obj
         self.obj.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.widget = widget # StsckedWidgetWindow or stWindow
+        self.widgetMainW = self.widget.objMainWindow
+        self.widgetLibrary = self.widget.objMainWindow.library
         
         self.oldPosition = self.pos()
 
@@ -409,12 +423,17 @@ class MoveableWindow(QWidget):
             self.obj.setWindowState(Qt.WindowState.WindowNoState)
             # self.obj.resize(QSize(1092, 614))
             self.obj.setGeometry(200, 0, 1092, 614)
+            if self.widgetMainW.viewIsGrid:
+                self.widgetLibrary.libraryResized()
+
             self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
 
         elif self.obj.windowState() == Qt.WindowState.WindowNoState or self.obj.windowState() == Qt.WindowState.WindowActive:
             self.obj.showMaximized()
             self.obj.setWindowState(Qt.WindowState.WindowMaximized)
+            if self.widgetMainW.viewIsGrid:
+                self.widgetLibrary.libraryMaximized()
 
             self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
@@ -426,6 +445,8 @@ class MoveableWindow(QWidget):
 
         self.obj.resize(QSize(1092, 614))
         self.obj.setWindowState(Qt.WindowState.WindowActive)
+        if self.widgetMainW.viewIsGrid:
+                self.widgetLibrary.libraryResized()
 
         self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.refIcon.setIcon(self.refIconIcon)

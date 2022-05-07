@@ -24,7 +24,6 @@ from themes import Themes
 # from settings import Settings
 
 from PyQt6.QtWidgets import (
-    QTabBar,
     QStackedWidget,
     QHBoxLayout,
     QVBoxLayout,
@@ -332,6 +331,7 @@ class MainWindow(QWidget):
         self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj('toggleList'))
 
         self.localSearchButton.clicked.connect(self.localSearchAction)
+        # self.localSearchButton.clicked.connect(self.autoAdd)
         self.localSearchButtonSingleFormat.clicked.connect(self.localSearchSingleFormatAction)
         self.tabWidget.currentChanged.connect(lambda:self.changeTabBarIcon())
 
@@ -615,8 +615,7 @@ class MainWindow(QWidget):
 
     def changeViewType(self, newViewIndex): # More work
         print('Changing view to', self.toggleViewValue[newViewIndex])
-
-        
+   
     def popDialog(self, type):
         if type == 'empty':
             txt, t_txt = "Bundle is empty, Please select a filled directory", "Empty Bundle Error"
@@ -652,10 +651,7 @@ class MainWindow(QWidget):
 
         elif self.localDirDialog != '' and len(dir) != 0:
             rightStructure = self.correctDirStructure(self.localDirPath)
-            print(rightStructure)
             if rightStructure == True:
-                # print(dir, self.localDirDialog)
-                print("voila")
                 self.newPath = self.extractParentFolderPath(self.localDirPath)
                 self.setting.libraryNewPath = self.newPath
 
@@ -736,6 +732,7 @@ class MainWindow(QWidget):
                 emptyCover = False
         if emptyCover == True:
             manhuaMetaDict["MangaCover"] = self.themeObj.defaultCoverImage
+            
         # print(manhuaChapterList)
         sortedManhuaChapterDict = self.sortChapters(manhuaChapterList)
         manhuaMetaDict["Chapters"] = sortedManhuaChapterDict
@@ -743,6 +740,8 @@ class MainWindow(QWidget):
         if not((manhuaMetaDict["MangaTitle"]) in self.localMangaTitleDict):
             self.localMangaTitleDict.update({manhuaMetaDict["MangaTitle"] : manhuaMetaDict})
             self.mangaObj = Manga(self.localMangaTitleDict[manhuaMetaDict["MangaTitle"]], self.library)
+            self.library.libraryMetadata = self.localMangaTitleDict
+            self.library.libraryListdata.append(self.mangaObj)
             self.library.addToLibraryAction(self.mangaObj)
         else:
             self.popDialog('duplicate')
@@ -770,6 +769,14 @@ class MainWindow(QWidget):
                     newSortedDict.update({chapterNameList[ind] : someList[ind]})
         return newSortedDict
 
+    def autoAdd(self):
+        path = Path("C:\\Users\\Eniola Olawale\\Documents\\DSBPrivacy\\Eniola Emmanuel Olawale\\Manga")
+        dir = os.listdir(path)
+        for x in dir:
+            xPath = os.path.join(path, x)
+            self.addToLibrary(xPath)
+
+
     # def addMangaWidgetsToLibrary(self, obj):
     #     if self.viewIsGrid:
     #         self.libraryShelfGridLayout.addWidget(obj)
@@ -780,7 +787,6 @@ class MainWindow(QWidget):
     #     self.tabWidget.setCurrentIndex(1)
 
 
-
 class Library(QStackedWidget):
     def __init__(self, obj, parent):
         super(Library, self).__init__(parent)
@@ -789,7 +795,10 @@ class Library(QStackedWidget):
         
         self.gridX = 0
         self.gridY = 0
-        self.gridYLimit = 5
+        self.gridYLimit = 7
+
+        self.libraryMetadata = dict()
+        self.libraryListdata = list()
 
         self.noItems = QWidget()
         self.libraryShelf = QWidget()
@@ -805,21 +814,23 @@ class Library(QStackedWidget):
 
 
     def loadLibraryTab(self):
-
         # Check if the lbrary shelf has a layout and remove it first.... PLEASE DO THIS
-
-
         self.libraryShelfLayout = QVBoxLayout(self.libraryShelf)
         self.libraryShelfLayout.setContentsMargins(0, 0, 0, 0)
 
         self.libraryScrollArea = QScrollArea(self.libraryShelf)
         self.libraryScrollArea.setWidgetResizable(True)
+        self.libraryScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.libraryScrollAreaWidget = QWidget()
 
         if self.obj.viewIsGrid:
             self.libraryShelfGridLayout = QGridLayout(self.libraryScrollAreaWidget)
             self.libraryScrollArea.setWidget(self.libraryScrollAreaWidget)
+            self.libraryShelfGridLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+            self.libraryShelfGridLayout.setDefaultPositioning(0, Qt.Orientation.Horizontal)
+            self.libraryShelfGridLayout.setContentsMargins(5, 10, 5, 10)
+            # self.libraryShelfGridLayout.setSpacing(10)
         else:
             self.libraryShelfListLayout = QVBoxLayout(self.libraryScrollAreaWidget)
             self.libraryScrollArea.setWidget(self.libraryScrollAreaWidget)
@@ -828,12 +839,14 @@ class Library(QStackedWidget):
     def loadLibraryItems(self):
         print("View is", self.obj.viewIsGrid)
         self.loadLibraryTab()
+        if self.obj.viewIsGrid:
+            self.libraryMaximized()
         self.libraryShelf.setLayout(self.libraryShelfLayout)
 
     def addToLibraryAction(self, mangaObj):
         if self.obj.viewIsGrid:
             if self.gridYLimit >= self.gridY: 
-                self.libraryShelfGridLayout.addWidget(mangaObj, self.gridX, self.gridY, 1, 1)#Alignment
+                self.libraryShelfGridLayout.addWidget(mangaObj, self.gridX, self.gridY, 1, 1)
             else:
                 self.gridY = 0
                 self.gridX += 1
@@ -843,7 +856,37 @@ class Library(QStackedWidget):
             self.libraryShelfListLayout.addWidget(mangaObj)
         self.obj.tabWidget.setCurrentIndex(1)
         self.setCurrentIndex(1)
-        print("Current is 1")
+        print("Manga Obj Geometry: ", mangaObj.geometry(), "\n\n")
+
+    def libraryMaximized(self):
+        self.libraryDisplayChangeAction(7)
+
+    def libraryResized(self):
+        self.libraryDisplayChangeAction(5)
+
+    def libraryDisplayChangeAction(self, limit):
+        print("I am running")
+        self.gridYLimit = limit
+        self.libraryItemLength = len(self.libraryListdata)
+
+        xLen = int(self.libraryItemLength / (limit + 1))
+        if self.libraryItemLength % (limit + 1) != 0:
+            xLen += 1
+            # print(xLen)
+        i = 0
+        for x in range(xLen):
+            for y  in range(limit + 1):
+                if i < self.libraryItemLength:
+                    self.libraryShelfGridLayout.addWidget(self.libraryListdata[i], x, y, 1, 1)
+                    self.gridX = x
+                    self.gridY = y + 1
+                    print(f"x = {x} y = {y} i = {i}")
+                    i += 1
+                else:
+                    break
+
+        print("Len of library List: ", self.libraryItemLength)
+        print("library List: ", self.libraryListdata)
 
 
 
@@ -919,10 +962,9 @@ class Manga(QPushButton):
         self.mangaBgLayout.setContentsMargins(5, 5, 5, 10)
         
         self.setLayout(self.mangaBgLayout)
-        self.setMaximumSize(QSize(120, 170))
-        self.setMinimumSize(QSize(110, 160))
-        self.setStyleSheet(" QLabel#mangaLabel{ padding: 7px; border-radius: 5px;}  QLabel#nameLabel{ padding: 1px; border-radius: 5px;} QPushButton#fav { background: rgb(147,148,165); border-radius: 5px;} QPushButton#fav:hover { background-color: rgb(72,75,106)} .Manga { border-radius: 5px; background-color: rgba(147,148,165,40);} .Manga:hover{ background: rgba(0, 0, 0, 40); }")
-        print("I am now a manga \nMy name is", self.mangaName, "\nMy Image is", self.mangaCover)
+        self.setMaximumSize(QSize(110, 170))
+        self.setMinimumSize(QSize(110, 170))
+        self.setStyleSheet(" QLabel#mangaLabel{ padding: 7px; border-radius: 5px; background-color: white; border: none;}  QLabel#nameLabel{ padding: 1px; border-radius: 5px;} QPushButton#fav { background: rgb(147,148,165);  border: none; border-radius: 5px;} QPushButton#fav:hover { background-color: rgb(72,75,106)} .Manga { border-radius: 5px; background-color: white;} .Manga:hover{ background: rgba(0, 0, 0, 40); }")
 
         self.mangaFavoriteButton.clicked.connect(lambda: self.favorite(self.isFavorite))
         # self.show()
