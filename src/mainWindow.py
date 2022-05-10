@@ -856,6 +856,7 @@ class Library(QStackedWidget):
             self.libraryShelfListLayout.addWidget(mangaObj)
         self.obj.tabWidget.setCurrentIndex(1)
         self.setCurrentIndex(1)
+        # print(self.geometry())
         print("Manga Obj Geometry: ", mangaObj.geometry(), "\n\n")
 
     def libraryMaximized(self):
@@ -865,7 +866,7 @@ class Library(QStackedWidget):
         self.libraryDisplayChangeAction(5)
 
     def libraryDisplayChangeAction(self, limit):
-        print("I am running")
+        print(self.obj.tabWidget.geometry())
         self.gridYLimit = limit
         self.libraryItemLength = len(self.libraryListdata)
 
@@ -880,13 +881,9 @@ class Library(QStackedWidget):
                     self.libraryShelfGridLayout.addWidget(self.libraryListdata[i], x, y, 1, 1)
                     self.gridX = x
                     self.gridY = y + 1
-                    print(f"x = {x} y = {y} i = {i}")
                     i += 1
                 else:
                     break
-
-        print("Len of library List: ", self.libraryItemLength)
-        print("library List: ", self.libraryListdata)
 
 
 
