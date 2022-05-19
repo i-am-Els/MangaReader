@@ -446,7 +446,7 @@ class MoveableWindow(QWidget):
         self.obj.resize(QSize(1092, 614))
         self.obj.setWindowState(Qt.WindowState.WindowActive)
         if self.widgetMainW.viewIsGrid:
-                self.widgetLibrary.libraryResized()
+            self.widgetLibrary.libraryResized()
 
         self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.refIcon.setIcon(self.refIconIcon)

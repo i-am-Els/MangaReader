@@ -44,7 +44,7 @@ if __name__ == "__main__":
     appLayout = QVBoxLayout()
     appWidget = QWidget()
 
-    stWindow = setup.Window()
+    stWindow = setup.Window(appWindow)
     stWindowLayout = QVBoxLayout()
     stWindowLayout.addWidget(stWindow)
 

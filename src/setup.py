@@ -32,15 +32,15 @@ class Link(object):
 
 
 class Window(QStackedWidget):
-    def __init__(self):
+    def __init__(self, appW):
         super().__init__()
-
+        self.appW = appW
         self.windowIcon = QIcon()
         self.windowIcon.addPixmap(QPixmap("resources/logo/mrlogoRound.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.windowIcon)
 
 
-        self.objMainWindow = mainWindow.MainWindow(Link, self, self.windowIcon)
+        self.objMainWindow = mainWindow.MainWindow(Link, self, self.windowIcon, self.appW)
         self.objReader = reader.Reader(Link, self)
         self.objPref = pref.Preference(Link, self)
 
