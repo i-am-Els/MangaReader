@@ -377,12 +377,9 @@ class MainWindow(QWidget):
         self.library.setObjectName("libraryOrigin")
         self.libraryIcon = QIcon() 
 
-        # self.loadLibraryItems()
 
         #---------------------------------------------------     
-        # self.tabBar.addTab(self.homeIcon, "Home")
-        # self.tabBar.addTab(self.libraryIcon, "Library")
-        # self.tabWidget.setTabBar(self.tabBar)  
+       
         self.tabWidget.addTab(self.home, self.homeIcon, "Home")
         self.tabWidget.addTab(self.library, self.libraryIcon, "Library")
         self.tabWidget.setCurrentIndex(0)
@@ -577,7 +574,6 @@ class MainWindow(QWidget):
 
             if self.launchDone:
                 self.library.switchLayout("grid")
-                # self.library.switchAllManhuaInLibVariant("list")
                 
             return self.viewOptionIndex, self.previousViewOptionIndex
 
@@ -597,8 +593,6 @@ class MainWindow(QWidget):
 
             if self.launchDone:
                 self.library.switchLayout("list")
-                # self.library.switchAllManhuaInLibVariant("grid")
-                # self.library.libraryListReDisplay()
             return self.viewOptionIndex, self.previousViewOptionIndex
 
     def selectViewType(self, viewsIndex):
@@ -711,15 +705,6 @@ class MainWindow(QWidget):
         file_n = os.path.basename(path)
         return file_n
 
-
-    # def addManhuaWidgetsToLibrary(self, obj):
-    #     if self.viewIsGrid:
-    #         self.libraryShelfGridLayout.addWidget(obj)
-    #         print("display me as Grid")
-    #     else:
-    #         self.libraryShelfListLayout.addWidget(obj)
-    #         print("display me as List")
-    #     self.tabWidget.setCurrentIndex(1)
 
 
 class Library(QStackedWidget):
@@ -923,10 +908,6 @@ class Library(QStackedWidget):
         else:
             self.loadLibraryItems()
 
-    # def switchAllManhuaInLibVariant(self, type):
-    #     self.libraryItemLength = len(self.libraryListdata)
-    #     for x in range(self.libraryItemLength):
-    #         self.libraryListdata[x].switchVariant(type)
 
 
 class Manhua(QPushButton):
@@ -1072,20 +1053,4 @@ class Manhua(QPushButton):
 
     def deleteSelf(self):
         ...
-
-    def switchVariant(self, type):
-        if type == "list":
-            # self.objectHolder.remove(self.manhuaBgLayoutList)
-            self.objectHolder.clear()
-            self.manhuaBgLayoutGrid = QVBoxLayout()
-            self.objectHolder.add(self.manhuaBgLayoutGrid)
-            self.recreateObjectWidgets()
-            self.displayGridVariant()
-        else:
-            # self.objectHolder.remove(self.manhuaBgLayoutGrid)
-            self.objectHolder.clear()
-            self.manhuaBgLayoutList = QHBoxLayout()
-            self.objectHolder.add(self.manhuaBgLayoutList)
-            self.recreateObjectWidgets()
-            self.displayListVariant()
         
