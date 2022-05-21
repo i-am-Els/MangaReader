@@ -19,10 +19,7 @@
 
 from pathlib import Path
 import os, re
-
 from themes import Themes
-# from settings import Settings
-
 from PyQt6.QtWidgets import (
     QStackedWidget,
     QHBoxLayout,
@@ -40,9 +37,9 @@ from PyQt6.QtWidgets import (
     QComboBox, 
     QScrollArea
 )
-
 from PyQt6.QtCore import QSize, Qt, QObjectCleanupHandler
 from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
+
 
 
 class MainWindow(QWidget):
@@ -266,8 +263,8 @@ class MainWindow(QWidget):
         self.toggleList = [self.toggleGridView, self.toggleListView]
         self.toggleViewValue = ["Grid View", "List View"]
 
-        self.previousViewOptionIndex = 0
-        self.viewOptionIndex = 0
+        self.previousViewOptionIndex = 1
+        self.viewOptionIndex = 1
 
         self.view = QLabel(self.toggleViewValue[self.viewOptionIndex])
         #----------------------------------------------------
@@ -334,7 +331,6 @@ class MainWindow(QWidget):
         self.tabWidget.currentChanged.connect(lambda:self.changeTabBarIcon())
         self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj('toggleGrid'))
         self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj('toggleList'))
-
 
     def setApiIndex(self, intIndex):
         clickedIndex = intIndex
@@ -712,7 +708,6 @@ class Library(QStackedWidget):
         super(Library, self).__init__(parent)
         self.parent = parent
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.objectHolder = QObjectCleanupHandler()
         self.gridX = 0
         self.gridY = 0
         self.gridYLimit = 7
@@ -748,6 +743,7 @@ class Library(QStackedWidget):
 
         else:
             self.libraryShelfListLayout = QVBoxLayout(self.libraryScrollAreaWidget)
+            self.libraryShelfListLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
             self.libraryScrollArea.setWidget(self.libraryScrollAreaWidget)
             self.libraryShelfListLayout.setContentsMargins(5, 10, 5, 10)
 
@@ -915,8 +911,6 @@ class Manhua(QPushButton):
         super(Manhua, self).__init__(parent)
         self.metadata: dict = metadata
         self.parent = parent
-        self.objectHolder = QObjectCleanupHandler()
-        # self.justCreated = True
         self.setCheckable(True)
         # self.setChecked(False)
         self.manhuaName = metadata["ManhuaTitle"]
@@ -934,20 +928,19 @@ class Manhua(QPushButton):
        
         if self.parent.parent.viewIsGrid:
             self.manhuaBgLayoutGrid = QVBoxLayout()
-            self.objectHolder.add(self.manhuaBgLayoutGrid)
             self.displayGridVariant()
         else:
             self.manhuaBgLayoutList = QHBoxLayout()
-            self.objectHolder.add(self.manhuaBgLayoutList)
             self.displayListVariant()
-        # self.show()
-
+        
     def recreateObjectWidgets(self):
         self.manhuaCoverDisplayLabel = QLabel()
         self.manhuaCoverDisplayLabel.setObjectName("manhuaLabel")
         self.manhuaCoverDisplayLabel.setSizePolicy(self.sizePolicy)
         self.manhuaCoverLayout = QVBoxLayout()
         self.manhuaDetailsLayout = QHBoxLayout()
+        self.manhuaDetailsLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
         # self.manhuaDetailsWidget = QWidget()
         self.manhuaNameLabel = QLabel()
         self.manhuaNameLabel.setObjectName("nameLabel")
@@ -986,8 +979,6 @@ class Manhua(QPushButton):
         self.setStyleSheet(" QLabel#manhuaLabel{ padding: 7px; border-radius: 5px; background-color: white; border: none;}  QLabel#nameLabel{ padding: 1px; border-radius: 5px;} QPushButton#fav { background: rgb(147,148,165);  border: none; border-radius: 5px;} QPushButton#fav:hover { background-color: rgb(72,75,106)} .Manhua { border-radius: 5px; background-color: white;} .Manhua:hover{ background: rgba(0, 0, 0, 40); }")
 
         self.manhuaFavoriteButton.clicked.connect(lambda: self.favorite(self.isFavorite))
-
-
 
     def displayGridVariant(self):
         self.manhuaDetailsLayout.setStretch(0, 7)
