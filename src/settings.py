@@ -1,4 +1,4 @@
-# Manhua Reader,  An application for reading mangas and manhuas online and offline
+# Manhua Reader,  An application for reading manhuas and manhuas online and offline
 # Copyright (C) 2022  Eniola Emmanuel Olawale
 
 # This program is free software: you can redistribute it and/or modify
@@ -35,7 +35,7 @@ class Settings(object):
         
         self.libraryInitPath = "C:\\"
         self.libraryNewPath = self.libraryInitPath
-        self.localMangaTitleDict = dict()
+        self.localManhuaTitleDict = dict()
 
 
 
@@ -57,7 +57,7 @@ class Settings(object):
 
         self.downloadNewPath = self.downloadInitPath
 
-        self.apiName = ['Asura Scan', 'Mangabat', 'HolyManga']
+        self.apiName = ['Asura Scan', 'Manhuabat', 'HolyManhua']
         self.apiIndex = 1
         
     def setMainWindowVariables(self):
@@ -67,7 +67,7 @@ class Settings(object):
 
         self.objM.apiName = self.apiName
         self.objM.apiIndex = self.apiIndex
-        self.objM.localMangaTitleDict = self.localMangaTitleDict
+        self.objM.localManhuaTitleDict = self.localManhuaTitleDict
 
     def setPrefVariables(self):
         self.objP.compressionState = self.compressionState

@@ -1,4 +1,4 @@
-# Manhua Reader,  An application for reading mangas and manhuas online and offline
+# Manhua Reader,  An application for reading manhuas and manhuas online and offline
 # Copyright (C) 2022  Eniola Emmanuel Olawale
 
 # This program is free software: you can redistribute it and/or modify
@@ -64,7 +64,7 @@ class Window(QStackedWidget):
         self.objPref.themeObj = self.theme
 
 
-        # self.objMainWindow.library.loadLibraryTab()
+        # self.objMainWindow.library.loadLibraryItems()
         self.objMainWindow.loadHomeTab()
         
     def changeStackIndex(self, obj, w_index):

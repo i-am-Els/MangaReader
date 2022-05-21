@@ -1,4 +1,4 @@
-# Manhua Reader,  An application for reading mangas and manhuas online and offline
+# Manhua Reader,  An application for reading manhuas and manhuas online and offline
 # Copyright (C) 2022  Eniola Emmanuel Olawale
 
 # This program is free software: you can redistribute it and/or modify
@@ -71,8 +71,8 @@ class MainWindow(QWidget):
         self.firstRun = True
         self.launchDone = False
 
-        self.localMangaTitleDict = dict()
-        self.mangaObj = object()
+        self.localManhuaTitleDict = dict()
+        self.manhuaObj = object()
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
@@ -171,7 +171,7 @@ class MainWindow(QWidget):
         self.apiButton = QPushButton()
         # self.apiButton.addItems(self.apiName)
         self.apiButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.apiButton.setToolTip("Manga plugin dropdown here...")
+        self.apiButton.setToolTip("Manhua plugin dropdown here...")
 
         self.apiButton.setCheckable(True)
         self.apiButton.setSizePolicy(self.sizePolicy)
@@ -266,8 +266,8 @@ class MainWindow(QWidget):
         self.toggleList = [self.toggleGridView, self.toggleListView]
         self.toggleViewValue = ["Grid View", "List View"]
 
-        self.previousViewOptionIndex = 1
-        self.viewOptionIndex = 1
+        self.previousViewOptionIndex = 0
+        self.viewOptionIndex = 0
 
         self.view = QLabel(self.toggleViewValue[self.viewOptionIndex])
         #----------------------------------------------------
@@ -373,11 +373,11 @@ class MainWindow(QWidget):
         self.home.setLayout(self.homeTabStackLayout)
         #---------------------------------------------------
 
-        self.library = Library(parent=self)
+        self.library = Library(self.appW, parent=self)
         self.library.setObjectName("libraryOrigin")
         self.libraryIcon = QIcon() 
 
-        # self.loadLibraryTab()
+        # self.loadLibraryItems()
 
         #---------------------------------------------------     
         # self.tabBar.addTab(self.homeIcon, "Home")
@@ -577,11 +577,8 @@ class MainWindow(QWidget):
 
             if self.launchDone:
                 self.library.switchLayout("grid")
-                self.library.switchAllMangaInLibVariant("list")
-                if self.appW.windowState() == Qt.WindowState.WindowMaximized or self.appW.windowState() == Qt.WindowState.WindowFullScreen:
-                    self.library.libraryMaximized()
-                elif self.appW.windowState() == Qt.WindowState.WindowNoState or self.appW.windowState() == Qt.WindowState.WindowActive:
-                    self.library.libraryResized()
+                # self.library.switchAllManhuaInLibVariant("list")
+                
             return self.viewOptionIndex, self.previousViewOptionIndex
 
         else:
@@ -600,8 +597,8 @@ class MainWindow(QWidget):
 
             if self.launchDone:
                 self.library.switchLayout("list")
-                self.library.switchAllMangaInLibVariant("grid")
-                self.library.libraryListReDisplay()
+                # self.library.switchAllManhuaInLibVariant("grid")
+                # self.library.libraryListReDisplay()
             return self.viewOptionIndex, self.previousViewOptionIndex
 
     def selectViewType(self, viewsIndex):
@@ -638,7 +635,7 @@ class MainWindow(QWidget):
         elif type == 'none':
             txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.cbr' files.", "Not an Archive File"
         elif type == 'duplicate':
-             txt, t_txt = "The manga title already exists in your library, select another title", "Duplicate Action"
+             txt, t_txt = "The manhua title already exists in your library, select another title", "Duplicate Action"
         
         messageBox = QMessageBox()
         messageBox.setIcon(QMessageBox.Icon.Information)
@@ -664,12 +661,12 @@ class MainWindow(QWidget):
             pass
 
         elif self.localDirDialog != '' and len(dir) != 0:
-            rightStructure = self.correctDirStructure(self.localDirPath)
+            rightStructure = self.library.correctDirStructure(self.localDirPath)
             if rightStructure == True:
                 self.newPath = self.extractParentFolderPath(self.localDirPath)
                 self.setting.libraryNewPath = self.newPath
 
-                self.addToLibrary(self.localDirPath)
+                self.library.addToLibrary(self.localDirPath)
             else:
                 self.popDialog('structure')
                 self.localSearchAction()
@@ -714,6 +711,136 @@ class MainWindow(QWidget):
         file_n = os.path.basename(path)
         return file_n
 
+
+    # def addManhuaWidgetsToLibrary(self, obj):
+    #     if self.viewIsGrid:
+    #         self.libraryShelfGridLayout.addWidget(obj)
+    #         print("display me as Grid")
+    #     else:
+    #         self.libraryShelfListLayout.addWidget(obj)
+    #         print("display me as List")
+    #     self.tabWidget.setCurrentIndex(1)
+
+
+class Library(QStackedWidget):
+    def __init__(self, appW, parent):
+        super(Library, self).__init__(parent)
+        self.parent = parent
+        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.objectHolder = QObjectCleanupHandler()
+        self.gridX = 0
+        self.gridY = 0
+        self.gridYLimit = 7
+        self.appW = appW
+
+        self.libraryMetadata = dict()
+        self.libraryListdata = list()
+
+        self.noItems = QWidget()
+        self.libraryShelf = QWidget()
+        self.descriptionPage = QWidget()
+        
+        self.addWidget(self.noItems)
+        self.addWidget(self.libraryShelf)
+        self.addWidget(self.descriptionPage)
+
+        self.setCurrentIndex(0)
+
+        self.loadLibraryLayout()
+        self.parent.launchDone = True
+
+    def loadLibraryItems(self):
+        # Check if the lbrary shelf has a layout and remove it first.... PLEASE DO THIS
+        self.libraryScrollAreaWidget = QWidget()
+
+        if self.parent.viewIsGrid:
+            self.libraryShelfGridLayout = QGridLayout(self.libraryScrollAreaWidget)
+            self.libraryScrollArea.setWidget(self.libraryScrollAreaWidget)
+            self.libraryShelfGridLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+            self.libraryShelfGridLayout.setDefaultPositioning(0, Qt.Orientation.Horizontal)
+            self.libraryShelfGridLayout.setContentsMargins(5, 10, 5, 10)
+            # self.libraryShelfGridLayout.setSpacing(10)
+
+        else:
+            self.libraryShelfListLayout = QVBoxLayout(self.libraryScrollAreaWidget)
+            self.libraryScrollArea.setWidget(self.libraryScrollAreaWidget)
+            self.libraryShelfListLayout.setContentsMargins(5, 10, 5, 10)
+
+        self.recreateManhuas()
+
+        if self.parent.viewIsGrid:
+            if self.appW.windowState() == Qt.WindowState.WindowMaximized or self.appW.windowState() == Qt.WindowState.WindowFullScreen:
+                self.libraryMaximized()
+            elif self.appW.windowState() == Qt.WindowState.WindowNoState or self.appW.windowState() == Qt.WindowState.WindowActive:
+                self.libraryResized()
+        else: 
+            self.libraryListReDisplay()
+
+        self.libraryShelfLayout.addWidget(self.libraryScrollArea)
+        
+    def loadLibraryLayout(self):
+        print("View is", self.parent.viewIsGrid)
+
+        self.libraryShelfLayout = QVBoxLayout(self.libraryShelf)
+        self.libraryShelfLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.libraryScrollArea = QScrollArea(self.libraryShelf)
+        self.libraryScrollArea.setWidgetResizable(True)
+        self.libraryScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        self.loadLibraryItems()
+        self.libraryShelf.setLayout(self.libraryShelfLayout)
+
+    def addToLibraryAction(self, manhuaObj):
+        if self.parent.viewIsGrid:
+            if self.gridYLimit >= self.gridY: 
+                self.libraryShelfGridLayout.addWidget(manhuaObj, self.gridX, self.gridY, 1, 1)
+            else:
+                self.gridY = 0
+                self.gridX += 1
+                self.libraryShelfGridLayout.addWidget(manhuaObj, self.gridX, self.gridY, 1, 1)
+            self.gridY += 1
+        else:
+            self.libraryShelfListLayout.addWidget(manhuaObj)
+        self.parent.tabWidget.setCurrentIndex(1)
+        self.setCurrentIndex(1)
+        # print(self.geometry())
+        print("Manhua Obj Geometry: ", manhuaObj.geometry(), "\n\n")
+
+    def libraryMaximized(self):
+        self.libraryDisplayChangeAction(7)
+
+    def libraryResized(self):
+        self.libraryDisplayChangeAction(5)
+
+    def libraryDisplayChangeAction(self, limit):
+        print(self.parent.tabWidget.geometry())
+        self.gridYLimit = limit
+        self.libraryItemLength = len(self.libraryListdata)
+        if self.libraryItemLength != 0:
+            xLen = int(self.libraryItemLength / (limit + 1))
+            if self.libraryItemLength % (limit + 1) != 0:
+                xLen += 1
+                # print(xLen)
+            i = 0
+            for x in range(xLen):
+                for y  in range(limit + 1):
+                    if i < self.libraryItemLength:
+                        # self.libraryListdata[i].switchVariant("list")
+                        self.libraryShelfGridLayout.addWidget(self.libraryListdata[i], x, y, 1, 1)
+                        self.gridX = x
+                        self.gridY = y + 1
+                        i += 1
+                    else:
+                        break
+
+    def libraryListReDisplay(self):
+        self.libraryItemLength = len(self.libraryListdata)
+        if self.libraryItemLength != 0:
+            for x in range(self.libraryItemLength):
+                # self.libraryListdata[x].switchVariant("grid")
+                self.libraryShelfListLayout.addWidget(self.libraryListdata[x])
+
     def correctDirStructure(self, path):
         correct = False
         imageExtList = ['.jpeg', '.jpg', '.png']
@@ -731,8 +858,8 @@ class MainWindow(QWidget):
         manhuaMetaDict = dict()
         manhuaChapterList = list()
 
-        manhuaMetaDict["MangaTitle"] = Path(path).stem
-        manhuaMetaDict["MangaPath"] = str(path)
+        manhuaMetaDict["ManhuaTitle"] = Path(path).stem
+        manhuaMetaDict["ManhuaPath"] = str(path)
         emptyCover = True
 
         for x in os.listdir(path):
@@ -742,21 +869,21 @@ class MainWindow(QWidget):
                 sChapterName = Path(xPath).name
                 manhuaChapterList.append(sChapterName)
             elif Path(xPath).suffix in ['.jpeg', '.jpg', '.png'] and emptyCover == True:
-                manhuaMetaDict["MangaCover"] = xPath
+                manhuaMetaDict["ManhuaCover"] = xPath
                 emptyCover = False
         if emptyCover == True:
-            manhuaMetaDict["MangaCover"] = self.themeObj.defaultCoverImage
+            manhuaMetaDict["ManhuaCover"] = self.parent.themeObj.defaultCoverImage
             
         # print(manhuaChapterList)
         sortedManhuaChapterDict = self.sortChapters(manhuaChapterList)
         manhuaMetaDict["Chapters"] = sortedManhuaChapterDict
+        manhuaMetaDict["IsFav"] = False
 
-        if not((manhuaMetaDict["MangaTitle"]) in self.localMangaTitleDict):
-            self.localMangaTitleDict.update({manhuaMetaDict["MangaTitle"] : manhuaMetaDict})
-            self.mangaObj = Manga(self.localMangaTitleDict[manhuaMetaDict["MangaTitle"]], self.library)
-            self.library.libraryMetadata = self.localMangaTitleDict
-            self.library.libraryListdata.append(self.mangaObj)
-            self.library.addToLibraryAction(self.mangaObj)
+        if not((manhuaMetaDict["ManhuaTitle"]) in self.libraryMetadata):
+            self.libraryMetadata.update({manhuaMetaDict["ManhuaTitle"] : manhuaMetaDict})
+            self.manhuaObj = Manhua(self.libraryMetadata[manhuaMetaDict["ManhuaTitle"]], self)
+            self.libraryListdata.append(self.manhuaObj)
+            self.addToLibraryAction(self.manhuaObj)
         else:
             self.popDialog('duplicate')
 
@@ -783,267 +910,137 @@ class MainWindow(QWidget):
                     newSortedDict.update({chapterNameList[ind] : someList[ind]})
         return newSortedDict
 
-    def autoAdd(self):
-        path = Path("C:\\Users\\Eniola Olawale\\Documents\\DSBPrivacy\\Eniola Emmanuel Olawale\\Manga")
-        dir = os.listdir(path)
-        for x in dir:
-            xPath = os.path.join(path, x)
-            self.addToLibrary(xPath)
-
-
-    # def addMangaWidgetsToLibrary(self, obj):
-    #     if self.viewIsGrid:
-    #         self.libraryShelfGridLayout.addWidget(obj)
-    #         print("display me as Grid")
-    #     else:
-    #         self.libraryShelfListLayout.addWidget(obj)
-    #         print("display me as List")
-    #     self.tabWidget.setCurrentIndex(1)
-
-
-class Library(QStackedWidget):
-    def __init__(self, parent):
-        super(Library, self).__init__(parent)
-        self.parent = parent
-        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.objectHolder = QObjectCleanupHandler()
-        self.gridX = 0
-        self.gridY = 0
-        self.gridYLimit = 7
-
-        self.libraryMetadata = dict()
-        self.libraryListdata = list()
-
-        self.noItems = QWidget()
-        self.libraryShelf = QWidget()
-        self.descriptionPage = QWidget()
-        
-        self.addWidget(self.noItems)
-        self.addWidget(self.libraryShelf)
-        self.addWidget(self.descriptionPage)
-
-        self.setCurrentIndex(0)
-
-        self.loadLibraryItems()
-        self.parent.launchDone = True
-
-
-    def loadLibraryTab(self):
-        # Check if the lbrary shelf has a layout and remove it first.... PLEASE DO THIS
-        self.libraryShelfLayout = QVBoxLayout(self.libraryShelf)
-        self.libraryShelfLayout.setContentsMargins(0, 0, 0, 0)
-
-        self.libraryScrollArea = QScrollArea(self.libraryShelf)
-        self.libraryScrollArea.setWidgetResizable(True)
-        self.libraryScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-
-        self.libraryScrollAreaWidget = QWidget()
-
-        if self.parent.viewIsGrid:
-            self.libraryShelfGridLayout = QGridLayout(self.libraryScrollAreaWidget)
-            self.libraryScrollArea.setWidget(self.libraryScrollAreaWidget)
-            self.libraryShelfGridLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
-            self.libraryShelfGridLayout.setDefaultPositioning(0, Qt.Orientation.Horizontal)
-            self.libraryShelfGridLayout.setContentsMargins(5, 10, 5, 10)
-            # self.libraryShelfGridLayout.setSpacing(10)
-
-            self.objectHolder.add(self.libraryShelfGridLayout)
-
-        else:
-            self.libraryShelfListLayout = QVBoxLayout(self.libraryScrollAreaWidget)
-            self.libraryScrollArea.setWidget(self.libraryScrollAreaWidget)
-            self.libraryShelfListLayout.setContentsMargins(5, 10, 5, 10)
-
-            self.objectHolder.add(self.libraryShelfListLayout)
-
-        self.libraryShelfLayout.addWidget(self.libraryScrollArea)
-
-    def loadLibraryItems(self):
-        print("View is", self.parent.viewIsGrid)
-        self.loadLibraryTab()
-        if self.parent.viewIsGrid:
-            self.libraryMaximized()
-        self.libraryShelf.setLayout(self.libraryShelfLayout)
-
-    def addToLibraryAction(self, mangaObj):
-        if self.parent.viewIsGrid:
-            if self.gridYLimit >= self.gridY: 
-                self.libraryShelfGridLayout.addWidget(mangaObj, self.gridX, self.gridY, 1, 1)
-            else:
-                self.gridY = 0
-                self.gridX += 1
-                self.libraryShelfGridLayout.addWidget(mangaObj, self.gridX, self.gridY, 1, 1)
-            self.gridY += 1
-        else:
-            self.libraryShelfListLayout.addWidget(mangaObj)
-        self.parent.tabWidget.setCurrentIndex(1)
-        self.setCurrentIndex(1)
-        # print(self.geometry())
-        print("Manga Obj Geometry: ", mangaObj.geometry(), "\n\n")
-
-    def libraryMaximized(self):
-        self.libraryDisplayChangeAction(7)
-
-    def libraryResized(self):
-        self.libraryDisplayChangeAction(5)
-
-    def libraryDisplayChangeAction(self, limit):
-        print(self.parent.tabWidget.geometry())
-        self.gridYLimit = limit
-        self.libraryItemLength = len(self.libraryListdata)
-
-        xLen = int(self.libraryItemLength / (limit + 1))
-        if self.libraryItemLength % (limit + 1) != 0:
-            xLen += 1
-            # print(xLen)
-        i = 0
-        for x in range(xLen):
-            for y  in range(limit + 1):
-                if i < self.libraryItemLength:
-                    # self.libraryListdata[i].switchVariant("list")
-                    self.libraryShelfGridLayout.addWidget(self.libraryListdata[i], x, y, 1, 1)
-                    self.gridX = x
-                    self.gridY = y + 1
-                    i += 1
-                else:
-                    break
-
-    def libraryListReDisplay(self):
-        self.libraryItemLength = len(self.libraryListdata)
-        for x in range(self.libraryItemLength):
-            # self.libraryListdata[x].switchVariant("grid")
-            self.libraryShelfListLayout.addWidget(self.libraryListdata[x])
+    def recreateManhuas(self):
+        self.libraryListdata.clear()
+        for k in self.libraryMetadata.keys():
+            self.manhuaObj = Manhua(self.libraryMetadata[k], self)
+            self.libraryListdata.append(self.manhuaObj)
 
     def switchLayout(self, type):
+        self.libraryScrollAreaWidget.deleteLater()
         if type == "grid":
-            # self.objectHolder.remove(self.libraryShelfListLayout)
-            self.objectHolder.clear()
-            self.libraryShelfGridLayout = QGridLayout()
-            self.libraryScrollAreaWidget.setLayout(self.libraryShelfGridLayout)
+            self.loadLibraryItems()
         else:
-            # self.objectHolder.remove(self.libraryShelfGridLayout)
-            self.objectHolder.clear()
-            self.libraryShelfListLayout = QVBoxLayout()
-            self.libraryScrollAreaWidget.setLayout(self.libraryShelfListLayout)
+            self.loadLibraryItems()
 
-    def switchAllMangaInLibVariant(self, type):
-        self.libraryItemLength = len(self.libraryListdata)
-        for x in range(self.libraryItemLength):
-            self.libraryListdata[x].switchVariant(type)
+    # def switchAllManhuaInLibVariant(self, type):
+    #     self.libraryItemLength = len(self.libraryListdata)
+    #     for x in range(self.libraryItemLength):
+    #         self.libraryListdata[x].switchVariant(type)
 
 
-class Manga(QPushButton):
+class Manhua(QPushButton):
     def __init__(self, metadata, parent=None):
-        super(Manga, self).__init__(parent)
+        super(Manhua, self).__init__(parent)
         self.metadata: dict = metadata
         self.parent = parent
         self.objectHolder = QObjectCleanupHandler()
         # self.justCreated = True
         self.setCheckable(True)
         # self.setChecked(False)
-        self.mangaName = metadata["MangaTitle"]
-        self.mangaPath = Path(metadata["MangaPath"])
-        self.mangaCover = Path(metadata["MangaCover"])
-        self.mangaChapters = metadata["Chapters"]
-        self.mangaId = metadata["MangaTitle"]
-        self.isFavorite = False
+        self.manhuaName = metadata["ManhuaTitle"]
+        self.manhuaPath = Path(metadata["ManhuaPath"])
+        self.manhuaCover = Path(metadata["ManhuaCover"])
+        self.manhuaChapters = metadata["Chapters"]
+        self.manhuaId = metadata["ManhuaTitle"]
+        self.isFavorite = metadata["IsFav"]
         self.bookmarkPosition = object()
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        self.setObjectName(self.mangaName)
+        self.setObjectName(self.manhuaName)
 
-        # self.mangaCoverLabel = QLabel()  #Holds the description page image
+        # self.manhuaCoverLabel = QLabel()  #Holds the description page image
         self.recreateObjectWidgets()
        
         if self.parent.parent.viewIsGrid:
-            self.mangaBgLayoutGrid = QVBoxLayout()
-            self.objectHolder.add(self.mangaBgLayoutGrid)
+            self.manhuaBgLayoutGrid = QVBoxLayout()
+            self.objectHolder.add(self.manhuaBgLayoutGrid)
             self.displayGridVariant()
         else:
-            self.mangaBgLayoutList = QHBoxLayout()
-            self.objectHolder.add(self.mangaBgLayoutList)
+            self.manhuaBgLayoutList = QHBoxLayout()
+            self.objectHolder.add(self.manhuaBgLayoutList)
             self.displayListVariant()
         # self.show()
 
     def recreateObjectWidgets(self):
-        self.mangaCoverDisplayLabel = QLabel()
-        self.mangaCoverDisplayLabel.setObjectName("mangaLabel")
-        self.mangaCoverDisplayLabel.setSizePolicy(self.sizePolicy)
-        self.mangaCoverLayout = QVBoxLayout()
-        self.mangaDetailsLayout = QHBoxLayout()
-        # self.mangaDetailsWidget = QWidget()
-        self.mangaNameLabel = QLabel()
-        self.mangaNameLabel.setObjectName("nameLabel")
-        self.mangaFavoriteButton = QPushButton()
-        self.mangaFavoriteButton.setSizePolicy(self.sizePolicy)
-        self.mangaFavoriteButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.mangaFavoriteButtonIcon = QIcon()
+        self.manhuaCoverDisplayLabel = QLabel()
+        self.manhuaCoverDisplayLabel.setObjectName("manhuaLabel")
+        self.manhuaCoverDisplayLabel.setSizePolicy(self.sizePolicy)
+        self.manhuaCoverLayout = QVBoxLayout()
+        self.manhuaDetailsLayout = QHBoxLayout()
+        # self.manhuaDetailsWidget = QWidget()
+        self.manhuaNameLabel = QLabel()
+        self.manhuaNameLabel.setObjectName("nameLabel")
+        self.manhuaFavoriteButton = QPushButton()
+        self.manhuaFavoriteButton.setSizePolicy(self.sizePolicy)
+        self.manhuaFavoriteButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.manhuaFavoriteButtonIcon = QIcon()
 
-        self.mangaCoverPixmap = QPixmap(str(self.mangaCover)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
-        self.mangaCoverDisplayLabel.setPixmap(self.mangaCoverPixmap)
-        self.mangaCoverLayout.addWidget(self.mangaCoverDisplayLabel)
-        self.mangaCoverLayout.setSpacing(0)
-        self.mangaCoverLayout.setContentsMargins(0, 0, 0, 0)
+        self.manhuaCoverPixmap = QPixmap(str(self.manhuaCover)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+        self.manhuaCoverDisplayLabel.setPixmap(self.manhuaCoverPixmap)
+        self.manhuaCoverLayout.addWidget(self.manhuaCoverDisplayLabel)
+        self.manhuaCoverLayout.setSpacing(0)
+        self.manhuaCoverLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.mangaNameLabel.setText(self.mangaName)
-        self.mangaNameLabel.setSizePolicy(self.sizePolicy)
-        self.mangaNameLabelFont = QFont()
-        self.mangaNameLabelFont.setPointSize(7)
-        self.mangaNameLabelFont.setBold(False)
-        self.mangaNameLabel.setFont(self.mangaNameLabelFont)
-        self.mangaNameLabel.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-        self.mangaNameLabel.setMaximumHeight(20)
+        self.manhuaNameLabel.setText(self.manhuaName)
+        self.manhuaNameLabel.setSizePolicy(self.sizePolicy)
+        self.manhuaNameLabelFont = QFont()
+        self.manhuaNameLabelFont.setPointSize(7)
+        self.manhuaNameLabelFont.setBold(False)
+        self.manhuaNameLabel.setFont(self.manhuaNameLabelFont)
+        self.manhuaNameLabel.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        self.manhuaNameLabel.setMaximumHeight(20)
 
-        self.mangaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        self.mangaFavoriteButton.setIcon(self.mangaFavoriteButtonIcon)
-        self.mangaFavoriteButton.setFixedSize(QSize(20, 20))
-        self.mangaFavoriteButton.setObjectName("fav")
+        self.manhuaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.manhuaFavoriteButton.setIcon(self.manhuaFavoriteButtonIcon)
+        self.manhuaFavoriteButton.setFixedSize(QSize(20, 20))
+        self.manhuaFavoriteButton.setObjectName("fav")
 
-        # self.mangaDetailsWidget.setLayout(self.mangaDetailsLayout)
-        self.mangaDetailsLayout.addWidget(self.mangaNameLabel)
-        self.mangaDetailsLayout.addWidget(self.mangaFavoriteButton)
+        # self.manhuaDetailsWidget.setLayout(self.manhuaDetailsLayout)
+        self.manhuaDetailsLayout.addWidget(self.manhuaNameLabel)
+        self.manhuaDetailsLayout.addWidget(self.manhuaFavoriteButton)
 
-        self.mangaCoverDisplayLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.manhuaCoverDisplayLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.checkFav(self.isFavorite)
 
-        self.setStyleSheet(" QLabel#mangaLabel{ padding: 7px; border-radius: 5px; background-color: white; border: none;}  QLabel#nameLabel{ padding: 1px; border-radius: 5px;} QPushButton#fav { background: rgb(147,148,165);  border: none; border-radius: 5px;} QPushButton#fav:hover { background-color: rgb(72,75,106)} .Manga { border-radius: 5px; background-color: white;} .Manga:hover{ background: rgba(0, 0, 0, 40); }")
+        self.setStyleSheet(" QLabel#manhuaLabel{ padding: 7px; border-radius: 5px; background-color: white; border: none;}  QLabel#nameLabel{ padding: 1px; border-radius: 5px;} QPushButton#fav { background: rgb(147,148,165);  border: none; border-radius: 5px;} QPushButton#fav:hover { background-color: rgb(72,75,106)} .Manhua { border-radius: 5px; background-color: white;} .Manhua:hover{ background: rgba(0, 0, 0, 40); }")
 
-        self.mangaFavoriteButton.clicked.connect(lambda: self.favorite(self.isFavorite))
+        self.manhuaFavoriteButton.clicked.connect(lambda: self.favorite(self.isFavorite))
 
 
 
     def displayGridVariant(self):
-        self.mangaDetailsLayout.setStretch(0, 7)
-        self.mangaDetailsLayout.setStretch(1, 2)
-        self.mangaDetailsLayout.setSpacing(1)
-        self.mangaDetailsLayout.setContentsMargins(0, 0, 0, 0)
+        self.manhuaDetailsLayout.setStretch(0, 7)
+        self.manhuaDetailsLayout.setStretch(1, 2)
+        self.manhuaDetailsLayout.setSpacing(1)
+        self.manhuaDetailsLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.mangaBgLayoutGrid.addLayout(self.mangaCoverLayout)
-        self.mangaBgLayoutGrid.addLayout(self.mangaDetailsLayout)
+        self.manhuaBgLayoutGrid.addLayout(self.manhuaCoverLayout)
+        self.manhuaBgLayoutGrid.addLayout(self.manhuaDetailsLayout)
 
-        self.mangaBgLayoutGrid.setStretch(0, 7)
-        self.mangaBgLayoutGrid.setStretch(1, 1)
-        self.mangaBgLayoutGrid.setSpacing(1)
-        self.mangaBgLayoutGrid.setContentsMargins(5, 5, 5, 10)
+        self.manhuaBgLayoutGrid.setStretch(0, 7)
+        self.manhuaBgLayoutGrid.setStretch(1, 1)
+        self.manhuaBgLayoutGrid.setSpacing(1)
+        self.manhuaBgLayoutGrid.setContentsMargins(5, 5, 5, 10)
         
-        self.setLayout(self.mangaBgLayoutGrid)
+        self.setLayout(self.manhuaBgLayoutGrid)
         self.setMaximumSize(QSize(110, 170))
         self.setMinimumSize(QSize(110, 170))
     
     def displayListVariant(self):
-        self.mangaDetailsLayout.setStretch(0, 10)
-        self.mangaDetailsLayout.setStretch(1, 1)
-        self.mangaDetailsLayout.setSpacing(1)
-        self.mangaDetailsLayout.setContentsMargins(0, 0, 0, 0)
+        self.manhuaDetailsLayout.setStretch(0, 10)
+        self.manhuaDetailsLayout.setStretch(1, 1)
+        self.manhuaDetailsLayout.setSpacing(1)
+        self.manhuaDetailsLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.mangaBgLayoutList.addLayout(self.mangaCoverLayout)
-        self.mangaBgLayoutList.addLayout(self.mangaDetailsLayout)
+        self.manhuaBgLayoutList.addLayout(self.manhuaCoverLayout)
+        self.manhuaBgLayoutList.addLayout(self.manhuaDetailsLayout)
 
-        self.mangaBgLayoutList.setStretch(0, 1)
-        self.mangaBgLayoutList.setStretch(1, 7)
-        self.mangaBgLayoutList.setSpacing(1)
-        self.mangaBgLayoutList.setContentsMargins(5, 5, 5, 10)
+        self.manhuaBgLayoutList.setStretch(0, 1)
+        self.manhuaBgLayoutList.setStretch(1, 7)
+        self.manhuaBgLayoutList.setSpacing(1)
+        self.manhuaBgLayoutList.setContentsMargins(5, 5, 5, 10)
 
-        self.setLayout(self.mangaBgLayoutList)
+        self.setLayout(self.manhuaBgLayoutList)
         self.setMinimumHeight(110)
         self.setMaximumHeight(110)
 
@@ -1063,30 +1060,32 @@ class Manga(QPushButton):
         print(self.isFavorite)
 
     def addToFavorite(self):
-        self.mangaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-checked-64.png"))
-        self.mangaFavoriteButton.setIcon(self.mangaFavoriteButtonIcon)
+        self.manhuaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-checked-64.png"))
+        self.manhuaFavoriteButton.setIcon(self.manhuaFavoriteButtonIcon)
+        self.parent.libraryMetadata[self.manhuaName]["IsFav"] = True
         ...
     
     def removeFavorite(self):
-        self.mangaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"))
-        self.mangaFavoriteButton.setIcon(self.mangaFavoriteButtonIcon)
+        self.manhuaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"))
+        self.manhuaFavoriteButton.setIcon(self.manhuaFavoriteButtonIcon)
+        self.parent.libraryMetadata[self.manhuaName]["IsFav"] = False
 
     def deleteSelf(self):
         ...
 
     def switchVariant(self, type):
         if type == "list":
-            # self.objectHolder.remove(self.mangaBgLayoutList)
+            # self.objectHolder.remove(self.manhuaBgLayoutList)
             self.objectHolder.clear()
-            self.mangaBgLayoutGrid = QVBoxLayout()
-            self.objectHolder.add(self.mangaBgLayoutGrid)
+            self.manhuaBgLayoutGrid = QVBoxLayout()
+            self.objectHolder.add(self.manhuaBgLayoutGrid)
             self.recreateObjectWidgets()
             self.displayGridVariant()
         else:
-            # self.objectHolder.remove(self.mangaBgLayoutGrid)
+            # self.objectHolder.remove(self.manhuaBgLayoutGrid)
             self.objectHolder.clear()
-            self.mangaBgLayoutList = QHBoxLayout()
-            self.objectHolder.add(self.mangaBgLayoutList)
+            self.manhuaBgLayoutList = QHBoxLayout()
+            self.objectHolder.add(self.manhuaBgLayoutList)
             self.recreateObjectWidgets()
             self.displayListVariant()
         

@@ -1,4 +1,4 @@
-# Manhua Reader,  An application for reading mangas and manhuas online and offline
+# Manhua Reader,  An application for reading manhuas and manhuas online and offline
 # Copyright (C) 2022  Eniola Emmanuel Olawale
 
 # This program is free software: you can redistribute it and/or modify

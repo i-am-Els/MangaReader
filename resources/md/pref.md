@@ -1,6 +1,6 @@
 # Settings - Preferences
 ## Library
- Auto update manga
+ Auto update manhua
 * Chapters
 * Cover Image and description
 ## Reader

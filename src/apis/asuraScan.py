@@ -6,10 +6,10 @@ class AsuraScan(object):
     def __init__(self):
         super().__init__()
 
-        self.url = "https://manga-scrapper-for-asura-scans-website.p.rapidapi.com/series"
+        self.url = "https://manhua-scrapper-for-asura-scans-website.p.rapidapi.com/series"
 
         self.headers = {
-            'x-rapidapi-host': "manga-scrapper-for-asura-scans-website.p.rapidapi.com",
+            'x-rapidapi-host': "manhua-scrapper-for-asura-scans-website.p.rapidapi.com",
             'x-rapidapi-key': "d2f094e3e6mshe0faf209b8e1845p1c9c19jsn21aabd671c19"
         }
 
