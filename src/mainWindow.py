@@ -726,8 +726,20 @@ class Library(QStackedWidget):
 
         self.setCurrentIndex(0)
 
+        self.setNoItemsWidget()
+
         self.loadLibraryLayout()
         self.parent.launchDone = True
+
+    def setNoItemsWidget(self):
+        self.noItemsLabel = QLabel()
+        self.noItemsPixmap = QPixmap("resources/icons/digital-library.png")
+        self.noItemsLabel.setPixmap(self.noItemsPixmap.scaled(256, 256, Qt.AspectRatioMode.KeepAspectRatio))
+        self.noItemsLayout = QVBoxLayout()
+        self.noItemsLayout.addWidget(self.noItemsLabel, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.noItems.setLayout(self.noItemsLayout)
+
 
     def loadLibraryItems(self):
         # Check if the lbrary shelf has a layout and remove it first.... PLEASE DO THIS
