@@ -504,8 +504,6 @@ class Preference(QWidget):
         self.readerDisplayIndex = radioIndex
         if radioBtn.isChecked():
             self.setting.readerDisplayIndex = radioIndex
-            # print(self.setting.readerDisplayIndex, self.readerDisplayIndex)
-        # self.setting.setPrefVariables()
         
     def onToggleClicked(self, btnIndex, btn):
         self.toggleBtnState = btn.isChecked()
@@ -519,15 +517,11 @@ class Preference(QWidget):
         else:
             self.setting.fsState = self.toggleBtnState
 
-        print(self.setting.updateChapter, self.setting.updateOther, self.setting.hideNav, self.setting.fsState)
-        # self.setting.setPrefVariables()
-
     def selectDownloadDir(self):
         self.downloadDirDialog = QFileDialog.getExistingDirectory(self,"Select Download Location", self.newPath)
 
         self.downloadDirPath = self.convertToPath(self.downloadDirDialog)
         if self.downloadDirDialog != "":
-            # print('Not empty::', self.downloadDirDialog) 
             self.setting.downloadNewPath = str(self.downloadDirPath)
 
             self.newPath = self.setting.downloadNewPath
@@ -542,8 +536,6 @@ class Preference(QWidget):
 
         self.downloadDirPathDisplay = QLabel(str(self.newPath))
         self.downloadDirPathDisplay.setSizePolicy(self.sizePolicy)
-        # self.downloadDirPathDisplay.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # self.downloadOverWifiLabel.setMaximumHeight(60)
         self.downloadDirPathBtn = QPushButton("Choose")
         self.downloadDirPathBtn.setSizePolicy(self.sizePolicy)
 
@@ -650,16 +642,13 @@ class Preference(QWidget):
     def compressSelect(self, btn):
         if btn.isChecked():
             self.setting.compressionState = True
-            print("Compression Allowed", self.setting.compressionState)
             self.radioCbr.setDisabled(False)
             self.radioCbz.setDisabled(False)
             
         else:
             self.setting.compressionState = False
-            print("Compression Allowed", self.setting.compressionState)
             self.radioCbr.setDisabled(True)
             self.radioCbz.setDisabled(True)
-        # self.setting.setPrefVariables()
 
     def setWindowTheme(self, btn):
         if btn.isChecked():
@@ -668,7 +657,6 @@ class Preference(QWidget):
             self.win_dow.setTheme(0)
         self.setting.setPrefVariables()
             
-
     def themesWidgetObj(self):
         self.themesLabel = QLabel("Dark Theme")
         self.themesBtn = ToggleSwitch()
@@ -692,9 +680,6 @@ class Preference(QWidget):
         self.themesLayout.addLayout(self.spaceEL)
 
         self.themesBtn.clicked.connect(lambda: self.setWindowTheme(self.themesBtn))
-
-    # def makeEffective(self):
-    #     pass
 
     def convertToPath(self, path):
         path_n = Path(path)

@@ -263,13 +263,13 @@ class MainWindow(QWidget):
         self.toggleList = [self.toggleGridView, self.toggleListView]
         self.toggleViewValue = ["Grid View", "List View"]
 
-        self.previousViewOptionIndex = 1
+        self.previousViewOptionIndex = 0
         self.viewOptionIndex = 1
 
         self.view = QLabel(self.toggleViewValue[self.viewOptionIndex])
         #----------------------------------------------------
 
-        self.selectViewType(self.viewOptionIndex)
+        self.selectView(self.viewOptionIndex)
 
         #----------------------------------------------------
 
@@ -403,7 +403,7 @@ class MainWindow(QWidget):
             Themes.changeTabBarIconDark(self)
 
     def loadApi(self, api_Index):
-        print("Loading api", self.apiName[api_Index])
+        ...
 
     def loadHomeItems(self):# More Work 'Online Mode'
         # self.loadApi(self.apiIndex)
@@ -431,7 +431,6 @@ class MainWindow(QWidget):
 
     def refresh(self, refreshPgIndex):# Much More work
         if (refreshPgIndex == 0) or (refreshPgIndex == 3):
-            print(refreshPgIndex)
             self.loadApi(self.apiIndex)
 
     def changeStackIndex(self, obj, w_index):
@@ -566,10 +565,10 @@ class MainWindow(QWidget):
             self.toggleListView.setIconSize(self.icon_size * 1.1)
 
             self.view.setText("Grid View")
-            self.viewOptionIndex = 0
+            self.previousViewOptionIndex = 0
 
             if self.launchDone:
-                self.library.switchLayout("grid")
+                self.library.switchLayout()
                 
             return self.viewOptionIndex, self.previousViewOptionIndex
 
@@ -585,37 +584,28 @@ class MainWindow(QWidget):
             self.toggleGridView.setIconSize(self.icon_size * 1.1)
 
             self.view.setText("List View")
-            self.viewOptionIndex = 1
+            self.previousViewOptionIndex = 1
 
             if self.launchDone:
-                self.library.switchLayout("list")
+                self.library.switchLayout()
             return self.viewOptionIndex, self.previousViewOptionIndex
-
-    def selectViewType(self, viewsIndex):
-        self.selectView(viewsIndex)
-        self.previousViewOptionIndex = viewsIndex
-        return self.previousViewOptionIndex
     
     def selectViewTypeByObj(self, objName):
-        self.previousViewOptionIndex = self.viewOptionIndex
         if objName == "toggleGrid":
-            self.selectView(0)
+            self.viewOptionIndex = 0
+            self.selectView(self.viewOptionIndex)
         else:
-            self.selectView(1)
+            self.viewOptionIndex = 1
+            self.selectView(self.viewOptionIndex)
 
     def selectView(self, view_index):
-        if view_index == 0:
+        if view_index == 0 and view_index != self.previousViewOptionIndex:
             self.viewIsGrid = True
             self.viewTypeAction(self.viewIsGrid)
         else:
-            self.viewIsGrid = False
-            self.viewTypeAction(self.viewIsGrid)
-
-        if self.previousViewOptionIndex != view_index:
-            self.changeViewType(self.viewOptionIndex)
-
-    def changeViewType(self, newViewIndex): # More work
-        print('Changing view to', self.toggleViewValue[newViewIndex])
+            if view_index == 1 and view_index != self.previousViewOptionIndex:
+                self.viewIsGrid = False
+                self.viewTypeAction(self.viewIsGrid)
    
     def popDialog(self, type):
         if type == 'empty':
@@ -640,7 +630,6 @@ class MainWindow(QWidget):
 
         self.localDirPath = self.convertToPath(self.localDirDialog)
         dir = list(os.listdir(self.localDirPath))
-        # print(dir, self.localDirDialog)
         
 
         if len(dir) == 0:
@@ -675,18 +664,14 @@ class MainWindow(QWidget):
 
             self.setting.libraryNewPath = self.newPath
 
-            # print(self.localSingleImport)
-            print(self.localSingleDialog)
 
             return self.localSingleImport
 
         elif self.localSingleDialog == ('', ''):
-            print("no file selected")
             pass
 
         elif not(os.path.isfile(self.localSinglePath)):
             self.popDialog('none')
-            # print(self.localSingleDialog)
             self.localSearchSingleFormatAction()
         
     def convertToPath(self, path):
@@ -718,7 +703,7 @@ class Library(QStackedWidget):
 
         self.noItems = QWidget()
         self.libraryShelf = QWidget()
-        self.descriptionPage = QWidget()
+        self.descriptionPage = Description(self)
         
         self.addWidget(self.noItems)
         self.addWidget(self.libraryShelf)
@@ -740,9 +725,7 @@ class Library(QStackedWidget):
 
         self.noItems.setLayout(self.noItemsLayout)
 
-
     def loadLibraryItems(self):
-        # Check if the lbrary shelf has a layout and remove it first.... PLEASE DO THIS
         self.libraryScrollAreaWidget = QWidget()
 
         if self.parent.viewIsGrid:
@@ -772,8 +755,6 @@ class Library(QStackedWidget):
         self.libraryShelfLayout.addWidget(self.libraryScrollArea)
         
     def loadLibraryLayout(self):
-        print("View is", self.parent.viewIsGrid)
-
         self.libraryShelfLayout = QVBoxLayout(self.libraryShelf)
         self.libraryShelfLayout.setContentsMargins(0, 0, 0, 0)
 
@@ -797,8 +778,6 @@ class Library(QStackedWidget):
             self.libraryShelfListLayout.addWidget(manhuaObj)
         self.parent.tabWidget.setCurrentIndex(1)
         self.setCurrentIndex(1)
-        # print(self.geometry())
-        print("Manhua Obj Geometry: ", manhuaObj.geometry(), "\n\n")
 
     def libraryMaximized(self):
         self.libraryDisplayChangeAction(7)
@@ -807,19 +786,16 @@ class Library(QStackedWidget):
         self.libraryDisplayChangeAction(5)
 
     def libraryDisplayChangeAction(self, limit):
-        print(self.parent.tabWidget.geometry())
         self.gridYLimit = limit
         self.libraryItemLength = len(self.libraryListdata)
         if self.libraryItemLength != 0:
             xLen = int(self.libraryItemLength / (limit + 1))
             if self.libraryItemLength % (limit + 1) != 0:
                 xLen += 1
-                # print(xLen)
             i = 0
             for x in range(xLen):
                 for y  in range(limit + 1):
                     if i < self.libraryItemLength:
-                        # self.libraryListdata[i].switchVariant("list")
                         self.libraryShelfGridLayout.addWidget(self.libraryListdata[i], x, y, 1, 1)
                         self.gridX = x
                         self.gridY = y + 1
@@ -867,10 +843,10 @@ class Library(QStackedWidget):
         if emptyCover == True:
             manhuaMetaDict["ManhuaCover"] = self.parent.themeObj.defaultCoverImage
             
-        # print(manhuaChapterList)
         sortedManhuaChapterDict = self.sortChapters(manhuaChapterList)
         manhuaMetaDict["Chapters"] = sortedManhuaChapterDict
         manhuaMetaDict["IsFav"] = False
+        manhuaMetaDict["Status"] = "Local Manhua Bundle"
 
         if not((manhuaMetaDict["ManhuaTitle"]) in self.libraryMetadata):
             self.libraryMetadata.update({manhuaMetaDict["ManhuaTitle"] : manhuaMetaDict})
@@ -909,13 +885,13 @@ class Library(QStackedWidget):
             self.manhuaObj = Manhua(self.libraryMetadata[k], self)
             self.libraryListdata.append(self.manhuaObj)
 
-    def switchLayout(self, type):
+    def switchLayout(self):
         self.libraryScrollAreaWidget.deleteLater()
-        if type == "grid":
-            self.loadLibraryItems()
-        else:
-            self.loadLibraryItems()
+        self.loadLibraryItems()
 
+    def openDescription(self, dataDict):
+        self.descriptionPage.setData(dataDict)
+        self.setCurrentIndex(2)
 
 
 class Manhua(QPushButton):
@@ -944,6 +920,8 @@ class Manhua(QPushButton):
         else:
             self.manhuaBgLayoutList = QHBoxLayout()
             self.displayListVariant()
+
+        self.clicked.connect(lambda: self.parent.openDescription(self.metadata))
         
     def recreateObjectWidgets(self):
         self.manhuaCoverDisplayLabel = QLabel()
@@ -1041,7 +1019,6 @@ class Manhua(QPushButton):
         else:
             self.removeFavorite()
             self.isFavorite = False
-        print(self.isFavorite)
 
     def addToFavorite(self):
         self.manhuaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-checked-64.png"))
@@ -1057,3 +1034,219 @@ class Manhua(QPushButton):
     def deleteSelf(self):
         ...
         
+    
+
+class Description(QWidget):
+    def __init__(self, parent):
+        super(Description, self).__init__(parent)
+        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.max_button_size = QSize(36, 36)
+        self.min_button_size = QSize(16, 16)
+        self.icon_size = QSize(20, 20)
+        self.parent = parent
+        self.launchDone = False
+        self.isGrid = bool()
+        self.previousViewOptionIndex = int()
+        self.viewOptionIndex = int()
+        self.descChapters = dict()
+        self.createDescriptionWidget()
+        self.launchDone = True
+
+        self.sideBInnerAListViewOp.clicked.connect(lambda: self.selectViewTypeByObj("toggleList"))
+        self.sideBInnerAGridViewOp.clicked.connect(lambda: self.selectViewTypeByObj("toggleGrid"))
+        self.sideAInnerABackBtn.clicked.connect(lambda: self.exit())
+        
+    def createDescriptionWidget(self):
+        self.mainLayout = QHBoxLayout()
+        
+        self.sideALayout = QVBoxLayout()
+        
+        self.sideAInnerALayout = QHBoxLayout()
+        self.sideAInnerABackBtn = QPushButton()
+        self.sideAInnerABackBtn.setObjectName("backDescButton")
+
+        self.sideAInnerABackBtn.setSizePolicy(self.sizePolicy)
+        self.sideAInnerABackBtn.setMinimumSize(self.min_button_size)
+        self.sideAInnerABackBtn.setMaximumSize(self.max_button_size)
+        self.sideAInnerABackBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.sideAInnerABackBtn.setGeometry(0, 0, 36, 36)
+        self.sideAInnerABackBtnIcon = QIcon()
+        self.sideAInnerABackBtn.setIconSize(self.icon_size)
+        self.sideAInnerABackBtn.setCheckable(True)
+
+        self.sideAInnerAModeTag = QLabel()
+        self.sideAInnerALayout.addWidget(self.sideAInnerABackBtn)
+        self.sideAInnerALayout.addWidget(self.sideAInnerAModeTag)
+
+        self.sideAInnerBLayout = QGridLayout()
+        self.nameLabel = QLabel()
+        self.coverLabel = QLabel()
+        self.describeManhuaLabel = QLabel()
+
+        self.sideAInnerBLayout.addWidget(self.coverLabel, 0, 0, 1, 1)
+        self.sideAInnerBLayout.addWidget(self.nameLabel, 0, 1, 1, 1)
+        self.sideAInnerBLayout.addWidget(self.describeManhuaLabel, 1, 0, 2, 2)
+
+
+        self.sideALayout.addLayout(self.sideAInnerALayout)
+        self.sideALayout.addLayout(self.sideAInnerBLayout)
+
+        self.sideBLayout = QVBoxLayout()
+        self.sideBInnerALayout = QHBoxLayout()
+        self.sideBInnerAListViewOp = QPushButton()
+        self.sideBInnerAGridViewOp = QPushButton()
+
+        self.previousViewOptionIndex = 0
+        self.viewOptionIndex = 1
+        self.selectView(self.viewOptionIndex)
+
+        self.sideBInnerAGridViewOp.setCheckable(True)
+        self.sideBInnerAGridViewOp.setObjectName("toggleGridView")
+
+        self.sideBInnerAListViewOp.setCheckable(True)
+        self.sideBInnerAListViewOp.setObjectName("toggleListView")
+        
+        self.sideBInnerAGridViewOp.setSizePolicy(self.sizePolicy)
+        self.sideBInnerAGridViewOp.setMinimumSize(self.min_button_size * 1.75)
+        self.sideBInnerAGridViewOp.setMaximumSize(self.min_button_size * 1.75)
+        self.sideBInnerAGridViewOp.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        
+        self.sideBInnerAListViewOp.setSizePolicy(self.sizePolicy)
+        self.sideBInnerAListViewOp.setMinimumSize(self.min_button_size * 1.75)
+        self.sideBInnerAListViewOp.setMaximumSize(self.min_button_size * 1.75)
+        self.sideBInnerAListViewOp.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+
+        self.sideBInnerASpaceEater = QWidget()
+        self.sideBInnerALayout.addWidget(self.sideBInnerASpaceEater)
+        self.sideBInnerALayout.addWidget(self.sideBInnerAGridViewOp)
+        self.sideBInnerALayout.addWidget(self.sideBInnerAListViewOp)
+
+        self.sideBInnerBLayout = QVBoxLayout()
+        self.sideBInnerBWidget = QWidget()
+        self.sideBdeepInnerBLayout = QVBoxLayout(self.sideBInnerBWidget)
+        self.sideBdeepInnerBLayout.setContentsMargins(0, 0, 0, 0)
+
+        self.scrollArea = QScrollArea(self.sideBInnerBWidget)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        self.loadDescriptionItems()
+
+        self.sideBInnerBWidget.setLayout(self.sideBdeepInnerBLayout)
+        self.sideBInnerBLayout.addWidget(self.sideBInnerBWidget)
+
+        self.sideBLayout.addLayout(self.sideBInnerALayout)
+        self.sideBLayout.addLayout(self.sideBInnerBLayout)
+
+        self.mainLayout.addLayout(self.sideALayout)
+        self.mainLayout.addLayout(self.sideBLayout)
+        
+        self.setLayout(self.mainLayout)
+
+    def loadDescriptionItems(self):
+        self.scrollAreaWidget = QWidget()
+
+        if self.isGrid:
+            self.chapterDescGridLayout = QGridLayout(self.scrollAreaWidget)
+            self.scrollArea.setWidget(self.scrollAreaWidget)
+            self.chapterDescGridLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+            self.chapterDescGridLayout.setDefaultPositioning(0, Qt.Orientation.Horizontal)
+            self.chapterDescGridLayout.setContentsMargins(5, 10, 5, 10)
+
+        else:
+            self.chapterDescListLayout = QVBoxLayout(self.scrollAreaWidget)
+            self.chapterDescListLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+            self.scrollArea.setWidget(self.scrollAreaWidget)
+            self.chapterDescListLayout.setContentsMargins(5, 10, 5, 10)
+
+        if self.isGrid:
+            self.chapterDescGridDisplay()
+        else: 
+            self.chapterDescListDisplay()
+
+        self.sideBdeepInnerBLayout.addWidget(self.scrollArea)
+
+    def setData(self, dataDict):
+        self.setName(dataDict["ManhuaTitle"])
+        self.setCover(dataDict["ManhuaCover"])
+        self.setChapters(dataDict["Chapters"])
+        self.setStatus(dataDict["Status"])
+
+    def setName(self, name):
+        self.nameLabel.setText(name)
+        self.nameLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.nameLabelFont = QFont()
+        self.nameLabelFont.setBold(True)
+        self.nameLabelFont.setPointSize(16)
+        self.nameLabel.setFont(self.nameLabelFont)
+
+    def setCover(self, cover):
+        self.coverPixmap = QPixmap(str(cover)).scaled(120, 160, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+        self.coverLabel.setPixmap(self.coverPixmap)
+
+    def setChapters(self, chapters):
+        self.descChapters = chapters
+
+    def setStatus(self, status):
+        self.sideAInnerAModeTag.setText(status)
+
+    def selectViewTypeByObj(self, objName):
+        if objName == "toggleGrid":
+            self.viewOptionIndex = 0
+            self.selectView(self.viewOptionIndex)
+        else:
+            self.viewOptionIndex = 1
+            self.selectView(self.viewOptionIndex)
+
+    def selectView(self, view_index):
+        if view_index == 0 and view_index != self.previousViewOptionIndex:
+            self.isGrid = True
+            self.viewTypeAction(self.isGrid)
+        else:
+            if view_index == 1 and view_index != self.previousViewOptionIndex:
+                self.isGrid = False
+                self.viewTypeAction(self.isGrid)
+
+    def viewTypeAction(self, gridView):
+        if gridView == True:
+            self.sideBInnerAGridViewOpIcon = QIcon()
+            self.sideBInnerAGridViewOpIcon.addPixmap(QPixmap("resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.sideBInnerAGridViewOp.setIcon(self.sideBInnerAGridViewOpIcon)
+            self.sideBInnerAGridViewOp.setIconSize(self.icon_size * 1.1)
+            #--------------------------------------------
+            self.sideBInnerAListViewOpDisabledIcon =QIcon()
+            self.sideBInnerAListViewOpDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.sideBInnerAListViewOp.setIcon(self.sideBInnerAListViewOpDisabledIcon)
+            self.sideBInnerAListViewOp.setIconSize(self.icon_size * 1.1)
+            self.previousViewOptionIndex = 0
+
+            if self.launchDone:
+                self.switchLayout()
+
+        else:
+            self.sideBInnerAListViewOpIcon = QIcon()
+            self.sideBInnerAListViewOpIcon.addPixmap(QPixmap("resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.sideBInnerAListViewOp.setIcon(self.sideBInnerAListViewOpIcon)
+            self.sideBInnerAListViewOp.setIconSize(self.icon_size * 1.1)
+            #--------------------------------------------
+            self.sideBInnerAGridViewOpDisabledIcon = QIcon()
+            self.sideBInnerAGridViewOpDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.sideBInnerAGridViewOp.setIcon(self.sideBInnerAGridViewOpDisabledIcon)
+            self.sideBInnerAGridViewOp.setIconSize(self.icon_size * 1.1)
+            self.previousViewOptionIndex = 1
+
+            if self.launchDone:
+                self.switchLayout()
+
+    def switchLayout(self):
+        self.scrollAreaWidget.deleteLater()
+        self.loadDescriptionItems()
+
+    def chapterDescGridDisplay(self):
+        ...
+
+    def chapterDescListDisplay(self):
+        ...
+
+    def exit(self):
+        self.parent.setCurrentIndex(1)

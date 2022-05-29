@@ -115,7 +115,7 @@ class Themes:
         
         objM.library.noItems.setStyleSheet(" QWidget{ background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QLabel { border: none; }")
         
-        objM.library.descriptionPage.setStyleSheet("background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+        objM.library.descriptionPage.setStyleSheet("border: 2px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
         objM.library.libraryShelf.setStyleSheet("background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
@@ -138,6 +138,11 @@ class Themes:
 
         objM.localSearchIconSingleFormat.addPixmap(QPixmap("resources/icons/icons8-cbr-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.localSearchButtonSingleFormat.setIcon(objM.localSearchIconSingleFormat)
+
+        objM.library.descriptionPage.sideAInnerABackBtnIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objM.library.descriptionPage.sideAInnerABackBtn.setIcon(objM.library.descriptionPage.sideAInnerABackBtnIcon)
+        
+        objM.library.descriptionPage.sideAInnerABackBtn.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
         
         objM.refreshIcon.addPixmap(QPixmap("resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.refreshButton.setIcon(objM.refreshIcon)
@@ -209,8 +214,6 @@ class Themes:
         pass
 
     def darkMode(self, obj):
-        print("Dark Mode Activated")
-
         objM = obj.objMainWindow
         objP = obj.objPref
         objR = obj.objReader

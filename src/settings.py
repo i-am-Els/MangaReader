@@ -88,8 +88,6 @@ class Settings(object):
 
         self.objP.newPath = self.downloadNewPath
 
-        # print('donee')
-
     def setObjMState(self):
         self.apiIndex = self.objM.apiIndex
         self.objM.apiButton.setText(self.apiName[self.apiIndex])
