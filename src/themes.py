@@ -443,7 +443,7 @@ class MoveableWindow(QWidget):
 
     def mouseMoveEvent(self, event):
         delta = QPointF(event.globalPosition() - self.oldPosition)
-        self.obj.move(self.obj.x() + delta.x(), self.obj.y() + delta.y())
+        self.obj.move(self.obj.x() + int(delta.x()), self.obj.y() + int(delta.y()))
         
 
         self.obj.resize(QSize(1092, 614))
