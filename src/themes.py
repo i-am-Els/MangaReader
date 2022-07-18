@@ -408,51 +408,58 @@ class MoveableWindow(QWidget):
         super().__init__()
         self.refIcon = QPushButton()
         self.refIconIcon = QIcon()
-        self.obj = obj
-        self.obj.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        self.obj = obj #<MainWindow Class>
+        # self.obj.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.widget = widget # StsckedWidgetWindow or stWindow
         self.widgetMainW = self.widget.objMainWindow
         self.widgetLibrary = self.widget.objMainWindow.library
         
         self.oldPosition = self.pos()
 
+
     def mousePressEvent(self, event):
-        self.oldPosition = event.globalPosition()
+        layOut = self.obj.customTitleBar.buttonsLayout
+        if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count()))) :
+            self.oldPosition = event.globalPosition()
 
     def mouseDoubleClickEvent(self, event):
-        
-        self.oldPosition = event.globalPosition()
-        if self.obj.windowState() == Qt.WindowState.WindowMaximized or self.obj.windowState() == Qt.WindowState.WindowFullScreen:
-            self.obj.setWindowState(Qt.WindowState.WindowNoState)
-            # self.obj.resize(QSize(1092, 614))
-            self.obj.setGeometry(200, 0, 1092, 614)
+        layOut = self.obj.customTitleBar.buttonsLayout
+        if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count())))  :  
+            self.oldPosition = event.globalPosition()
+            if self.obj.windowState() == Qt.WindowState.WindowMaximized or self.obj.windowState() == Qt.WindowState.WindowFullScreen:
+                self.obj.setWindowState(Qt.WindowState.WindowNoState)
+                # self.obj.resize(QSize(1092, 614))
+                self.obj.setGeometry(200, 0, 1092, 614)
+                if self.widgetMainW.viewIsGrid:
+                    self.widgetLibrary.libraryResized()
+
+                self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+                self.refIcon.setIcon(self.refIconIcon)
+
+            elif self.obj.windowState() == Qt.WindowState.WindowNoState or self.obj.windowState() == Qt.WindowState.WindowActive:
+                self.obj.showMaximized()
+                self.obj.setWindowState(Qt.WindowState.WindowMaximized)
+                if self.widgetMainW.viewIsGrid:
+                    self.widgetLibrary.libraryMaximized()
+
+                self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+                self.refIcon.setIcon(self.refIconIcon)
+
+    def mouseMoveEvent(self, event):
+        layOut = self.obj.customTitleBar.buttonsLayout
+        if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count()))) :
+            
+            delta = QPointF(event.globalPosition() - self.oldPosition)
+            self.obj.move(self.obj.x() + int(delta.x()), self.obj.y() + int(delta.y()))
+            
+
+            self.obj.resize(QSize(1092, 614))
+            self.obj.setWindowState(Qt.WindowState.WindowActive)
             if self.widgetMainW.viewIsGrid:
                 self.widgetLibrary.libraryResized()
 
             self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
 
-        elif self.obj.windowState() == Qt.WindowState.WindowNoState or self.obj.windowState() == Qt.WindowState.WindowActive:
-            self.obj.showMaximized()
-            self.obj.setWindowState(Qt.WindowState.WindowMaximized)
-            if self.widgetMainW.viewIsGrid:
-                self.widgetLibrary.libraryMaximized()
-
-            self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            self.refIcon.setIcon(self.refIconIcon)
-
-    def mouseMoveEvent(self, event):
-        delta = QPointF(event.globalPosition() - self.oldPosition)
-        self.obj.move(self.obj.x() + int(delta.x()), self.obj.y() + int(delta.y()))
-        
-
-        self.obj.resize(QSize(1092, 614))
-        self.obj.setWindowState(Qt.WindowState.WindowActive)
-        if self.widgetMainW.viewIsGrid:
-            self.widgetLibrary.libraryResized()
-
-        self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        self.refIcon.setIcon(self.refIconIcon)
-
-        self.oldPosition = event.globalPosition()
-         
+            self.oldPosition = event.globalPosition()
+            

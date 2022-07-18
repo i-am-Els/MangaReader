@@ -72,6 +72,7 @@ class MainWindow(QWidget):
         self.manhuaObj = object()
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        
 
         self.create_widgets()
 
