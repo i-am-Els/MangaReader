@@ -18,9 +18,9 @@
 from pathlib import Path
 import PyQt6
 
-from PyQt6.QtCore import QPointF, Qt, QRect, QSize
+from PyQt6.QtCore import QPoint, QPointF, Qt, QRect, QSize
 
-from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush, QCursor
+from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush, QCursor, QGuiApplication
 
 from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QWidget, QSizePolicy, QVBoxLayout
 
@@ -413,19 +413,18 @@ class MoveableWindow(QWidget):
         self.widget = widget # StsckedWidgetWindow or stWindow
         self.widgetMainW = self.widget.objMainWindow
         self.widgetLibrary = self.widget.objMainWindow.library
-        
-        self.oldPosition = self.pos()
+        self.prevGeo = self.obj.geometry()
+        self.oldPosition = self.geometry()
 
 
     def mousePressEvent(self, event):
         layOut = self.obj.customTitleBar.buttonsLayout
         if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count()))) :
-            self.oldPosition = event.globalPosition()
+            self.oldPosition = event.scenePosition()
 
     def mouseDoubleClickEvent(self, event):
         layOut = self.obj.customTitleBar.buttonsLayout
-        if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count())))  :  
-            self.oldPosition = event.globalPosition()
+        if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count())))  :
             if self.obj.windowState() == Qt.WindowState.WindowMaximized or self.obj.windowState() == Qt.WindowState.WindowFullScreen:
                 self.obj.setWindowState(Qt.WindowState.WindowNoState)
                 # self.obj.resize(QSize(1092, 614))
@@ -444,16 +443,24 @@ class MoveableWindow(QWidget):
 
                 self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
                 self.refIcon.setIcon(self.refIconIcon)
+        
 
     def mouseMoveEvent(self, event):
         layOut = self.obj.customTitleBar.buttonsLayout
         if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count()))) :
-            
-            delta = QPointF(event.globalPosition() - self.oldPosition)
-            self.obj.move(self.obj.x() + int(delta.x()), self.obj.y() + int(delta.y()))
-            
+            # self.obj.resize(QSize(1092, 614))
+            if self.obj.windowState() == Qt.WindowState.WindowFullScreen or self.obj.windowState() == Qt.WindowState.WindowMaximized:
+                self.oldPosition = QPointF(self.prevGeo.width() * .5, 50)
+            gr = self.obj.geometry()
+            screenPos = event.globalPosition()
+            pos = screenPos - self.oldPosition 
+            x = int(max(pos.x(), 0))
+            y = int(max(pos.y(), 0))
+            screen = QGuiApplication.screenAt(QPoint(x, y)).size()
+            x = int(min(x, screen.width() - gr.width()))
+            y = int(min(y, screen.height() - gr.height()))
+            self.obj.move(x, y)
 
-            self.obj.resize(QSize(1092, 614))
             self.obj.setWindowState(Qt.WindowState.WindowActive)
             if self.widgetMainW.viewIsGrid:
                 self.widgetLibrary.libraryResized()
@@ -461,5 +468,11 @@ class MoveableWindow(QWidget):
             self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
 
-            self.oldPosition = event.globalPosition()
+
+    def mouseReleaseEvent(self, event):
+        if event.globalPosition().y() < 10:
+            self.prevGeo = self.obj.geometry()
+            self.obj.setWindowState(Qt.WindowState.WindowMaximized)
+            self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.refIcon.setIcon(self.refIconIcon)
             
