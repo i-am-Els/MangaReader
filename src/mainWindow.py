@@ -698,6 +698,7 @@ class Library(QStackedWidget):
         self.gridY = 0
         self.gridYLimit = 7
         self.appW = appW
+        self.setMinimumSize(640, 720)
 
         self.libraryMetadata = dict()
         self.libraryListdata = list()
@@ -735,7 +736,7 @@ class Library(QStackedWidget):
             self.libraryShelfGridLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
             self.libraryShelfGridLayout.setDefaultPositioning(0, Qt.Orientation.Horizontal)
             self.libraryShelfGridLayout.setContentsMargins(5, 10, 5, 10)
-            # self.libraryShelfGridLayout.setSpacing(10)
+            self.libraryShelfGridLayout.setSpacing(10)
 
         else:
             self.libraryShelfListLayout = QVBoxLayout(self.libraryScrollAreaWidget)
@@ -750,7 +751,7 @@ class Library(QStackedWidget):
                 self.libraryMaximized()
             elif self.appW.windowState() == Qt.WindowState.WindowNoState or self.appW.windowState() == Qt.WindowState.WindowActive:
                 self.libraryResized()
-        else: 
+        else:
             self.libraryListReDisplay()
 
         self.libraryShelfLayout.addWidget(self.libraryScrollArea)
@@ -767,13 +768,16 @@ class Library(QStackedWidget):
         self.libraryShelf.setLayout(self.libraryShelfLayout)
 
     def addToLibraryAction(self, manhuaObj):
+        self.calculateLibraryDimension()
+        spacing = self.calculateLibrarySpacing()
         if self.parent.viewIsGrid:
+            self.libraryShelfGridLayout.setSpacing(spacing)
             if self.gridYLimit >= self.gridY: 
-                self.libraryShelfGridLayout.addWidget(manhuaObj, self.gridX, self.gridY, 1, 1)
+                self.libraryShelfGridLayout.addWidget(manhuaObj, self.gridX, self.gridY)
             else:
                 self.gridY = 0
                 self.gridX += 1
-                self.libraryShelfGridLayout.addWidget(manhuaObj, self.gridX, self.gridY, 1, 1)
+                self.libraryShelfGridLayout.addWidget(manhuaObj, self.gridX, self.gridY)
             self.gridY += 1
         else:
             self.libraryShelfListLayout.addWidget(manhuaObj)
@@ -781,14 +785,22 @@ class Library(QStackedWidget):
         self.setCurrentIndex(1)
 
     def libraryMaximized(self):
-        self.libraryDisplayChangeAction(7)
+        dimension = self.calculateLibraryDimension()
+        spacing = self.calculateLibrarySpacing()
+        self.libraryDisplayChangeAction(dimension, spacing)
+        
 
     def libraryResized(self):
-        self.libraryDisplayChangeAction(5)
+        dimension = self.calculateLibraryDimension()
+        spacing = self.calculateLibrarySpacing()
+        self.libraryDisplayChangeAction(dimension, spacing)
 
-    def libraryDisplayChangeAction(self, limit):
+    def libraryDisplayChangeAction(self, limit, spacing):
         self.gridYLimit = limit
         self.libraryItemLength = len(self.libraryListdata)
+        
+        self.libraryShelfGridLayout.setSpacing(spacing)
+
         if self.libraryItemLength != 0:
             xLen = int(self.libraryItemLength / (limit + 1))
             if self.libraryItemLength % (limit + 1) != 0:
@@ -797,7 +809,7 @@ class Library(QStackedWidget):
             for x in range(xLen):
                 for y  in range(limit + 1):
                     if i < self.libraryItemLength:
-                        self.libraryShelfGridLayout.addWidget(self.libraryListdata[i], x, y, 1, 1)
+                        self.libraryShelfGridLayout.addWidget(self.libraryListdata[i], x, y)
                         self.gridX = x
                         self.gridY = y + 1
                         i += 1
@@ -855,7 +867,7 @@ class Library(QStackedWidget):
             self.libraryListdata.append(self.manhuaObj)
             self.addToLibraryAction(self.manhuaObj)
         else:
-            self.popDialog('duplicate')
+            self.parent.popDialog('duplicate')
 
     def sortChapters(self, someList):
         newSortedDict = dict()
@@ -894,8 +906,29 @@ class Library(QStackedWidget):
         self.descriptionPage.setData(dataDict)
         self.setCurrentIndex(2)
 
+    def calculateLibraryDimension(self):
+        print(self.geometry())
+        dimensionV = self.geometry().width()
+
+        dimension = int(dimensionV / Manhua.manhuaSize.width()) - 2
+        print(dimension)
+        self.gridYLimit = dimension
+        return dimension
+
+    def calculateLibrarySpacing(self):
+        spacingV = self.geometry().width()
+        print(spacingV,  Manhua.manhuaSize.width())
+        dimension = int(spacingV / Manhua.manhuaSize.width()) - 1
+        spacing = spacingV - (Manhua.manhuaSize.width() * dimension)
+        print(spacing, spacingV, Manhua.manhuaSize.width())
+        spacing = int(spacing / dimension)
+        print(spacing, dimension)
+        return spacing
+
 
 class Manhua(QPushButton):
+    manhuaSize = QSize(120, 170)
+    
     def __init__(self, metadata, parent=None):
         super(Manhua, self).__init__(parent)
         self.metadata: dict = metadata
@@ -911,6 +944,8 @@ class Manhua(QPushButton):
         self.bookmarkPosition = object()
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.setObjectName(self.manhuaName)
+        
+        
 
         # self.manhuaCoverLabel = QLabel()  #Holds the description page image
         self.recreateObjectWidgets()
@@ -986,8 +1021,8 @@ class Manhua(QPushButton):
         self.manhuaBgLayoutGrid.setContentsMargins(5, 5, 5, 10)
         
         self.setLayout(self.manhuaBgLayoutGrid)
-        self.setMaximumSize(QSize(110, 170))
-        self.setMinimumSize(QSize(110, 170))
+        self.setMaximumSize(self.manhuaSize)
+        self.setMinimumSize(self.manhuaSize)
     
     def displayListVariant(self):
         self.manhuaDetailsLayout.setStretch(0, 10)
@@ -1004,8 +1039,8 @@ class Manhua(QPushButton):
         self.manhuaBgLayoutList.setContentsMargins(5, 5, 5, 10)
 
         self.setLayout(self.manhuaBgLayoutList)
-        self.setMinimumHeight(110)
-        self.setMaximumHeight(110)
+        self.setMinimumHeight(140)
+        self.setMaximumHeight(140)
 
     def checkFav(self, isFavorite):
         if isFavorite == False:
