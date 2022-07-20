@@ -907,22 +907,17 @@ class Library(QStackedWidget):
         self.setCurrentIndex(2)
 
     def calculateLibraryDimension(self):
-        print(self.geometry())
         dimensionV = self.geometry().width()
 
         dimension = int(dimensionV / Manhua.manhuaSize.width()) - 2
-        print(dimension)
         self.gridYLimit = dimension
         return dimension
 
     def calculateLibrarySpacing(self):
         spacingV = self.geometry().width()
-        print(spacingV,  Manhua.manhuaSize.width())
         dimension = int(spacingV / Manhua.manhuaSize.width()) - 1
         spacing = spacingV - (Manhua.manhuaSize.width() * dimension)
-        print(spacing, spacingV, Manhua.manhuaSize.width())
         spacing = int(spacing / dimension)
-        print(spacing, dimension)
         return spacing
 
 
