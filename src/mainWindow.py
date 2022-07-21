@@ -665,6 +665,7 @@ class Library(QStackedWidget):
         self.gridY = 0
         self.gridYLimit = 7
         self.appW = appW
+        self.previousOpen = ""
 
         self.libraryMetadata = dict()
         self.libraryListdata = list()
@@ -825,6 +826,7 @@ class Library(QStackedWidget):
         manhuaMetaDict["Chapters"] = sortedManhuaChapterDict
         manhuaMetaDict["IsFav"] = False
         manhuaMetaDict["Status"] = "Local Manhua Bundle"
+        manhuaMetaDict["Description"] = "No Description... This file is a locally imported file, metadata consist of no description..."
 
         if not((manhuaMetaDict["ManhuaTitle"]) in self.libraryMetadata):
             self.libraryMetadata.update({manhuaMetaDict["ManhuaTitle"] : manhuaMetaDict})
@@ -868,7 +870,10 @@ class Library(QStackedWidget):
         self.loadLibraryItems()
 
     def openDescription(self, dataDict):
-        self.descriptionPage.setData(dataDict)
+        if dataDict["ManhuaTitle"] != self.previousOpen:
+            self.descriptionPage.setData(dataDict)
+            self.descriptionPage.resetChapters()
+            self.previousOpen = dataDict["ManhuaTitle"]
         self.setCurrentIndex(2)
 
     def calculateLibraryDimension(self):
@@ -884,6 +889,17 @@ class Library(QStackedWidget):
         spacing = spacingV - (Manhua.manhuaSize.width() * dimension)
         spacing = int(spacing / dimension)
         return spacing
+
+
+    class Chapters(QPushButton):
+        def __init__(self, sTitle, pTitlePath):
+            super().__init__()
+            self.title = sTitle
+            self.titlePath = pTitlePath
+            
+            self.labelString = f"{self.title} \n{self.titlePath}"
+            self.titleLabel = QLabel(self.labelString, self)
+            self.setMinimumHeight(50)
 
 
 class Manhua(QPushButton):
@@ -1041,15 +1057,11 @@ class Description(QWidget):
         self.icon_size = QSize(20, 20)
         self.parent = parent
         self.launchDone = False
-        self.isGrid = bool()
-        self.previousViewOptionIndex = int()
-        self.viewOptionIndex = int()
+        self.dataDict = dict()
         self.descChapters = dict()
         self.createDescriptionWidget()
         self.launchDone = True
 
-        self.listToggle.clicked.connect(lambda: self.selectViewTypeByObj("toggleList"))
-        self.gridToggle.clicked.connect(lambda: self.selectViewTypeByObj("toggleGrid"))
         self.exitButton.clicked.connect(lambda: self.exit())
         self.setObjectName("descPage")
         
@@ -1086,6 +1098,7 @@ class Description(QWidget):
 
         self.nameLabelL.setStretch(0, 1)
         self.nameLabelL.setStretch(1, 4)
+        self.nameLabelL.setSpacing(1)
         self.nameLabelL.setContentsMargins(0, 0, 0, 0)
 
         self.coverLabel = QLabel()
@@ -1111,34 +1124,6 @@ class Description(QWidget):
         self.infoLayout.setStretch(2, 7)
 
         self.chaptersLayout = QVBoxLayout()
-        self.chaptersHeaderLayout = QHBoxLayout()
-        self.listToggle = QPushButton()
-        self.gridToggle = QPushButton()
-
-        self.previousViewOptionIndex = 0
-        self.viewOptionIndex = 1
-        self.selectView(self.viewOptionIndex)
-
-        self.gridToggle.setCheckable(True)
-        self.gridToggle.setObjectName("toggleGridView")
-
-        self.listToggle.setCheckable(True)
-        self.listToggle.setObjectName("toggleListView")
-        
-        self.gridToggle.setSizePolicy(self.sizePolicy)
-        self.gridToggle.setMinimumSize(self.min_button_size * 1.75)
-        self.gridToggle.setMaximumSize(self.min_button_size * 1.75)
-        self.gridToggle.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        
-        self.listToggle.setSizePolicy(self.sizePolicy)
-        self.listToggle.setMinimumSize(self.min_button_size * 1.75)
-        self.listToggle.setMaximumSize(self.min_button_size * 1.75)
-        self.listToggle.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-
-        self.headerSpacer = QWidget()
-        self.chaptersHeaderLayout.addWidget(self.headerSpacer)
-        self.chaptersHeaderLayout.addWidget(self.gridToggle)
-        self.chaptersHeaderLayout.addWidget(self.listToggle)
 
         self.chaptersSelectionLayout = QVBoxLayout()
         self.selectionWidget = QWidget()
@@ -1153,8 +1138,6 @@ class Description(QWidget):
 
         self.selectionWidget.setLayout(self.selectionLayout)
         self.chaptersSelectionLayout.addWidget(self.selectionWidget)
-
-        self.chaptersLayout.addLayout(self.chaptersHeaderLayout)
         self.chaptersLayout.addLayout(self.chaptersSelectionLayout)
 
         self.mainLayout.addLayout(self.infoLayout)
@@ -1168,31 +1151,22 @@ class Description(QWidget):
     def loadDescriptionItems(self):
         self.scrollAreaWidget = QWidget()
 
-        if self.isGrid:
-            self.chapterDescGridLayout = QGridLayout(self.scrollAreaWidget)
-            self.scrollArea.setWidget(self.scrollAreaWidget)
-            self.chapterDescGridLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
-            self.chapterDescGridLayout.setDefaultPositioning(0, Qt.Orientation.Horizontal)
-            self.chapterDescGridLayout.setContentsMargins(5, 10, 5, 10)
+        self.chapterDescListLayout = QVBoxLayout(self.scrollAreaWidget)
+        self.chapterDescListLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.scrollArea.setWidget(self.scrollAreaWidget)
+        self.chapterDescListLayout.setContentsMargins(5, 10, 5, 10)
 
-        else:
-            self.chapterDescListLayout = QVBoxLayout(self.scrollAreaWidget)
-            self.chapterDescListLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
-            self.scrollArea.setWidget(self.scrollAreaWidget)
-            self.chapterDescListLayout.setContentsMargins(5, 10, 5, 10)
-
-        if self.isGrid:
-            self.chapterDescGridDisplay()
-        else: 
-            self.chapterDescListDisplay()
+        self.chapterDescListDisplay()
 
         self.selectionLayout.addWidget(self.scrollArea)
 
     def setData(self, dataDict):
+        self.dataDict = dataDict
         self.setName(dataDict["ManhuaTitle"])
         self.setCover(dataDict["ManhuaCover"])
         self.setChapters(dataDict["Chapters"])
         self.setStatus(dataDict["Status"])
+        self.setDesc(dataDict["Description"])
 
     def setName(self, name):
         self.nameLabel.setText(name)
@@ -1208,69 +1182,27 @@ class Description(QWidget):
         self.coverLabel.setPixmap(self.coverPixmap)
         self.coverLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+    def setDesc(self, desc):
+        self.synopsisLabel.setText(desc)
+        self.synopsisLabel.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
+        self.synopsisLabel.setWordWrap(True)
+
     def setChapters(self, chapters):
         self.descChapters = chapters
 
     def setStatus(self, status):
         self.modeTag.setText(status)
 
-    def selectViewTypeByObj(self, objName):
-        if objName == "toggleGrid":
-            self.viewOptionIndex = 0
-            self.selectView(self.viewOptionIndex)
-        else:
-            self.viewOptionIndex = 1
-            self.selectView(self.viewOptionIndex)
-
-    def selectView(self, view_index):
-        if view_index == 0 and view_index != self.previousViewOptionIndex:
-            self.isGrid = True
-            self.viewTypeAction(self.isGrid)
-        else:
-            if view_index == 1 and view_index != self.previousViewOptionIndex:
-                self.isGrid = False
-                self.viewTypeAction(self.isGrid)
-
-    def viewTypeAction(self, gridView):
-        if gridView == True:
-            self.gridToggleIcon = QIcon()
-            self.gridToggleIcon.addPixmap(QPixmap("resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            self.gridToggle.setIcon(self.gridToggleIcon)
-            self.gridToggle.setIconSize(self.icon_size * 1.1)
-            
-            self.listToggleDisabledIcon =QIcon()
-            self.listToggleDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            self.listToggle.setIcon(self.listToggleDisabledIcon)
-            self.listToggle.setIconSize(self.icon_size * 1.1)
-            self.previousViewOptionIndex = 0
-
-            if self.launchDone:
-                self.switchLayout()
-
-        else:
-            self.listToggleIcon = QIcon()
-            self.listToggleIcon.addPixmap(QPixmap("resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            self.listToggle.setIcon(self.listToggleIcon)
-            self.listToggle.setIconSize(self.icon_size * 1.1)
-            
-            self.gridToggleDisabledIcon = QIcon()
-            self.gridToggleDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            self.gridToggle.setIcon(self.gridToggleDisabledIcon)
-            self.gridToggle.setIconSize(self.icon_size * 1.1)
-            self.previousViewOptionIndex = 1
-
-            if self.launchDone:
-                self.switchLayout()
-
-    def switchLayout(self):
+    def resetChapters(self):
         self.scrollAreaWidget.deleteLater()
         self.loadDescriptionItems()
 
-    def chapterDescGridDisplay(self):
-        ...
-
     def chapterDescListDisplay(self):
-        ...
+        for x in range(len(self.descChapters)):
+            key = list(self.descChapters.keys())[x]
+            path = self.descChapters.get(key)
+            chap = Library.Chapters(key, path)
+            self.chapterDescListLayout.addWidget(chap)
 
     def exit(self):
         self.parent.setCurrentIndex(1)

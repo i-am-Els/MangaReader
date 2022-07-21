@@ -19,6 +19,7 @@
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QMainWindow, QSizePolicy
 from PyQt6.QtCore import QSize, Qt
 import sys, setup, ctypes
+from color import Color
 from themes import WindowTitleBar, MoveableWindow
 
 def setTaskBarIcon():
@@ -52,7 +53,7 @@ class  App(QMainWindow):
         
         self.cWidget.setLayout(self.customTitleBar)
         self.cWidget.setMaximumHeight(30)
-        self.cWidget.setStyleSheet("QWidget{background-color: rgba(72, 75, 106, 0.65); color: white;}")
+        self.cWidget.setStyleSheet("QWidget{background-color: %s; color: %s;}" % (Color.lightColor11, Color.lightColor12))
         self.cLayout.addWidget(self.cWidget)
         self.cLayout.setSpacing(0)
         self.cLayout.setContentsMargins(0,0,0,0)

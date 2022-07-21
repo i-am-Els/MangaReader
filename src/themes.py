@@ -16,7 +16,7 @@
 
 
 from pathlib import Path
-import PyQt6
+from color import Color
 
 from PyQt6.QtCore import QPoint, QPointF, Qt, QRect, QSize
 
@@ -34,20 +34,22 @@ class Themes:
         self.defaultCoverImage = "resources/logo/thumbnailCoverless.png"
         self.defaultCoverPixmap = QPixmap(self.defaultCoverImage).scaled(60, 80, Qt.AspectRatioMode.KeepAspectRatio)
         # self.objP.spaceE.setPixmap(self.objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
+        self.scrollbarStyleLight = "QScrollArea { background-color: %s; border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QScrollBar:vertical { width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;} QScrollBar::handle:vertical { background: rgb(128, 128, 128); min-height:0px; border-radius: 3px;} QScrollBar::add-line:vertical { background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical {  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }" % (Color.lightColor3)
+
 
     def prefButtonActiveLight(self, obj, indexB):
-        if type(self.prevObjButton) == PyQt6.QtWidgets.QPushButton:
+        if type(self.prevObjButton) == QPushButton:
             self.prevObjButton.setStyleSheet(
-                "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250,250,250);} QPushButton:hover { color:white; background-color:rgb(210,211,219);} #backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
+                "QPushButton { color: Black; border-radius: 15px;background-color: %s;} QPushButton:hover { color:white; background-color:rgb(210, 211, 219);} #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}" % (Color.lightColor1)
             )
         else:
             pass
 
         obj.setStyleSheet(
-            "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210,211,219);}#backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
+            "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210, 211, 219);}#backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
         )
         self.prefButtonList[indexB].setStyleSheet(
-            "QPushButton { color:white;background-color:rgb(147,148,165); } #backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
+            "QPushButton { color:white;background-color:rgb(147, 148, 165); } #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
         )
 
         self.prevObjButton = self.prefButtonList[indexB]
@@ -56,22 +58,22 @@ class Themes:
         style ="""
         *{
             color: Black;
-            background-color: rgb(250,250,250);
+            background-color: %s;
         }
         QPushButton{
             border-radius: 18px;
         }
         QPushButton:hover {
-            background-color: rgb(147,148,165);
+            background-color: rgb(147, 148, 165);
         }
         QLineEdit{
-            border: 1px solid rgba(0,0,0,40);
+            border: 1px solid rgba(0, 0, 0, 40);
             border-radius: 18px;
             padding-left: 15px;
             font: 13px;
         }
         QStatusBar{
-            background-color: rgba(0,0,0,40);
+            background-color: rgba(0, 0, 0, 40);
         }
         QLabel{
             padding: 10px;
@@ -79,7 +81,7 @@ class Themes:
         }
 
         #toggleGridView:hover, #toggleListView:hover{
-            background-color: rgb(147,148,165);;
+            background-color: rgb(147, 148, 165);
             border-radius: 5px;
         }
 
@@ -89,7 +91,7 @@ class Themes:
 
         #historyLabel{
             color: white;
-            background-color: rgb(72,75,106); 
+            background-color: rgb(72, 75, 106); 
             font: 15px;
         }
         QListView{
@@ -97,14 +99,14 @@ class Themes:
             border: 1px solid rgb(210, 211, 219);
             border-radius: 10px;
         }
-        """
+        """ % (Color.lightColor1)
 
         obj.setStyleSheet(style)
         objM = obj.objMainWindow
         objP = obj.objPref
         objR = obj.objReader
         
-        objM.tabWidget.tabBar().setStyleSheet("QTabBar::tab { background-color: rgb(250, 250, 250); width: 200px; padding: 1px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }  QTabBar::tab:bottom{ background: rgb(235, 235, 235);}  QTabBar::tab:bottom:selected { background-color: rgb(72,75,106); color: rgb(250,250,250);}")
+        objM.tabWidget.tabBar().setStyleSheet("QTabBar::tab { background-color: %s; width: 200px; padding: 1px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }  QTabBar::tab:bottom{ background: rgb(235, 235, 235);}  QTabBar::tab:bottom:selected { background-color: rgb(72, 75, 106); color: rgb(250, 250, 250);}" % (Color.lightColor1))
 
         objM.tabWidget.setStyleSheet("QTabWidget::pane { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
 
@@ -114,13 +116,12 @@ class Themes:
         
         objM.library.noItems.setStyleSheet(" QWidget{ background: rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QLabel { border: none; }")
         
-        objM.library.descriptionPage.setStyleSheet("QWidget#descPage { background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } QPushButton:hover { background-color: rgb(147,148,165);}")
+        objM.library.descriptionPage.setStyleSheet("QWidget#descPage { background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } QPushButton:hover { background-color: rgb(147, 148, 165);}")
 
         objM.library.libraryShelf.setStyleSheet(" background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
-        self.scrollbarStyleLight = "QScrollArea { background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QScrollBar:vertical { width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;} QScrollBar::handle:vertical { background: rgb(128, 128, 128); min-height:0px; border-radius: 3px;} QScrollBar::add-line:vertical { background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical {  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }"
-
         objM.library.libraryScrollArea.setStyleSheet(self.scrollbarStyleLight)
+        objM.library.descriptionPage.scrollArea.setStyleSheet(self.scrollbarStyleLight)
 
         # self.objM.library.libraryScrollAreaWidget.setStyleSheet("QSCrollArea{ border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } ")
 
@@ -146,7 +147,7 @@ class Themes:
         objM.refreshIcon.addPixmap(QPixmap("resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.refreshButton.setIcon(objM.refreshIcon)
 
-        objM.apiButtonWidget.setStyleSheet("#apiWidget { background-color: rgb(210, 211, 219); border: 2px solid rgb(72,75,106); border-radius: 18px;} QPushButton{ background-color: rgb(210, 211, 219); margin: 5px;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
+        objM.apiButtonWidget.setStyleSheet("#apiWidget { background-color: rgb(210, 211, 219); border: 2px solid rgb(72, 75, 106); border-radius: 18px;} QPushButton{ background-color: rgb(210, 211, 219); margin: 5px;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
 
         objM.apiCombo.setStyleSheet(" QComboBox{  border: 0px; background-color: rgb(210, 211, 219);} QComboBox::drop-down{ border: 0px; width: 70px;} QComboBox:selected{ background-color: white;}")
 
@@ -156,7 +157,7 @@ class Themes:
             }
             #settingsButton:hover, #downloadButton:hover, #themesButton:hover{
                 color:white;
-                background-color:rgb(210,211,219);
+                background-color:rgb(210, 211, 219);
             }
             
         """
@@ -164,7 +165,7 @@ class Themes:
 
         objP.headerLabel.setMaximumHeight(48)
         
-        objP.stackedWidget.setStyleSheet("background-color: rgb(210,211,219); border-radius: 10px;")
+        objP.stackedWidget.setStyleSheet("background-color: rgb(210, 211, 219); border-radius: 10px;")
         
         objP.headerBackgroundWidget.setMaximumHeight(60)
         objP.headerBackgroundWidget.setStyleSheet("background-color: rgb(147, 148, 165); border-radius: 25px; color: white; padding-top: 0px;")
@@ -210,16 +211,16 @@ class Themes:
     def prefButtonActiveDark(self, obj, indexB):
         # if type(self.prevObjButton) == PyQt6.QtWidgets.QPushButton:
         #     self.prevObjButton.setStyleSheet(
-        #         "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250,250,250);} QPushButton:hover { color:white; background-color:rgb(210,211,219);} #backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
+        #         "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250, 250, 250);} QPushButton:hover { color:white; background-color:rgb(210, 211, 219);} #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
         #     )
         # else:
         #     pass
 
         # obj.setStyleSheet(
-        #     "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210,211,219);}#backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
+        #     "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210, 211, 219);}#backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
         # )
         # self.prefButtonList[indexB].setStyleSheet(
-        #     "QPushButton { color:white;background-color:rgb(147,148,165); } #backButton:hover{ background-color:rgb(147,148,165); border-radius: 18px}"
+        #     "QPushButton { color:white;background-color:rgb(147, 148, 165); } #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
         # )
 
         # self.prevObjButton = self.prefButtonList[indexB]
@@ -371,7 +372,7 @@ class WindowTitleBar(QHBoxLayout):
         self.closeIconIcon.addPixmap(QPixmap("resources/icons/icons8-close-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.closeIcon.setIcon(self.closeIconIcon)
 
-        self.closeIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgba(247,10,15,1);}")
+        self.closeIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: %s;}" % (Color.lightColor2))
 
         self.logoLayout.addWidget(self.customWindowIcon)
         self.logoLayout.addWidget(self.customWindowTitle)
