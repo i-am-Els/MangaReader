@@ -139,10 +139,10 @@ class Themes:
         objM.localSearchIconSingleFormat.addPixmap(QPixmap("resources/icons/icons8-cbr-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.localSearchButtonSingleFormat.setIcon(objM.localSearchIconSingleFormat)
 
-        objM.library.descriptionPage.sideAInnerABackBtnIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objM.library.descriptionPage.sideAInnerABackBtn.setIcon(objM.library.descriptionPage.sideAInnerABackBtnIcon)
+        objM.library.descriptionPage.exitButtonIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objM.library.descriptionPage.exitButton.setIcon(objM.library.descriptionPage.exitButtonIcon)
         
-        objM.library.descriptionPage.sideAInnerABackBtn.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+        objM.library.descriptionPage.exitButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
         
         objM.refreshIcon.addPixmap(QPixmap("resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.refreshButton.setIcon(objM.refreshIcon)

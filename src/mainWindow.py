@@ -1083,94 +1083,94 @@ class Description(QWidget):
         self.createDescriptionWidget()
         self.launchDone = True
 
-        self.sideBInnerAListViewOp.clicked.connect(lambda: self.selectViewTypeByObj("toggleList"))
-        self.sideBInnerAGridViewOp.clicked.connect(lambda: self.selectViewTypeByObj("toggleGrid"))
-        self.sideAInnerABackBtn.clicked.connect(lambda: self.exit())
+        self.listToggle.clicked.connect(lambda: self.selectViewTypeByObj("toggleList"))
+        self.gridToggle.clicked.connect(lambda: self.selectViewTypeByObj("toggleGrid"))
+        self.exitButton.clicked.connect(lambda: self.exit())
         
     def createDescriptionWidget(self):
         self.mainLayout = QHBoxLayout()
         
-        self.sideALayout = QVBoxLayout()
+        self.infoLayout = QVBoxLayout()
         
-        self.sideAInnerALayout = QHBoxLayout()
-        self.sideAInnerABackBtn = QPushButton()
-        self.sideAInnerABackBtn.setObjectName("backDescButton")
+        self.infoHeaderLayout = QHBoxLayout()
+        self.exitButton = QPushButton()
+        self.exitButton.setObjectName("backDescButton")
 
-        self.sideAInnerABackBtn.setSizePolicy(self.sizePolicy)
-        self.sideAInnerABackBtn.setMinimumSize(self.min_button_size)
-        self.sideAInnerABackBtn.setMaximumSize(self.max_button_size)
-        self.sideAInnerABackBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.sideAInnerABackBtn.setGeometry(0, 0, 36, 36)
-        self.sideAInnerABackBtnIcon = QIcon()
-        self.sideAInnerABackBtn.setIconSize(self.icon_size)
-        self.sideAInnerABackBtn.setCheckable(True)
+        self.exitButton.setSizePolicy(self.sizePolicy)
+        self.exitButton.setMinimumSize(self.min_button_size)
+        self.exitButton.setMaximumSize(self.max_button_size)
+        self.exitButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.exitButton.setGeometry(0, 0, 36, 36)
+        self.exitButtonIcon = QIcon()
+        self.exitButton.setIconSize(self.icon_size)
+        self.exitButton.setCheckable(True)
 
-        self.sideAInnerAModeTag = QLabel()
-        self.sideAInnerALayout.addWidget(self.sideAInnerABackBtn)
-        self.sideAInnerALayout.addWidget(self.sideAInnerAModeTag)
+        self.modeTag = QLabel()
+        self.infoHeaderLayout.addWidget(self.exitButton)
+        self.infoHeaderLayout.addWidget(self.modeTag)
 
-        self.sideAInnerBLayout = QGridLayout()
+        self.infoDescriptionLayout = QGridLayout()
         self.nameLabel = QLabel()
         self.coverLabel = QLabel()
         self.describeManhuaLabel = QLabel()
 
-        self.sideAInnerBLayout.addWidget(self.coverLabel, 0, 0, 1, 1)
-        self.sideAInnerBLayout.addWidget(self.nameLabel, 0, 1, 1, 1)
-        self.sideAInnerBLayout.addWidget(self.describeManhuaLabel, 1, 0, 2, 2)
+        self.infoDescriptionLayout.addWidget(self.coverLabel, 0, 0, 1, 1)
+        self.infoDescriptionLayout.addWidget(self.nameLabel, 0, 1, 1, 1)
+        self.infoDescriptionLayout.addWidget(self.describeManhuaLabel, 1, 0, 2, 2)
 
 
-        self.sideALayout.addLayout(self.sideAInnerALayout)
-        self.sideALayout.addLayout(self.sideAInnerBLayout)
+        self.infoLayout.addLayout(self.infoHeaderLayout)
+        self.infoLayout.addLayout(self.infoDescriptionLayout)
 
-        self.sideBLayout = QVBoxLayout()
-        self.sideBInnerALayout = QHBoxLayout()
-        self.sideBInnerAListViewOp = QPushButton()
-        self.sideBInnerAGridViewOp = QPushButton()
+        self.chaptersLayout = QVBoxLayout()
+        self.chaptersHeaderLayout = QHBoxLayout()
+        self.listToggle = QPushButton()
+        self.gridToggle = QPushButton()
 
         self.previousViewOptionIndex = 0
         self.viewOptionIndex = 1
         self.selectView(self.viewOptionIndex)
 
-        self.sideBInnerAGridViewOp.setCheckable(True)
-        self.sideBInnerAGridViewOp.setObjectName("toggleGridView")
+        self.gridToggle.setCheckable(True)
+        self.gridToggle.setObjectName("toggleGridView")
 
-        self.sideBInnerAListViewOp.setCheckable(True)
-        self.sideBInnerAListViewOp.setObjectName("toggleListView")
+        self.listToggle.setCheckable(True)
+        self.listToggle.setObjectName("toggleListView")
         
-        self.sideBInnerAGridViewOp.setSizePolicy(self.sizePolicy)
-        self.sideBInnerAGridViewOp.setMinimumSize(self.min_button_size * 1.75)
-        self.sideBInnerAGridViewOp.setMaximumSize(self.min_button_size * 1.75)
-        self.sideBInnerAGridViewOp.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.gridToggle.setSizePolicy(self.sizePolicy)
+        self.gridToggle.setMinimumSize(self.min_button_size * 1.75)
+        self.gridToggle.setMaximumSize(self.min_button_size * 1.75)
+        self.gridToggle.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         
-        self.sideBInnerAListViewOp.setSizePolicy(self.sizePolicy)
-        self.sideBInnerAListViewOp.setMinimumSize(self.min_button_size * 1.75)
-        self.sideBInnerAListViewOp.setMaximumSize(self.min_button_size * 1.75)
-        self.sideBInnerAListViewOp.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.listToggle.setSizePolicy(self.sizePolicy)
+        self.listToggle.setMinimumSize(self.min_button_size * 1.75)
+        self.listToggle.setMaximumSize(self.min_button_size * 1.75)
+        self.listToggle.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        self.sideBInnerASpaceEater = QWidget()
-        self.sideBInnerALayout.addWidget(self.sideBInnerASpaceEater)
-        self.sideBInnerALayout.addWidget(self.sideBInnerAGridViewOp)
-        self.sideBInnerALayout.addWidget(self.sideBInnerAListViewOp)
+        self.headerSpacer = QWidget()
+        self.chaptersHeaderLayout.addWidget(self.headerSpacer)
+        self.chaptersHeaderLayout.addWidget(self.gridToggle)
+        self.chaptersHeaderLayout.addWidget(self.listToggle)
 
-        self.sideBInnerBLayout = QVBoxLayout()
-        self.sideBInnerBWidget = QWidget()
-        self.sideBdeepInnerBLayout = QVBoxLayout(self.sideBInnerBWidget)
-        self.sideBdeepInnerBLayout.setContentsMargins(0, 0, 0, 0)
+        self.chaptersSelectionLayout = QVBoxLayout()
+        self.selectionWidget = QWidget()
+        self.selectionLayout = QVBoxLayout(self.selectionWidget)
+        self.selectionLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.scrollArea = QScrollArea(self.sideBInnerBWidget)
+        self.scrollArea = QScrollArea(self.selectionWidget)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
         self.loadDescriptionItems()
 
-        self.sideBInnerBWidget.setLayout(self.sideBdeepInnerBLayout)
-        self.sideBInnerBLayout.addWidget(self.sideBInnerBWidget)
+        self.selectionWidget.setLayout(self.selectionLayout)
+        self.chaptersSelectionLayout.addWidget(self.selectionWidget)
 
-        self.sideBLayout.addLayout(self.sideBInnerALayout)
-        self.sideBLayout.addLayout(self.sideBInnerBLayout)
+        self.chaptersLayout.addLayout(self.chaptersHeaderLayout)
+        self.chaptersLayout.addLayout(self.chaptersSelectionLayout)
 
-        self.mainLayout.addLayout(self.sideALayout)
-        self.mainLayout.addLayout(self.sideBLayout)
+        self.mainLayout.addLayout(self.infoLayout)
+        self.mainLayout.addLayout(self.chaptersLayout)
         
         self.setLayout(self.mainLayout)
 
@@ -1195,7 +1195,7 @@ class Description(QWidget):
         else: 
             self.chapterDescListDisplay()
 
-        self.sideBdeepInnerBLayout.addWidget(self.scrollArea)
+        self.selectionLayout.addWidget(self.scrollArea)
 
     def setData(self, dataDict):
         self.setName(dataDict["ManhuaTitle"])
@@ -1219,7 +1219,7 @@ class Description(QWidget):
         self.descChapters = chapters
 
     def setStatus(self, status):
-        self.sideAInnerAModeTag.setText(status)
+        self.modeTag.setText(status)
 
     def selectViewTypeByObj(self, objName):
         if objName == "toggleGrid":
@@ -1240,30 +1240,30 @@ class Description(QWidget):
 
     def viewTypeAction(self, gridView):
         if gridView == True:
-            self.sideBInnerAGridViewOpIcon = QIcon()
-            self.sideBInnerAGridViewOpIcon.addPixmap(QPixmap("resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            self.sideBInnerAGridViewOp.setIcon(self.sideBInnerAGridViewOpIcon)
-            self.sideBInnerAGridViewOp.setIconSize(self.icon_size * 1.1)
+            self.gridToggleIcon = QIcon()
+            self.gridToggleIcon.addPixmap(QPixmap("resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.gridToggle.setIcon(self.gridToggleIcon)
+            self.gridToggle.setIconSize(self.icon_size * 1.1)
             #--------------------------------------------
-            self.sideBInnerAListViewOpDisabledIcon =QIcon()
-            self.sideBInnerAListViewOpDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            self.sideBInnerAListViewOp.setIcon(self.sideBInnerAListViewOpDisabledIcon)
-            self.sideBInnerAListViewOp.setIconSize(self.icon_size * 1.1)
+            self.listToggleDisabledIcon =QIcon()
+            self.listToggleDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.listToggle.setIcon(self.listToggleDisabledIcon)
+            self.listToggle.setIconSize(self.icon_size * 1.1)
             self.previousViewOptionIndex = 0
 
             if self.launchDone:
                 self.switchLayout()
 
         else:
-            self.sideBInnerAListViewOpIcon = QIcon()
-            self.sideBInnerAListViewOpIcon.addPixmap(QPixmap("resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            self.sideBInnerAListViewOp.setIcon(self.sideBInnerAListViewOpIcon)
-            self.sideBInnerAListViewOp.setIconSize(self.icon_size * 1.1)
+            self.listToggleIcon = QIcon()
+            self.listToggleIcon.addPixmap(QPixmap("resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.listToggle.setIcon(self.listToggleIcon)
+            self.listToggle.setIconSize(self.icon_size * 1.1)
             #--------------------------------------------
-            self.sideBInnerAGridViewOpDisabledIcon = QIcon()
-            self.sideBInnerAGridViewOpDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            self.sideBInnerAGridViewOp.setIcon(self.sideBInnerAGridViewOpDisabledIcon)
-            self.sideBInnerAGridViewOp.setIconSize(self.icon_size * 1.1)
+            self.gridToggleDisabledIcon = QIcon()
+            self.gridToggleDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.gridToggle.setIcon(self.gridToggleDisabledIcon)
+            self.gridToggle.setIconSize(self.icon_size * 1.1)
             self.previousViewOptionIndex = 1
 
             if self.launchDone:
