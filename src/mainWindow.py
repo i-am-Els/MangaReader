@@ -37,7 +37,7 @@ from PyQt6.QtWidgets import (
     QComboBox, 
     QScrollArea
 )
-from PyQt6.QtCore import QSize, Qt, QObjectCleanupHandler
+from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
 
 
@@ -77,15 +77,12 @@ class MainWindow(QWidget):
         self.create_widgets()
 
     def create_widgets(self):
-        #------------------------------------------------
         self.gridLayout = QGridLayout()
 
-        #------------------------------------------------
         # Create a centralLayout to hold all other layouts
         self.centralLayout = QVBoxLayout()
         self.centralLayout.setSpacing(9)
 
-        #------------------------------------------------
         # Create an horizontal layout to hold all search functions
         self.searchLayout = QHBoxLayout()
         self.searchLayout.setContentsMargins(-1, 10, -1, 10)
@@ -141,7 +138,6 @@ class MainWindow(QWidget):
         self.localSearchButton.setIconSize(self.icon_size)
         self.localSearchButton.setObjectName("localSearchButton")
 
-
         self.localSearchButtonSingleFormat = QPushButton()
         self.localSearchButtonSingleFormat.setCheckable(True)
         self.localSearchButtonSingleFormat.setSizePolicy(self.sizePolicy)
@@ -152,7 +148,6 @@ class MainWindow(QWidget):
         self.localSearchIconSingleFormat = QIcon()
         self.localSearchButtonSingleFormat.setIconSize(self.icon_size)
         self.localSearchButtonSingleFormat.setObjectName("localSearcButtonSingleFormat")
-
 
         self.refreshButton = QPushButton()
         self.refreshButton.setCheckable(True)
@@ -165,7 +160,6 @@ class MainWindow(QWidget):
         self.refreshButton.setIconSize(self.icon_size)
         self.refreshButton.setObjectName("refreshButton")
 
-        
         self.apiButton = QPushButton()
         # self.apiButton.addItems(self.apiName)
         self.apiButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
@@ -196,7 +190,6 @@ class MainWindow(QWidget):
         self.apiButtonWidget.setLayout(self.apiButtonLayout)
         self.apiButtonWidget.setFixedSize(QSize(120, 36))
 
-
         # Add Widgets to searchLayout
         self.searchLayout.addWidget(self.menuButton)
         self.searchLayout.addWidget(self.refreshButton)
@@ -216,7 +209,6 @@ class MainWindow(QWidget):
 
         self.searchLayout.setContentsMargins(3, 5, 0, 5)
 
-        #------------------------------------------------
         # Create another horizontal layout to hold objects of focus
         self.containerLayout = QHBoxLayout()
         # Create a Vetical layout to hold the tabwidget
@@ -235,7 +227,6 @@ class MainWindow(QWidget):
         self.historyListView.setMinimumWidth(320)
         # Add widgets to the historyLayout
 
-        #---------------------------------------------------
         self.toggleLayout = QHBoxLayout()
 
         self.toggleGridView = QPushButton()
@@ -245,21 +236,16 @@ class MainWindow(QWidget):
         self.toggleListView = QPushButton()
         self.toggleListView.setCheckable(True)
         self.toggleListView.setObjectName("toggleListView")
-        #---------------------------------------------------
         
         self.toggleGridView.setSizePolicy(self.sizePolicy)
         self.toggleGridView.setMinimumSize(self.min_button_size * 1.75)
         self.toggleGridView.setMaximumSize(self.min_button_size * 1.75)
         self.toggleGridView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-
-        #----------------------------------------------------
         
         self.toggleListView.setSizePolicy(self.sizePolicy)
         self.toggleListView.setMinimumSize(self.min_button_size * 1.75)
         self.toggleListView.setMaximumSize(self.min_button_size * 1.75)
         self.toggleListView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-
-        #--------------------------------------------------------
 
         self.toggleList = [self.toggleGridView, self.toggleListView]
         self.toggleViewValue = ["Grid View", "List View"]
@@ -268,11 +254,8 @@ class MainWindow(QWidget):
         self.viewOptionIndex = 1
 
         self.view = QLabel(self.toggleViewValue[self.viewOptionIndex])
-        #----------------------------------------------------
 
         self.selectView(self.viewOptionIndex)
-
-        #----------------------------------------------------
 
         self.toggleLayout.addWidget(self.view)
         self.toggleLayout.addWidget(self.toggleList[0])
@@ -281,7 +264,6 @@ class MainWindow(QWidget):
         self.toggleLayout.setStretch(0, 4)
         self.toggleLayout.setStretch(1, 1)
         self.toggleLayout.setStretch(2, 1)
-
 
         self.create_home_widgets()
 
@@ -297,7 +279,6 @@ class MainWindow(QWidget):
         self.historyLayout.setStretch(1, 1)
         self.historyLayout.setSpacing(5)
 
-        #------------------------------------------------
         # Add homeLayout and historyLayout to containerLayout
         self.containerLayout.addLayout(self.homeLayout)
         self.containerLayout.addLayout(self.historyLayout)
@@ -305,17 +286,17 @@ class MainWindow(QWidget):
         # Set Layout Stretch policy
         self.containerLayout.setStretch(0, 7)
         self.containerLayout.setStretch(1, 3)
-        #------------------------------------------------
+        
         #Add searchLayout and containerLayout to centralLayout
         self.centralLayout.addLayout(self.searchLayout)
         self.centralLayout.addLayout(self.containerLayout)
         self.centralLayout.setStretch(0, 2)
-        self.centralLayout.setStretch(1, 12)
-        #------------------------------------------------
+        self.centralLayout.setStretch(1, 10)
+        
         self.gridLayout.addLayout(self.centralLayout, 0, 0, 1, 1)
 
         self.setLayout(self.gridLayout)
-        #-----------------------------------------------
+        
         self.searchButton.clicked.connect(self.search)
         self.lineEdit.returnPressed.connect(self.searchButton.click)
         
@@ -349,8 +330,6 @@ class MainWindow(QWidget):
 
     def create_home_widgets(self):
         self.tabWidget = QTabWidget()
-        # self.tabBar = QTabBar(self.tabWidget)
-        #---------------------------------------------------
 
         self.home = QWidget()
 
@@ -364,19 +343,14 @@ class MainWindow(QWidget):
 
         self.homeTabStackLayout.setContentsMargins(0, 0, 0, 0)
 
-        #----------------------------------------------------
         self.homeTabStackLayout.addWidget(self.homeTabStack)
 
         self.home.setLayout(self.homeTabStackLayout)
-        #---------------------------------------------------
 
         self.library = Library(self.appW, parent=self)
         self.library.setObjectName("libraryOrigin")
         self.libraryIcon = QIcon() 
 
-
-        #---------------------------------------------------     
-       
         self.tabWidget.addTab(self.home, self.homeIcon, "Home")
         self.tabWidget.addTab(self.library, self.libraryIcon, "Library")
         self.tabWidget.setCurrentIndex(0)
@@ -384,15 +358,12 @@ class MainWindow(QWidget):
             Themes.changeTabBarIconLight(self) # Changes selected tabbar icon
         else:
             Themes.changeTabBarIconDark(self)
-        #---------------------------------------------------
 
         self.tabWidget.setSizePolicy(self.sizePolicy)
         self.tabWidget.setTabPosition(QTabWidget.TabPosition.South)
         self.tabWidget.setTabsClosable(False)
         self.tabWidget.setMovable(False)
         self.tabWidget.setIconSize(QSize(64, 24))
-
-        #---------------------------------------------------
 
         self.homeLayout.addWidget(self.tabWidget)
 
@@ -443,16 +414,12 @@ class MainWindow(QWidget):
         self.noSearchResult = QWidget()
         self.searchResultPage = QWidget()
         self.descriptionPage = QWidget()
-        #---------------------------------------------------
-
-        #----------------------------------------------------
+        
         self.loadHomeDisplay()
         self.loadNoInternetDisplay()
         self.loadNoSearchResult()
         self.loadSearchResultPage()
-        self.loadDescriptionPage()
-
-        #---------------------------------------------------
+        self.loadDescriptionPage()      
 
         self.homeTabStack.addWidget(self.homeDisplay)
         self.homeTabStack.addWidget(self.noInternetDisplay)
@@ -559,7 +526,7 @@ class MainWindow(QWidget):
             self.toggleGridIcon.addPixmap(QPixmap("resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleGridView.setIcon(self.toggleGridIcon)
             self.toggleGridView.setIconSize(self.icon_size * 1.1)
-            #--------------------------------------------
+            
             self.toggleListDisabledIcon =QIcon()
             self.toggleListDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleListView.setIcon(self.toggleListDisabledIcon)
@@ -578,7 +545,7 @@ class MainWindow(QWidget):
             self.toggleListIcon.addPixmap(QPixmap("resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleListView.setIcon(self.toggleListIcon)
             self.toggleListView.setIconSize(self.icon_size * 1.1)
-            #--------------------------------------------
+            
             self.toggleGridDisabledIcon = QIcon()
             self.toggleGridDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleGridView.setIcon(self.toggleGridDisabledIcon)
@@ -698,7 +665,6 @@ class Library(QStackedWidget):
         self.gridY = 0
         self.gridYLimit = 7
         self.appW = appW
-        self.setMinimumSize(640, 720)
 
         self.libraryMetadata = dict()
         self.libraryListdata = list()
@@ -710,7 +676,7 @@ class Library(QStackedWidget):
         self.addWidget(self.noItems)
         self.addWidget(self.libraryShelf)
         self.addWidget(self.descriptionPage)
-
+        
         self.setCurrentIndex(0)
 
         self.setNoItemsWidget()
@@ -833,7 +799,6 @@ class Library(QStackedWidget):
                 correct = not(any(os.path.isdir(os.path.join(xPath, y)) == True for y in os.listdir(xPath))) and any((Path(os.path.join(xPath, y)).suffix in imageExtList) for y in os.listdir(xPath))
                 if correct == True:
                     break
-
         return correct
 
     def addToLibrary(self, path):
@@ -1086,6 +1051,7 @@ class Description(QWidget):
         self.listToggle.clicked.connect(lambda: self.selectViewTypeByObj("toggleList"))
         self.gridToggle.clicked.connect(lambda: self.selectViewTypeByObj("toggleGrid"))
         self.exitButton.clicked.connect(lambda: self.exit())
+        self.setObjectName("descPage")
         
     def createDescriptionWidget(self):
         self.mainLayout = QHBoxLayout()
@@ -1109,18 +1075,40 @@ class Description(QWidget):
         self.infoHeaderLayout.addWidget(self.exitButton)
         self.infoHeaderLayout.addWidget(self.modeTag)
 
-        self.infoDescriptionLayout = QGridLayout()
+        self.infoDescriptionLayout = QHBoxLayout()
         self.nameLabel = QLabel()
+        self.synopsisLabel = QLabel()
+        self.nameLabelQ = QWidget()
+        self.nameLabelL = QVBoxLayout(self.nameLabelQ)
+
+        self.nameLabelL.addWidget(self.nameLabel) 
+        self.nameLabelL.addWidget(self.synopsisLabel) 
+
+        self.nameLabelL.setStretch(0, 1)
+        self.nameLabelL.setStretch(1, 4)
+        self.nameLabelL.setContentsMargins(0, 0, 0, 0)
+
         self.coverLabel = QLabel()
+        self.coverLabel.setMaximumSize(Manhua.manhuaSize * 1.)
         self.describeManhuaLabel = QLabel()
 
-        self.infoDescriptionLayout.addWidget(self.coverLabel, 0, 0, 1, 1)
-        self.infoDescriptionLayout.addWidget(self.nameLabel, 0, 1, 1, 1)
-        self.infoDescriptionLayout.addWidget(self.describeManhuaLabel, 1, 0, 2, 2)
+        self.infoDescriptionLayout.addWidget(self.coverLabel)
+        self.infoDescriptionLayout.addWidget(self.nameLabelQ)
+        self.infoDescriptionLayout.setContentsMargins(0, 0, 0, 0)
 
+        self.infoDescriptionLayout.setStretch(0, 1)
+        self.infoDescriptionLayout.setStretch(1, 3)
+
+        self.chapterDetailsLayout = QVBoxLayout()
+        self.chapterDetailsLayout.addWidget(self.describeManhuaLabel)
 
         self.infoLayout.addLayout(self.infoHeaderLayout)
         self.infoLayout.addLayout(self.infoDescriptionLayout)
+        self.infoLayout.addLayout(self.chapterDetailsLayout)
+
+        self.infoLayout.setStretch(0, 1)
+        self.infoLayout.setStretch(1, 2)
+        self.infoLayout.setStretch(2, 7)
 
         self.chaptersLayout = QVBoxLayout()
         self.chaptersHeaderLayout = QHBoxLayout()
@@ -1171,6 +1159,9 @@ class Description(QWidget):
 
         self.mainLayout.addLayout(self.infoLayout)
         self.mainLayout.addLayout(self.chaptersLayout)
+
+        self.mainLayout.setStretch(0, 1)
+        self.mainLayout.setStretch(1, 1)
         
         self.setLayout(self.mainLayout)
 
@@ -1212,8 +1203,10 @@ class Description(QWidget):
         self.nameLabel.setFont(self.nameLabelFont)
 
     def setCover(self, cover):
-        self.coverPixmap = QPixmap(str(cover)).scaled(120, 160, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+        w, h = self.coverLabel.width(), self.coverLabel.height()
+        self.coverPixmap = QPixmap(str(cover)).scaled(w, h, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         self.coverLabel.setPixmap(self.coverPixmap)
+        self.coverLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
     def setChapters(self, chapters):
         self.descChapters = chapters
@@ -1244,7 +1237,7 @@ class Description(QWidget):
             self.gridToggleIcon.addPixmap(QPixmap("resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.gridToggle.setIcon(self.gridToggleIcon)
             self.gridToggle.setIconSize(self.icon_size * 1.1)
-            #--------------------------------------------
+            
             self.listToggleDisabledIcon =QIcon()
             self.listToggleDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.listToggle.setIcon(self.listToggleDisabledIcon)
@@ -1259,7 +1252,7 @@ class Description(QWidget):
             self.listToggleIcon.addPixmap(QPixmap("resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.listToggle.setIcon(self.listToggleIcon)
             self.listToggle.setIconSize(self.icon_size * 1.1)
-            #--------------------------------------------
+            
             self.gridToggleDisabledIcon = QIcon()
             self.gridToggleDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.gridToggle.setIcon(self.gridToggleDisabledIcon)

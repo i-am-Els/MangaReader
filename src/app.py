@@ -61,7 +61,7 @@ class  App(QMainWindow):
         self.appLayout.addLayout(self.stWindowLayout)
 
         self.appLayout.setStretch(0, 1)
-        self.appLayout.setStretch(1, 20)
+        self.appLayout.setStretch(1, 11)
         self.appLayout.setSpacing(0)
 
         self.appLayout.setContentsMargins(0,0,0,0)
