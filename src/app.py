@@ -53,7 +53,7 @@ class  App(QMainWindow):
         
         self.cWidget.setLayout(self.customTitleBar)
         self.cWidget.setMaximumHeight(30)
-        self.cWidget.setStyleSheet("QWidget{background-color: %s; color: %s;}" % (Color.lightColor11, Color.lightColor12))
+        self.cWidget.setStyleSheet("QWidget{background-color: rgba(72, 75, 106, 0.65); color: white;}")
         self.cLayout.addWidget(self.cWidget)
         self.cLayout.setSpacing(0)
         self.cLayout.setContentsMargins(0,0,0,0)

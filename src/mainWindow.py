@@ -756,7 +756,6 @@ class Library(QStackedWidget):
         spacing = self.calculateLibrarySpacing()
         self.libraryDisplayChangeAction(dimension, spacing)
         
-
     def libraryResized(self):
         dimension = self.calculateLibraryDimension()
         spacing = self.calculateLibrarySpacing()
@@ -890,6 +889,10 @@ class Library(QStackedWidget):
         spacing = int(spacing / dimension)
         return spacing
 
+    @staticmethod
+    def launchReader(path):
+        print(f"Launching Reader... {path}")
+        pass
 
     class Chapters(QPushButton):
         def __init__(self, sTitle, pTitlePath):
@@ -898,8 +901,11 @@ class Library(QStackedWidget):
             self.titlePath = pTitlePath
             
             self.labelString = f"{self.title} \n{self.titlePath}"
-            self.titleLabel = QLabel(self.labelString, self)
+            self.setText(self.labelString)
+            self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }")
             self.setMinimumHeight(50)
+
+            self.clicked.connect(lambda: Library.launchReader(self.titlePath))
 
 
 class Manhua(QPushButton):
@@ -1062,7 +1068,7 @@ class Description(QWidget):
         self.createDescriptionWidget()
         self.launchDone = True
 
-        self.exitButton.clicked.connect(lambda: self.exit())
+        self.exitButton.clicked.connect(lambda: self.exitPage())
         self.setObjectName("descPage")
         
     def createDescriptionWidget(self):
@@ -1193,6 +1199,10 @@ class Description(QWidget):
     def setStatus(self, status):
         self.modeTag.setText(status)
 
+    def setPath(self, pPath, path):
+        path = str(pPath) + '\\' + str(path) + '\\'
+        return path
+
     def resetChapters(self):
         self.scrollAreaWidget.deleteLater()
         self.loadDescriptionItems()
@@ -1200,9 +1210,10 @@ class Description(QWidget):
     def chapterDescListDisplay(self):
         for x in range(len(self.descChapters)):
             key = list(self.descChapters.keys())[x]
-            path = self.descChapters.get(key)
+            iPath = self.descChapters.get(key)
+            path = self.setPath(self.dataDict["ManhuaPath"], iPath)
             chap = Library.Chapters(key, path)
             self.chapterDescListLayout.addWidget(chap)
 
-    def exit(self):
+    def exitPage(self):
         self.parent.setCurrentIndex(1)
