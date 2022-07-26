@@ -36,7 +36,6 @@ class Themes:
         # self.objP.spaceE.setPixmap(self.objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
         self.scrollbarStyleLight = "QScrollArea { background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QScrollBar:vertical { width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;} QScrollBar::handle:vertical { background: rgb(128, 128, 128); min-height:0px; border-radius: 3px;} QScrollBar::add-line:vertical { background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical {  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }"
 
-
     def prefButtonActiveLight(self, obj, indexB):
         if type(self.prevObjButton) == QPushButton:
             self.prevObjButton.setStyleSheet(
@@ -225,7 +224,6 @@ class Themes:
         # self.prevObjButton = self.prefButtonList[indexB]
         pass
 
-
     def darkMode(self, obj):
         objM = obj.objMainWindow
         objP = obj.objPref
@@ -294,8 +292,6 @@ class ToggleSwitch(QPushButton):
             sw_rect.moveLeft(-width)
         painter.drawRoundedRect(sw_rect, radius, radius)
         painter.drawText(sw_rect, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop, label)
-
-
 
 class WindowTitleBar(QHBoxLayout):
     def __init__(self, obj, widgetTitle, widget):
@@ -428,7 +424,6 @@ class MoveableWindow(QWidget):
         self.prevGeo = self.obj.geometry()
         self.oldPosition = self.geometry()
 
-
     def mousePressEvent(self, event):
         layOut = self.obj.customTitleBar.buttonsLayout
         if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count()))) :
@@ -456,7 +451,6 @@ class MoveableWindow(QWidget):
                 self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
                 self.refIcon.setIcon(self.refIconIcon)
         
-
     def mouseMoveEvent(self, event):
         layOut = self.obj.customTitleBar.buttonsLayout
         if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count()))) :
@@ -479,7 +473,6 @@ class MoveableWindow(QWidget):
 
             self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
-
 
     def mouseReleaseEvent(self, event):
         if event.globalPosition().y() < 10:

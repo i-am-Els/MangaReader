@@ -347,7 +347,7 @@ class MainWindow(QWidget):
 
         self.home.setLayout(self.homeTabStackLayout)
 
-        self.library = Library(self.appW, parent=self)
+        self.library = Library(self.appW, self.win_dow, parent=self)
         self.library.setObjectName("libraryOrigin")
         self.libraryIcon = QIcon() 
 
@@ -657,7 +657,7 @@ class MainWindow(QWidget):
 
 
 class Library(QStackedWidget):
-    def __init__(self, appW, parent):
+    def __init__(self, appW, window, parent):
         super(Library, self).__init__(parent)
         self.parent = parent
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -665,6 +665,7 @@ class Library(QStackedWidget):
         self.gridY = 0
         self.gridYLimit = 7
         self.appW = appW
+        self.win_dow = window
         self.previousOpen = ""
 
         self.libraryMetadata = dict()
@@ -889,23 +890,25 @@ class Library(QStackedWidget):
         spacing = int(spacing / dimension)
         return spacing
 
-    @staticmethod
-    def launchReader(path):
-        print(f"Launching Reader... {path}")
+    def launchReader(self, path):
+        # print(f"Launching Reader... {path}")
+        self.win_dow.setCurrentIndex(1)
         pass
 
     class Chapters(QPushButton):
-        def __init__(self, sTitle, pTitlePath):
+        def __init__(self, sTitle, pTitlePath, parent):
             super().__init__()
             self.title = sTitle
             self.titlePath = pTitlePath
+            self.parent = parent
             
             self.labelString = f"{self.title} \n{self.titlePath}"
             self.setText(self.labelString)
             self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }")
             self.setMinimumHeight(50)
+            self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-            self.clicked.connect(lambda: Library.launchReader(self.titlePath))
+            self.clicked.connect(lambda: self.parent.launchReader(self.titlePath))
 
 
 class Manhua(QPushButton):
@@ -1212,7 +1215,7 @@ class Description(QWidget):
             key = list(self.descChapters.keys())[x]
             iPath = self.descChapters.get(key)
             path = self.setPath(self.dataDict["ManhuaPath"], iPath)
-            chap = Library.Chapters(key, path)
+            chap = Library.Chapters(key, path, self.parent)
             self.chapterDescListLayout.addWidget(chap)
 
     def exitPage(self):

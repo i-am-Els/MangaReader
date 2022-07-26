@@ -16,7 +16,7 @@
 
 
 
-from PyQt6.QtWidgets import QWidget, QStackedWidget
+from PyQt6.QtWidgets import QWidget, QHBoxLayout
 
 from themes import Themes
 from settings import Settings
@@ -24,13 +24,39 @@ from settings import Settings
 class Reader(QWidget):
     def __init__(self, obj, win_dow):
         super().__init__()
-
         self.obj = obj
         self.win_dow = win_dow
 
-        
         self.themeObj = object()
         self.setting = object()
 
         self.themeIndex = object()
 
+        self.hideNav = bool()
+        self.fsState = bool()
+        self.readerDisplayIndex = int()
+        self.initReaderState = []
+
+
+    def backAction(self):
+        self.obj.talkToStackWidgetIndex(0, self.win_dow)
+
+    def setState(self, state):
+        self.readerDisplayIndex = state[0]
+        self.hideNav = state[1]
+        self.fsState = state[2]
+        self.initReaderState = state
+
+    def selfInit(self):
+        self.mainLayout = QHBoxLayout()
+        self.scrollingLayoutInit()
+        self.pagingLayoutInit()
+
+    def scrollingLayoutInit(self):
+        ...
+
+    def pagingLayoutInit(self):
+        ...
+
+    def updateLayout(self):
+        print("Updating Layout")

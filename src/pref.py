@@ -71,6 +71,8 @@ class Preference(QWidget):
         self.readerDisplayList = []
         self.settingsToggleIndex = int()
         self.settingsToggleList = []
+        self.initReaderState = []
+        self.updatedReaderState = []
 
         self.downloadDirPath = object()
         self.initPath = object()
@@ -240,7 +242,14 @@ class Preference(QWidget):
 
     def backAction(self):
         self.setting.setPrefVariables()
+        self.updateReaderState()
         self.obj.talkToStackWidgetIndex(0, self.win_dow)
+
+    def updateReaderState(self):
+        if self.initReaderState != self.win_dow.objReader.initReaderState:
+            self.updatedReaderState = self.initReaderState
+            self.win_dow.objReader.setState(self.updatedReaderState)
+            self.win_dow.objReader.updateLayout()
 
     def changeStackIndex(self, obj, w_index):
         obj.setCurrentIndex(w_index)

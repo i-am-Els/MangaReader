@@ -57,7 +57,7 @@ class Settings(object):
 
         self.downloadNewPath = self.downloadInitPath
 
-        self.apiName = ['Asura Scan', 'Manhuabat', 'HolyManhua']
+        self.apiName = ['Asura Scan', 'Mangabat', 'HolyManga']
         self.apiIndex = 1
         
     def setMainWindowVariables(self):
@@ -88,6 +88,16 @@ class Settings(object):
 
         self.objP.newPath = self.downloadNewPath
 
+        self.objP.initReaderState = [self.readerDisplayIndex, self.hideNav, self.fsState]
+
+    def setReaderInits(self):
+        self.objR.hideNav = self.hideNav
+
+        self.objR.fsState = self.fsState
+
+        self.objR.readerDisplayIndex = self.readerDisplayIndex
+        self.objR.initReaderState = [self.readerDisplayIndex, self.hideNav, self.fsState]
+
     def setObjMState(self):
         self.apiIndex = self.objM.apiIndex
         self.objM.apiButton.setText(self.apiName[self.apiIndex])
@@ -95,6 +105,8 @@ class Settings(object):
     def setStates(self):
         self.setMainWindowVariables()
         self.setPrefVariables()
+        self.setReaderInits()
+        self.objR.selfInit()
 
         self.objM.apiCombo.addItems(self.apiName)
 
@@ -121,4 +133,3 @@ class Settings(object):
 
         self.objP.themesBtn.setChecked(self.objP.themeButtonState)
         
-    
