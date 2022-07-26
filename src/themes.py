@@ -190,6 +190,19 @@ class Themes:
         objP.spaceE.setPixmap(objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
 
         self.prefButtonActiveLight(objP, self.prefSelectedButtonIndex)
+
+        objR.style = """ 
+            QPushButton{
+                border-radius: 18px;
+                color: red;
+            }
+        """
+        objR.setStyleSheet(objR.style)
+
+        objR.backIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objR.backButton.setIcon(objR.backIcon)
+        
+        objR.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
     
     def changeTabBarIconLight(obj):
         obj.tabIndex = obj.tabWidget.currentIndex()

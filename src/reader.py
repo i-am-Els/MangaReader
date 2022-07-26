@@ -16,10 +16,11 @@
 
 
 
-from PyQt6.QtWidgets import QWidget, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QPushButton, QSizePolicy
+from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtGui import QCursor, QIcon, QFont
 
 from themes import Themes
-from settings import Settings
 
 class Reader(QWidget):
     def __init__(self, obj, win_dow):
@@ -29,14 +30,17 @@ class Reader(QWidget):
 
         self.themeObj = object()
         self.setting = object()
+        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
+        self.max_button_size = QSize(36, 36)
+        self.min_button_size = QSize(36, 36)
+        self.icon_size = QSize(20, 20)
         self.themeIndex = object()
 
         self.hideNav = bool()
         self.fsState = bool()
         self.readerDisplayIndex = int()
         self.initReaderState = []
-
 
     def backAction(self):
         self.obj.talkToStackWidgetIndex(0, self.win_dow)
@@ -51,9 +55,27 @@ class Reader(QWidget):
         self.mainLayout = QHBoxLayout()
         self.scrollingLayoutInit()
         self.pagingLayoutInit()
+        self.setLayout(self.mainLayout)
 
     def scrollingLayoutInit(self):
-        ...
+        self.backButtonLayout = QHBoxLayout()
+        self.backButton = QPushButton()
+        self.backButton.setObjectName("backButton")
+        self.backButton.setSizePolicy(self.sizePolicy)
+        self.backButton.setMinimumSize(self.min_button_size)
+        self.backButton.setMaximumSize(self.max_button_size)
+        self.backButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.backButton.setGeometry(0, 0, 36, 36)
+
+        self.backIcon = QIcon()
+        self.backButton.setIconSize(self.icon_size)
+        self.backButton.setCheckable(True)
+
+        self.backButtonLayout.addWidget(self.backButton)
+
+
+        self.mainLayout.addLayout(self.backButtonLayout)
+        self.backButton.clicked.connect(lambda: self.backAction())
 
     def pagingLayoutInit(self):
         ...
