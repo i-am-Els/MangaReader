@@ -26,7 +26,8 @@ from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QWidget, QSizePoli
 
 class Themes:
     def __init__(self, obj):
-        self.obj = obj        
+        self.obj = obj    
+        self.themeIndex = int()    
         self.prevObjButton = 0;
         self.prefSelectedButtonIndex = 0
         self.prefButtonList = [self.obj.objPref.settingsButton, self.obj.objPref.downloadButton, self.obj.objPref.themesButton]
@@ -191,18 +192,42 @@ class Themes:
 
         self.prefButtonActiveLight(objP, self.prefSelectedButtonIndex)
 
-        objR.style = """ 
-            QPushButton{
-                border-radius: 18px;
-                color: red;
-            }
-        """
-        objR.setStyleSheet(objR.style)
+        self.readerStyle(objR, objR.readerDisplayIndex)
 
-        objR.backIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objR.backButton.setIcon(objR.backIcon)
-        
-        objR.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+    def readerStyle(self, objR, index):
+        if self.themeIndex == 0:
+            objR.style = """ 
+                QPushButton{
+                    border-radius: 18px;
+                    color: red;
+                }
+            """
+            objR.setStyleSheet(objR.style)
+
+            objR.backIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            objR.backButton.setIcon(objR.backIcon)
+            
+            objR.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+
+            objR.setToCoverIcon.addPixmap(QPixmap("resources/icons/icons8-download-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            objR.setToCoverButton.setIcon(objR.setToCoverIcon)
+            
+            objR.setToCoverButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+
+            if index != 1:
+                objR.nextIcon.addPixmap(QPixmap("resources/icons/icons8-next-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+                objR.nextButton.setIcon(objR.nextIcon)
+            
+                objR.nextButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+
+                objR.previousIcon.addPixmap(QPixmap("resources/icons/icons8-previous-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+                objR.previousButton.setIcon(objR.previousIcon)
+            
+                objR.previousButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+            
+
+        else:
+            ...
     
     def changeTabBarIconLight(obj):
         obj.tabIndex = obj.tabWidget.currentIndex()
@@ -255,6 +280,7 @@ class Themes:
             self.prefButtonActiveDark(self.obj.objPref, indexB)
 
     def declareTheme(self, obj, themeIndex):
+        self.themeIndex = themeIndex
         if themeIndex == 0:
             obj.objMainWindow.themeIndex = themeIndex
             obj.objReader.themeIndex = themeIndex
@@ -268,10 +294,10 @@ class Themes:
             obj.objPref.themeIndex = themeIndex
             obj.setting.themeIndex = themeIndex
             obj.setting.themeButtonState = True
+        obj.objReader.themeObj = self
 
-        # obj.objMainWindow.themeObj = themeObj
-        # obj.objReader.themeObj = themeObj
-        # obj.objPref.themeObj = themeObj
+        # obj.objMainWindow.themeObj = self
+        # obj.objPref.themeObj = self
         
 
 class ToggleSwitch(QPushButton):
