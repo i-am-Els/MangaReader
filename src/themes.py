@@ -15,8 +15,8 @@
 
 
 
-from pathlib import Path
-from color import Color
+# from pathlib import Path
+# from color import Color
 
 from PyQt6.QtCore import QPoint, QPointF, Qt, QRect, QSize
 
@@ -214,6 +214,10 @@ class Themes:
             
             objR.setToCoverButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
+            objR.manhuaLabel.setStyleSheet(" background: grey;")
+            # objR.manhuaLabel.setStyleSheet(" background: grey; padding: 0px;")
+            # objR.majorWidget.setStyleSheet(" background: gray;")
+
             if index != 1:
                 objR.nextIcon.addPixmap(QPixmap("resources/icons/icons8-next-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
                 objR.nextButton.setIcon(objR.nextIcon)
@@ -224,7 +228,6 @@ class Themes:
                 objR.previousButton.setIcon(objR.previousIcon)
             
                 objR.previousButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
-            
 
         else:
             ...
@@ -342,6 +345,7 @@ class WindowTitleBar(QHBoxLayout):
         self.widgetIcon = widget.windowIcon
         self.widgetMainW = self.widget.objMainWindow
         self.widgetLibrary = self.widget.objMainWindow.library
+        self.widgetReader = self.widget.objReader
         widIcon = 30
         iconsize = 30
         iconsizew = 48
@@ -440,7 +444,6 @@ class WindowTitleBar(QHBoxLayout):
             
             self.restoreIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.restoreIcon.setIcon(self.restoreIconIcon)
-
         else:
             self.obj.showMaximized()
             self.obj.setWindowState(Qt.WindowState.WindowMaximized)
@@ -449,6 +452,7 @@ class WindowTitleBar(QHBoxLayout):
 
             self.restoreIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.restoreIcon.setIcon(self.restoreIconIcon)
+        self.widgetReader.calLabelSize()
 
 class MoveableWindow(QWidget):
     def __init__(self, obj, widget):

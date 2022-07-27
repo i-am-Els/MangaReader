@@ -16,17 +16,24 @@
 
 
 
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QSizePolicy
+from email.charset import QP
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSizePolicy, QScrollArea
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QCursor, QIcon, QFont
+from PyQt6.QtGui import QCursor, QIcon, QPixmap
+import os
+from pathlib import Path
 
-from themes import Themes
+# from themes import Themes
 
 class Reader(QWidget):
     def __init__(self, obj, win_dow):
         super().__init__()
         self.obj = obj
         self.win_dow = win_dow
+        self.imageList = []
+        self.imageCurrent = int()
+        self.currentPath = ''
+        self.manhuaKey = ""
 
         self.themeObj = object()
         self.setting = object()
@@ -36,6 +43,8 @@ class Reader(QWidget):
         self.min_button_size = QSize(36, 36)
         self.icon_size = QSize(20, 20)
         self.themeIndex = object()
+        self.mlWidth = int()
+        self.mlHeight = int()
 
         self.hideNav = bool()
         self.fsState = bool()
@@ -47,6 +56,13 @@ class Reader(QWidget):
 
     def backAction(self):
         self.obj.talkToStackWidgetIndex(0, self.win_dow)
+
+    def calLabelSize(self):
+        self.mlWidth = self.manhuaLabel.width()
+        self.mlHeight = self.manhuaLabel.height()
+        # if self.win_dow.currentIndex == 1:
+            # self.reScaleMLabel()
+            # ...
 
     def setState(self, state):
         self.readerDisplayIndex = state[0]
@@ -62,6 +78,7 @@ class Reader(QWidget):
             self.scrollingLayoutInit()
         else:
             self.pagingLayoutInit()
+        self.calLabelSize()
         self.majorLayout.addWidget(self.majorWidget)
         self.majorWidget.setLayout(self.mainLayout)
 
@@ -74,6 +91,8 @@ class Reader(QWidget):
         self.backButton.setMaximumSize(self.max_button_size)
         self.backButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.backButton.setGeometry(0, 0, 36, 36)
+        self.backButton.setToolTip("Return to Description Page")
+        self.backButton.setToolTipDuration(3000)
 
         self.backIcon = QIcon()
         self.backButton.setIconSize(self.icon_size)
@@ -81,7 +100,19 @@ class Reader(QWidget):
         self.leftLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.leftLayout.addWidget(self.backButton)
 
-        self.screenLayout = QVBoxLayout()
+        self.screenLayout = QHBoxLayout()
+        self.manhuaLabel = QLabel()
+        self.manhuaLabel.setScaledContents(True)
+        self.manhuaLabel.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self.spaceEatingWidgetLeft = QWidget()        
+        self.spaceEatingWidgetRight = QWidget()
+        self.screenLayout.addWidget(self.spaceEatingWidgetLeft)
+        self.screenLayout.addWidget(self.manhuaLabel)
+        self.screenLayout.addWidget(self.spaceEatingWidgetRight)
+
+        self.screenLayout.setStretch(0, 1)
+        self.screenLayout.setStretch(1, 2)
+        self.screenLayout.setStretch(2, 1)
 
         self.rightLayout = QVBoxLayout()
         self.setToCoverButton = QPushButton()
@@ -91,6 +122,8 @@ class Reader(QWidget):
         self.setToCoverButton.setMaximumSize(self.max_button_size)
         self.setToCoverButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.setToCoverButton.setGeometry(0, 0, 36, 36)
+        self.setToCoverButton.setToolTip("Set Current Image as Manhua Cover")
+        self.setToCoverButton.setToolTipDuration(3000)
 
         self.setToCoverIcon = QIcon()
         self.setToCoverButton.setIconSize(self.icon_size)
@@ -121,6 +154,8 @@ class Reader(QWidget):
         self.backButton.setMaximumSize(self.max_button_size)
         self.backButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.backButton.setGeometry(0, 0, 36, 36)
+        self.backButton.setToolTip("Return to Description Page")
+        self.backButton.setToolTipDuration(3000)
 
         self.backIcon = QIcon()
         self.backButton.setIconSize(self.icon_size)
@@ -144,8 +179,8 @@ class Reader(QWidget):
         self.backLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.previousLayout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
 
-        self.spaceEatingWidget2 = QWidget()
-        self.leftDummyLayout.addWidget(self.spaceEatingWidget2)
+        self.spaceEatingWidgetDown = QWidget()
+        self.leftDummyLayout.addWidget(self.spaceEatingWidgetDown)
         
         self.leftLayout.addLayout(self.backLayout)
         self.leftLayout.addLayout(self.previousLayout)
@@ -155,7 +190,19 @@ class Reader(QWidget):
         self.leftLayout.setStretch(1, 5)
         self.leftLayout.setStretch(2, 1)
 
-        self.screenLayout = QVBoxLayout()
+        self.screenLayout = QHBoxLayout()
+        self.manhuaLabel = QLabel()
+        self.manhuaLabel.setScaledContents(True)
+        self.manhuaLabel.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self.spaceEatingWidgetLeft = QWidget()        
+        self.spaceEatingWidgetRight = QWidget()
+        self.screenLayout.addWidget(self.spaceEatingWidgetLeft)
+        self.screenLayout.addWidget(self.manhuaLabel)
+        self.screenLayout.addWidget(self.spaceEatingWidgetRight)
+
+        self.screenLayout.setStretch(0, 1)
+        self.screenLayout.setStretch(1, 2)
+        self.screenLayout.setStretch(2, 1)
 
         self.rightLayout = QVBoxLayout()
         self.rightDummyLayout = QVBoxLayout()
@@ -180,6 +227,8 @@ class Reader(QWidget):
         self.setToCoverButton.setMaximumSize(self.max_button_size)
         self.setToCoverButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.setToCoverButton.setGeometry(0, 0, 36, 36)
+        self.setToCoverButton.setToolTip("Set Current Image as Manhua Cover")
+        self.setToCoverButton.setToolTipDuration(3000)
 
         self.setToCoverIcon = QIcon()
         self.setToCoverButton.setIconSize(self.icon_size)
@@ -191,8 +240,8 @@ class Reader(QWidget):
         self.nextLayout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
         self.setToCoverLayout.setAlignment(Qt.AlignmentFlag.AlignBottom) 
 
-        self.spaceEatingWidget = QWidget()
-        self.rightDummyLayout.addWidget(self.spaceEatingWidget)
+        self.spaceEatingWidgetUp = QWidget()
+        self.rightDummyLayout.addWidget(self.spaceEatingWidgetUp)
 
         self.rightLayout.addLayout(self.rightDummyLayout)
         self.rightLayout.addLayout(self.nextLayout)
@@ -221,10 +270,46 @@ class Reader(QWidget):
         self.themeObj.readerStyle(self, self.readerDisplayIndex)
 
     def previousAction(self, typeIndex):
-        ...
+        if typeIndex == 0:
+            if self.imageCurrent > 0:
+                self.imageCurrent -= 1
+                self.setImageToLabel(self.imageCurrent)
+        elif typeIndex == 2:
+            if self.imageCurrent < (len(self.imageList) - 1):
+                self.imageCurrent += 1
+                self.setImageToLabel(self.imageCurrent)
     
     def nextAction(self, typeIndex):
-        ...
+        if typeIndex == 0:
+            if self.imageCurrent < (len(self.imageList) - 1):
+                self.imageCurrent += 1
+                self.setImageToLabel(self.imageCurrent)
+        elif typeIndex == 2:
+            if self.imageCurrent > 0:
+                self.imageCurrent -= 1
+                self.setImageToLabel(self.imageCurrent)
 
     def setToCoverAction(self):
-        ...
+        imagePath = str(self.currentPath) + self.imageList[self.imageCurrent]
+        print(imagePath)
+        self.win_dow.objMainWindow.library.setCover(imagePath, self.manhuaKey)
+
+
+
+    def loadChapterPages(self, path, key):
+        self.currentPath = path
+        self.manhuaKey = key
+        self.imageList = []
+        for x in os.listdir(path):
+            if Path(x).suffix in ['.jpeg', '.jpg', '.png']:
+                self.imageList.append(str(x))
+        self.imageCurrent = 0
+        self.setImageToLabel(self.imageCurrent)
+
+    # def reScaleMLabel(self):
+    #     self.manhuaLabel.pixmap().scaled(self.mlWidth, self.mlHeight, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+
+    def setImageToLabel(self, index):
+        path = str(self.currentPath) + self.imageList[index]
+        self.manhuaLabel.setPixmap(QPixmap(path))
+        # self.manhuaLabel.setPixmap(QPixmap(path).scaled(self.mlWidth, self.mlHeight, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))

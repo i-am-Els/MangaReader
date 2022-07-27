@@ -19,7 +19,6 @@
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QMainWindow, QSizePolicy
 from PyQt6.QtCore import QSize, Qt
 import sys, setup, ctypes
-from color import Color
 from themes import WindowTitleBar, MoveableWindow
 
 def setTaskBarIcon():

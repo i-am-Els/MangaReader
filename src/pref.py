@@ -112,6 +112,8 @@ class Preference(QWidget):
         
         self.backButton.setIconSize(self.icon_size)
         self.backButton.setCheckable(True)
+        self.backButton.setToolTip("Return to Home")
+        self.backButton.setToolTipDuration(3000)
 
         #-----------------------------------------------
         self.headerLabel = QLabel("Preference | Settings")

@@ -42,8 +42,8 @@ class Settings(object):
         self.updateChapter = True
         self.updateOther = True
         self.hideNav = True
-        self.fsState = True
-        self.readerDisplayIndex = 1
+        self.fsState = False
+        self.readerDisplayIndex = 0
 
         self.compressionState = True
         

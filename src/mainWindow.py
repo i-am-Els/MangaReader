@@ -100,6 +100,8 @@ class MainWindow(QWidget):
         self.menuIcon = QIcon()
         self.menuButton.setIconSize(self.icon_size)
         self.menuButton.setObjectName("menuButton")
+        self.menuButton.setToolTip("Preference Menu")
+        self.menuButton.setToolTipDuration(3000)
 
         # TextBox
         self.lineEdit = QLineEdit()
@@ -120,6 +122,8 @@ class MainWindow(QWidget):
         self.searchButton.setMinimumSize(self.min_button_size)
         self.searchButton.setMaximumSize(self.max_button_size)
         self.searchButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.searchButton.setToolTip("Search Manhua")
+        self.searchButton.setToolTipDuration(3000)
 
         self.searchIcon = QIcon()
         self.searchButton.setIconSize(self.icon_size)
@@ -133,6 +137,8 @@ class MainWindow(QWidget):
         self.localSearchButton.setMinimumSize(self.min_button_size)
         self.localSearchButton.setMaximumSize(self.max_button_size)
         self.localSearchButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.localSearchButton.setToolTip("Load Manhua Bundle from local disk")
+        self.localSearchButton.setToolTipDuration(3000)
 
         self.localSearchIcon = QIcon()
         self.localSearchButton.setIconSize(self.icon_size)
@@ -144,6 +150,8 @@ class MainWindow(QWidget):
         self.localSearchButtonSingleFormat.setMinimumSize(self.min_button_size)
         self.localSearchButtonSingleFormat.setMaximumSize(self.max_button_size)
         self.localSearchButtonSingleFormat.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.localSearchButtonSingleFormat.setToolTip("Load Manhua in Archive formats from local disk")
+        self.localSearchButtonSingleFormat.setToolTipDuration(3000)
 
         self.localSearchIconSingleFormat = QIcon()
         self.localSearchButtonSingleFormat.setIconSize(self.icon_size)
@@ -155,6 +163,8 @@ class MainWindow(QWidget):
         self.refreshButton.setMinimumSize(self.max_button_size)
         self.refreshButton.setMaximumSize(self.max_button_size)
         self.refreshButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.refreshButton.setToolTip("Refresh Home tab")
+        self.refreshButton.setToolTipDuration(3000)
         
         self.refreshIcon = QIcon()
         self.refreshButton.setIconSize(self.icon_size)
@@ -890,17 +900,26 @@ class Library(QStackedWidget):
         spacing = int(spacing / dimension)
         return spacing
 
-    def launchReader(self, path):
-        # print(f"Launching Reader... {path}")
+    def launchReader(self, path, key):
+        if(self.win_dow.objReader.fsState == True and self.appW.windowState() != Qt.WindowState.WindowMaximized):
+            self.appW.customTitleBar.toggleRestore()
+        self.win_dow.objReader.loadChapterPages(path, key)
         self.win_dow.setCurrentIndex(1)
-        pass
+
+    def setCover(self, path, key):
+        self.libraryMetadata[key] = path
+        keys = list(self.libraryMetadata.keys())
+        index = keys.index(key)
+        self.libraryListdata[index].manhuaCoverPixmap = QPixmap(str(path)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+        self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
 
     class Chapters(QPushButton):
-        def __init__(self, sTitle, pTitlePath, parent):
+        def __init__(self, sTitle, pTitlePath, key, parent):
             super().__init__()
             self.title = sTitle
             self.titlePath = pTitlePath
             self.parent = parent
+            self.key = key
             
             self.labelString = f"{self.title} \n{self.titlePath}"
             self.setText(self.labelString)
@@ -908,7 +927,7 @@ class Library(QStackedWidget):
             self.setMinimumHeight(50)
             self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-            self.clicked.connect(lambda: self.parent.launchReader(self.titlePath))
+            self.clicked.connect(lambda: self.parent.launchReader(self.titlePath, self.key))
 
 
 class Manhua(QPushButton):
@@ -1088,6 +1107,8 @@ class Description(QWidget):
         self.exitButton.setMaximumSize(self.max_button_size)
         self.exitButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.exitButton.setGeometry(0, 0, 36, 36)
+        self.exitButton.setToolTip("Return to Home")
+        self.exitButton.setToolTipDuration(3000)
         self.exitButtonIcon = QIcon()
         self.exitButton.setIconSize(self.icon_size)
         self.exitButton.setCheckable(True)
@@ -1215,7 +1236,7 @@ class Description(QWidget):
             key = list(self.descChapters.keys())[x]
             iPath = self.descChapters.get(key)
             path = self.setPath(self.dataDict["ManhuaPath"], iPath)
-            chap = Library.Chapters(key, path, self.parent)
+            chap = Library.Chapters(key, path, self.dataDict["ManhuaTitle"], self.parent)
             self.chapterDescListLayout.addWidget(chap)
 
     def exitPage(self):
