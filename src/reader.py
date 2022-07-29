@@ -305,7 +305,6 @@ class Reader(QWidget):
             x = int((p/100) * n)
             if x < n:
                 imagePath = str(self.currentPath) + self.imageList[x]
-                print(imagePath, x)
                 self.win_dow.objMainWindow.library.setCover(imagePath, self.manhuaKey)
                 self.win_dow.objMainWindow.library.descriptionPage.setCover(imagePath)
         else:
