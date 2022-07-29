@@ -906,14 +906,14 @@ class Library(QStackedWidget):
         self.win_dow.objReader.loadChapterPages(path, key)
         self.win_dow.setCurrentIndex(1)
 
-    def setCover(self, path, key):
-        self.libraryMetadata[key] = path
-        keys = list(self.libraryMetadata.keys())
-        index = keys.index(key)
+    def setCover(self, path, manhuaName):
+        self.libraryMetadata[manhuaName]["ManhuaCover"] = str(path)
+        manhuasData = list(self.libraryMetadata.keys())
+        index = manhuasData.index(manhuaName)
         self.libraryListdata[index].manhuaCoverPixmap = QPixmap(str(path)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
 
-    class Chapters(QPushButton):
+    class Chapter(QPushButton):
         def __init__(self, sTitle, pTitlePath, key, parent):
             super().__init__()
             self.title = sTitle
@@ -1236,7 +1236,7 @@ class Description(QWidget):
             key = list(self.descChapters.keys())[x]
             iPath = self.descChapters.get(key)
             path = self.setPath(self.dataDict["ManhuaPath"], iPath)
-            chap = Library.Chapters(key, path, self.dataDict["ManhuaTitle"], self.parent)
+            chap = Library.Chapter(key, path, self.dataDict["ManhuaTitle"], self.parent)
             self.chapterDescListLayout.addWidget(chap)
 
     def exitPage(self):

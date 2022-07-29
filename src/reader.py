@@ -297,9 +297,21 @@ class Reader(QWidget):
                 self.setImageToLabel(self.imageCurrent)
 
     def setToCoverAction(self):
-        imagePath = str(self.currentPath) + self.imageList[self.imageCurrent]
-        print(imagePath)
-        self.win_dow.objMainWindow.library.setCover(imagePath, self.manhuaKey)
+        if self.readerDisplayIndex == 1:
+            n = len(self.imageList)
+            v = self.screenScrollArea.verticalScrollBar().value()
+            max = self.screenScrollArea.verticalScrollBar().maximum()
+            p = (v / max) * 100
+            x = int((p/100) * n)
+            if x < n:
+                imagePath = str(self.currentPath) + self.imageList[x]
+                print(imagePath, x)
+                self.win_dow.objMainWindow.library.setCover(imagePath, self.manhuaKey)
+                self.win_dow.objMainWindow.library.descriptionPage.setCover(imagePath)
+        else:
+            imagePath = str(self.currentPath) + self.imageList[self.imageCurrent]
+            self.win_dow.objMainWindow.library.setCover(imagePath, self.manhuaKey)
+            self.win_dow.objMainWindow.library.descriptionPage.setCover(imagePath)
 
     def setChapterLabels(self):
         self.screenScrollArea = QScrollArea()
@@ -349,6 +361,7 @@ class Reader(QWidget):
             manhuaLabel = Reader.ImageLabel(path, self.screenScrollAreaW.width())
             self.manhuaLayout.addWidget(manhuaLabel)
         self.prevPath = self.currentPath
+        self.screenScrollArea.verticalScrollBar().setMaximum(100)
 
     def clearLabels(self):
         self.screenScrollArea.deleteLater()
