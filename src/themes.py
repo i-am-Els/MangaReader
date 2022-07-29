@@ -214,9 +214,10 @@ class Themes:
             
             objR.setToCoverButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
-            objR.manhuaLabel.setStyleSheet(" background: grey;")
-            # objR.manhuaLabel.setStyleSheet(" background: grey; padding: 0px;")
-            # objR.majorWidget.setStyleSheet(" background: gray;")
+            objR.manhuaLabel.setStyleSheet(" padding: 0px;")
+            
+            if objR.readerDisplayIndex == 1:
+                objR.screenScrollArea.setStyleSheet("border: 0px")
 
             if index != 1:
                 objR.nextIcon.addPixmap(QPixmap("resources/icons/icons8-next-96.png"), QIcon.Mode.Normal, QIcon.State.Off)

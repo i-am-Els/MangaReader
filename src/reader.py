@@ -16,7 +16,6 @@
 
 
 
-from email.charset import QP
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSizePolicy, QScrollArea
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap
@@ -33,6 +32,7 @@ class Reader(QWidget):
         self.imageList = []
         self.imageCurrent = int()
         self.currentPath = ''
+        self.prevPath = ''
         self.manhuaKey = ""
 
         self.themeObj = object()
@@ -45,6 +45,8 @@ class Reader(QWidget):
         self.themeIndex = object()
         self.mlWidth = int()
         self.mlHeight = int()
+
+        self.ifSameChapter = False
 
         self.hideNav = bool()
         self.fsState = bool()
@@ -59,10 +61,9 @@ class Reader(QWidget):
 
     def calLabelSize(self):
         self.mlWidth = self.manhuaLabel.width()
-        self.mlHeight = self.manhuaLabel.height()
-        # if self.win_dow.currentIndex == 1:
-            # self.reScaleMLabel()
-            # ...
+        print(self.mlWidth)
+        if self.win_dow.currentIndex() == 1 and self.readerDisplayIndex == 1:
+            self.reScaleMLabel()
 
     def setState(self, state):
         self.readerDisplayIndex = state[0]
@@ -101,13 +102,22 @@ class Reader(QWidget):
         self.leftLayout.addWidget(self.backButton)
 
         self.screenLayout = QHBoxLayout()
-        self.manhuaLabel = QLabel()
-        self.manhuaLabel.setScaledContents(True)
-        self.manhuaLabel.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self.screenScrollAreaLayout = QVBoxLayout()
+        self.screenScrollAreaW = QWidget()
+
+        # self.screenScrollArea = QScrollArea()
+        # self.screenScrollArea.setWidgetResizable(True)
+        # self.screenScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        # self.screenScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        self.setChapterLabels()
+
         self.spaceEatingWidgetLeft = QWidget()        
         self.spaceEatingWidgetRight = QWidget()
+        self.screenScrollAreaW.setLayout(self.screenScrollAreaLayout)
+
         self.screenLayout.addWidget(self.spaceEatingWidgetLeft)
-        self.screenLayout.addWidget(self.manhuaLabel)
+        self.screenLayout.addWidget(self.screenScrollAreaW)
         self.screenLayout.addWidget(self.spaceEatingWidgetRight)
 
         self.screenLayout.setStretch(0, 1)
@@ -194,6 +204,7 @@ class Reader(QWidget):
         self.manhuaLabel = QLabel()
         self.manhuaLabel.setScaledContents(True)
         self.manhuaLabel.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Ignored)
+        self.manhuaLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.spaceEatingWidgetLeft = QWidget()        
         self.spaceEatingWidgetRight = QWidget()
         self.screenLayout.addWidget(self.spaceEatingWidgetLeft)
@@ -294,7 +305,21 @@ class Reader(QWidget):
         print(imagePath)
         self.win_dow.objMainWindow.library.setCover(imagePath, self.manhuaKey)
 
+    def setChapterLabels(self):
+        self.screenScrollArea = QScrollArea()
+        self.screenScrollArea.setWidgetResizable(True)
+        self.screenScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.screenScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
+        self.manhuaLabel = QWidget()
+
+        self.manhuaLayout = QVBoxLayout(self.manhuaLabel)
+        self.manhuaLayout.setSpacing(0)
+        # self.manhuaLabel.setLayout(self.manhuaLayout)
+        self.screenScrollArea.setWidget(self.manhuaLabel)
+        self.setScrollLabelImages()
+        self.manhuaLayout.setSpacing(0)
+        self.screenScrollAreaLayout.addWidget(self.screenScrollArea)
 
     def loadChapterPages(self, path, key):
         self.currentPath = path
@@ -304,12 +329,41 @@ class Reader(QWidget):
             if Path(x).suffix in ['.jpeg', '.jpg', '.png']:
                 self.imageList.append(str(x))
         self.imageCurrent = 0
-        self.setImageToLabel(self.imageCurrent)
+        if self.readerDisplayIndex != 1:
+            self.setImageToLabel(self.imageCurrent)
+        else:
+            if self.currentPath != self.prevPath:
+                self.clearLabels()
 
-    # def reScaleMLabel(self):
-    #     self.manhuaLabel.pixmap().scaled(self.mlWidth, self.mlHeight, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation)
+    def reScaleMLabel(self):
+        for label in self.manhuaLayout.children():
+            print(type(label))
+            if type(label) == QLabel:
+                print(True)
+                label.pixmap().scaledToWidth(self.mlWidth)
 
     def setImageToLabel(self, index):
         path = str(self.currentPath) + self.imageList[index]
         self.manhuaLabel.setPixmap(QPixmap(path))
-        # self.manhuaLabel.setPixmap(QPixmap(path).scaled(self.mlWidth, self.mlHeight, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.SmoothTransformation))
+
+    def setScrollLabelImages(self):
+        for x in self.imageList: 
+            path = str(self.currentPath) + str(x)
+            manhuaLabel = Reader.ImageLabel(path, self.mlWidth)
+            self.manhuaLayout.addWidget(manhuaLabel)
+        self.prevPath = self.currentPath
+
+    def clearLabels(self):
+        self.screenScrollArea.deleteLater()
+        self.setChapterLabels()
+        self.themeObj.readerStyle(self, self.readerDisplayIndex)
+
+    class ImageLabel(QLabel):
+        def __init__(self, path, width):
+            super().__init__()
+            self.path = path
+            self.width = width
+            self.setScaledContents(True)
+            self.setPixmap(QPixmap(self.path).scaledToWidth(self.width, Qt.TransformationMode.SmoothTransformation))
+            self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.setStyleSheet("padding: 0px;")
