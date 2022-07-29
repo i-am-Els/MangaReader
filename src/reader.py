@@ -16,7 +16,7 @@
 
 
 
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSizePolicy, QScrollArea
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QWidgetItem, QLabel, QSizePolicy, QScrollArea
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap
 import os
@@ -43,8 +43,6 @@ class Reader(QWidget):
         self.min_button_size = QSize(36, 36)
         self.icon_size = QSize(20, 20)
         self.themeIndex = object()
-        self.mlWidth = int()
-        self.mlHeight = int()
 
         self.ifSameChapter = False
 
@@ -60,8 +58,6 @@ class Reader(QWidget):
         self.obj.talkToStackWidgetIndex(0, self.win_dow)
 
     def calLabelSize(self):
-        self.mlWidth = self.manhuaLabel.width()
-        print(self.mlWidth)
         if self.win_dow.currentIndex() == 1 and self.readerDisplayIndex == 1:
             self.reScaleMLabel()
 
@@ -336,11 +332,12 @@ class Reader(QWidget):
                 self.clearLabels()
 
     def reScaleMLabel(self):
-        for label in self.manhuaLayout.children():
-            print(type(label))
-            if type(label) == QLabel:
-                print(True)
-                label.pixmap().scaledToWidth(self.mlWidth)
+        for i in range(self.manhuaLayout.count()):
+            layout = self.manhuaLayout.layout()
+            item = layout.itemAt(i).widget()
+            if type(item) == Reader.ImageLabel:
+                pix = item.pixmap()
+                item.setPixmap(pix.scaledToWidth(self.screenScrollAreaW.width(), Qt.TransformationMode.SmoothTransformation))
 
     def setImageToLabel(self, index):
         path = str(self.currentPath) + self.imageList[index]
@@ -349,7 +346,7 @@ class Reader(QWidget):
     def setScrollLabelImages(self):
         for x in self.imageList: 
             path = str(self.currentPath) + str(x)
-            manhuaLabel = Reader.ImageLabel(path, self.mlWidth)
+            manhuaLabel = Reader.ImageLabel(path, self.screenScrollAreaW.width())
             self.manhuaLayout.addWidget(manhuaLabel)
         self.prevPath = self.currentPath
 

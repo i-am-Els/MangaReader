@@ -43,7 +43,7 @@ class Settings(object):
         self.updateOther = True
         self.hideNav = True
         self.fsState = False
-        self.readerDisplayIndex = 0
+        self.readerDisplayIndex = 1
 
         self.compressionState = True
         
