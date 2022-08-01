@@ -429,7 +429,7 @@ class Preference(QWidget):
 
         #----------------------------------------------
 
-        self.readerNavLabel = QLabel("Hide Page Navigation")
+        self.readerNavLabel = QLabel("Use Key shortcuts For Navigation\n\tA -> Previous Page | D -> Next Page\n\tQ -> Previous Chapter | E -> Next Chapter")
         self.readerNavLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.readerNavLabel.setSizePolicy(self.sizePolicy)
         self.readerNavLabelFont = QFont()

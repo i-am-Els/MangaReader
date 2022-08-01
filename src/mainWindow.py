@@ -884,6 +884,7 @@ class Library(QStackedWidget):
             self.descriptionPage.setData(dataDict)
             self.descriptionPage.resetChapters()
             self.previousOpen = dataDict["ManhuaTitle"]
+            self.win_dow.objReader.setData()
         self.setCurrentIndex(2)
 
     def calculateLibraryDimension(self):
@@ -900,10 +901,11 @@ class Library(QStackedWidget):
         spacing = int(spacing / dimension)
         return spacing
 
-    def launchReader(self, path, key):
+    def launchReader(self, index):
         if(self.win_dow.objReader.fsState == True and self.appW.windowState() != Qt.WindowState.WindowMaximized):
             self.appW.customTitleBar.toggleRestore()
-        self.win_dow.objReader.loadChapterPages(path, key)
+        self.win_dow.objReader.loadChapterPages(index)
+        self.win_dow.objReader.setFocus()
         self.win_dow.setCurrentIndex(1)
 
     def setCover(self, path, manhuaName):
@@ -914,12 +916,12 @@ class Library(QStackedWidget):
         self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
 
     class Chapter(QPushButton):
-        def __init__(self, sTitle, pTitlePath, key, parent):
+        def __init__(self, sTitle, pTitlePath, index, parent):
             super().__init__()
             self.title = sTitle
             self.titlePath = pTitlePath
             self.parent = parent
-            self.key = key
+            self.index = index
             
             self.labelString = f"{self.title} \n{self.titlePath}"
             self.setText(self.labelString)
@@ -927,7 +929,8 @@ class Library(QStackedWidget):
             self.setMinimumHeight(50)
             self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-            self.clicked.connect(lambda: self.parent.launchReader(self.titlePath, self.key))
+
+            self.clicked.connect(lambda: self.parent.launchReader(self.index))
 
 
 class Manhua(QPushButton):
@@ -1087,6 +1090,7 @@ class Description(QWidget):
         self.launchDone = False
         self.dataDict = dict()
         self.descChapters = dict()
+        self.chapterLen = int()
         self.createDescriptionWidget()
         self.launchDone = True
 
@@ -1197,6 +1201,7 @@ class Description(QWidget):
         self.setChapters(dataDict["Chapters"])
         self.setStatus(dataDict["Status"])
         self.setDesc(dataDict["Description"])
+        self.chapterLen = len(self.descChapters)
 
     def setName(self, name):
         self.nameLabel.setText(name)
@@ -1236,7 +1241,7 @@ class Description(QWidget):
             key = list(self.descChapters.keys())[x]
             iPath = self.descChapters.get(key)
             path = self.setPath(self.dataDict["ManhuaPath"], iPath)
-            chap = Library.Chapter(key, path, self.dataDict["ManhuaTitle"], self.parent)
+            chap = Library.Chapter(key, path, x, self.parent)
             self.chapterDescListLayout.addWidget(chap)
 
     def exitPage(self):

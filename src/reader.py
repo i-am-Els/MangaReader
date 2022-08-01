@@ -16,7 +16,7 @@
 
 
 
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QWidgetItem, QLabel, QSizePolicy, QScrollArea
+from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSizePolicy, QScrollArea
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap
 import os
@@ -31,7 +31,11 @@ class Reader(QWidget):
         self.win_dow = win_dow
         self.imageList = []
         self.imageCurrent = int()
-        self.currentPath = ''
+        self.currentDict = dict()
+        self.currentManhuaPath = ''
+        self.currentChapterIndex = int()
+        self.currentIndexPath = ''
+        self.currentManhuaChapterLen = int()
         self.prevPath = ''
         self.manhuaKey = ""
 
@@ -52,9 +56,17 @@ class Reader(QWidget):
         self.initReaderState = []
         
         self.majorLayout = QVBoxLayout()
-        
+
+    def setData(self):
+        self.currentDict = self.win_dow.objMainWindow.library.descriptionPage.dataDict
+        self.currentManhuaPath = self.currentDict["ManhuaPath"] 
+        self.currentChapterIndex = 0
+        self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))      
+        self.currentManhuaChapterLen = self.win_dow.objMainWindow.library.descriptionPage.chapterLen
+
 
     def backAction(self):
+        self.win_dow.objMainWindow.setFocus()
         self.obj.talkToStackWidgetIndex(0, self.win_dow)
 
     def calLabelSize(self):
@@ -296,6 +308,18 @@ class Reader(QWidget):
                 self.imageCurrent -= 1
                 self.setImageToLabel(self.imageCurrent)
 
+    def prevChapter(self):
+        if self.currentChapterIndex > 0:
+            self.currentChapterIndex -= 1
+            self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))
+            self.loadChapterPages(self.currentChapterIndex)
+
+    def nextChapter(self):
+        if self.currentChapterIndex < self.currentManhuaChapterLen:
+            self.currentChapterIndex += 1
+            self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))
+            self.loadChapterPages(self.currentChapterIndex)
+
     def setToCoverAction(self):
         if self.readerDisplayIndex == 1:
             n = len(self.imageList)
@@ -304,11 +328,11 @@ class Reader(QWidget):
             p = (v / max) * 100
             x = int((p/100) * n)
             if x < n:
-                imagePath = str(self.currentPath) + self.imageList[x]
+                imagePath = str(self.currentIndexPath) + "\\" + self.imageList[x]
                 self.win_dow.objMainWindow.library.setCover(imagePath, self.manhuaKey)
                 self.win_dow.objMainWindow.library.descriptionPage.setCover(imagePath)
         else:
-            imagePath = str(self.currentPath) + self.imageList[self.imageCurrent]
+            imagePath = str(self.currentIndexPath)  + "\\" + self.imageList[self.imageCurrent]
             self.win_dow.objMainWindow.library.setCover(imagePath, self.manhuaKey)
             self.win_dow.objMainWindow.library.descriptionPage.setCover(imagePath)
 
@@ -328,18 +352,19 @@ class Reader(QWidget):
         self.manhuaLayout.setSpacing(0)
         self.screenScrollAreaLayout.addWidget(self.screenScrollArea)
 
-    def loadChapterPages(self, path, key):
-        self.currentPath = path
-        self.manhuaKey = key
+    def loadChapterPages(self, index):
+        self.currentChapterIndex = index
+        self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])) 
+        self.manhuaKey = self.currentDict["ManhuaTitle"]
         self.imageList = []
-        for x in os.listdir(path):
+        for x in os.listdir(self.currentIndexPath):
             if Path(x).suffix in ['.jpeg', '.jpg', '.png']:
                 self.imageList.append(str(x))
         self.imageCurrent = 0
         if self.readerDisplayIndex != 1:
             self.setImageToLabel(self.imageCurrent)
         else:
-            if self.currentPath != self.prevPath:
+            if self.currentIndexPath != self.prevPath:
                 self.clearLabels()
 
     def reScaleMLabel(self):
@@ -351,21 +376,42 @@ class Reader(QWidget):
                 item.setPixmap(pix.scaledToWidth(self.screenScrollAreaW.width(), Qt.TransformationMode.SmoothTransformation))
 
     def setImageToLabel(self, index):
-        path = str(self.currentPath) + self.imageList[index]
+        path = str(self.currentIndexPath) + "\\" + str(self.imageList[index])
         self.manhuaLabel.setPixmap(QPixmap(path))
 
     def setScrollLabelImages(self):
         for x in self.imageList: 
-            path = str(self.currentPath) + str(x)
+            path = str(self.currentIndexPath) + "\\" + str(x)
             manhuaLabel = Reader.ImageLabel(path, self.screenScrollAreaW.width())
             self.manhuaLayout.addWidget(manhuaLabel)
-        self.prevPath = self.currentPath
+        self.prevPath = self.currentIndexPath
         self.screenScrollArea.verticalScrollBar().setMaximum(100)
 
     def clearLabels(self):
         self.screenScrollArea.deleteLater()
         self.setChapterLabels()
         self.themeObj.readerStyle(self, self.readerDisplayIndex)
+
+    def keyPressEvent(self, event):
+        if self.hideNav:
+            if self.win_dow.currentIndex() == 1: 
+                if event.key() == Qt.Key.Key_A and self.readerDisplayIndex != 1:
+                    if self.readerDisplayIndex == 0:
+                        self.previousAction(0)
+                    else:
+                        self.previousAction(2)
+
+                elif event.key() == Qt.Key.Key_D and self.readerDisplayIndex != 1:
+                    if self.readerDisplayIndex == 0:
+                        self.nextAction(0)
+                    else:
+                        self.nextAction(2)
+
+                elif event.key() == Qt.Key.Key_Q:
+                    self.prevChapter()
+
+                elif event.key() == Qt.Key.Key_E:
+                    self.nextChapter()
 
     class ImageLabel(QLabel):
         def __init__(self, path, width):
