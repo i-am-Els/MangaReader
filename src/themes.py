@@ -93,10 +93,15 @@ class Themes:
             background-color: rgb(72, 75, 106); 
             font: 15px;
         }
-        QListView{
+        #historyListView{
             background-color: rgb(210, 211, 219);
-            border: 1px solid rgb(210, 211, 219);
-            border-radius: 10px;
+            border: none;
+        }
+        #historyScroll, scroll{
+            background-color: rgb(210, 211, 219);
+            padding: 0px;
+            margin: 0px;
+            border: none;
         }
         """
 
@@ -121,6 +126,7 @@ class Themes:
 
         objM.library.libraryScrollArea.setStyleSheet(self.scrollbarStyleLight)
         objM.library.descriptionPage.scrollArea.setStyleSheet(self.scrollbarStyleLight)
+        objM.scroll.setStyleSheet(self.scrollbarStyleLight)
 
         # self.objM.library.libraryScrollAreaWidget.setStyleSheet("QSCrollArea{ border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } ")
 

@@ -17,6 +17,7 @@
 
 
 
+from datetime import datetime
 from pathlib import Path
 import os, re
 from themes import Themes
@@ -30,7 +31,6 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QLabel,
     QSizePolicy,
-    QListView,
     QMessageBox,
     QPushButton,
     QFileDialog,
@@ -63,6 +63,8 @@ class MainWindow(QWidget):
         self.icon_size = QSize(20, 20)
         self.localDirImport = []
         self.localSingleImport = []
+        self.history = []
+        self.historyData =list()
 
         self.apiName = []
         self.firstRun = True
@@ -233,9 +235,21 @@ class MainWindow(QWidget):
         self.historyLabel.setObjectName("historyLabel")
         self.historyLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.historyListView = QListView()
+        self.historyListView = QWidget()
+        self.historyListViewL = QVBoxLayout(self.historyListView)
+        self.scroll = QScrollArea(self.historyListView)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        self.historyScrollItems()
+
+        self.historyListViewL.setContentsMargins(0, 0, 0, 0)
+        self.historyListView.setLayout(self.historyListViewL)
+
         self.historyListView.setMinimumWidth(320)
-        # Add widgets to the historyLayout
+        self.historyListView.setObjectName("historyListView")
+        self.scrollW.setObjectName("historyScroll")
+        self.scroll.setObjectName("scroll")
 
         self.toggleLayout = QHBoxLayout()
 
@@ -323,6 +337,25 @@ class MainWindow(QWidget):
         self.tabWidget.currentChanged.connect(lambda:self.changeTabBarIcon())
         self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj('toggleGrid'))
         self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj('toggleList'))
+
+
+    def historyScrollItems(self):
+        self.scrollW = QWidget()
+
+        self.historyScrollL = QVBoxLayout(self.scrollW)
+        self.historyScrollL.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.scroll.setWidget(self.scrollW)
+        self.historyScrollL.setContentsMargins(5, 10, 5, 10)
+        self.reloadHistory()
+        self.historyListViewL.addWidget(self.scroll)
+        
+    def reloadHistory(self):
+        # self.historyStorage
+        ...
+
+    def resetHistory(self):
+        self.scrollW.deleteLater()
+        self.historyScrollItems()
 
     def setApiIndex(self, intIndex):
         clickedIndex = intIndex
@@ -665,7 +698,6 @@ class MainWindow(QWidget):
         return file_n
 
 
-
 class Library(QStackedWidget):
     def __init__(self, appW, window, parent):
         super(Library, self).__init__(parent)
@@ -883,8 +915,10 @@ class Library(QStackedWidget):
         if dataDict["ManhuaTitle"] != self.previousOpen:
             self.descriptionPage.setData(dataDict)
             self.descriptionPage.resetChapters()
+            self.win_dow.objReader.setData(dataDict["ManhuaTitle"])
+            self.win_dow.objReader.previousManhuaName = self.previousOpen
             self.previousOpen = dataDict["ManhuaTitle"]
-            self.win_dow.objReader.setData()
+
         self.setCurrentIndex(2)
 
     def calculateLibraryDimension(self):
@@ -915,22 +949,68 @@ class Library(QStackedWidget):
         self.libraryListdata[index].manhuaCoverPixmap = QPixmap(str(path)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
 
-    class Chapter(QPushButton):
-        def __init__(self, sTitle, pTitlePath, index, parent):
-            super().__init__()
-            self.title = sTitle
-            self.titlePath = pTitlePath
-            self.parent = parent
-            self.index = index
-            
-            self.labelString = f"{self.title} \n{self.titlePath}"
-            self.setText(self.labelString)
-            self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }")
-            self.setMinimumHeight(50)
-            self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+
+class History(QPushButton):
+    def __init__(self, manhuaName, chapter, index, path, parent):
+        super().__init__()
+        self.manhuaName = manhuaName
+        # self.dataDict = self.parent.win_dow.objMainWindow.library.libraryMetadata[self.manhuaName]
+        self.chapter = chapter
+        self.chapterIndex = index
+        self.path = path
+        self.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        self.parent = parent
+        self.labelString = f"{self.manhuaName} - {self.chapter}\n{self.time}"
+        self.setText(self.labelString)
+         
+        self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }")
+        self.setMinimumHeight(50)
+        self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+
+        self.clicked.connect(lambda: self.launchHistory())
+        self.dict = dict()
+        self.dict["ManhuaName"] = self.manhuaName
+        self.dict["Chapter"] = self.chapter
+        self.dict["ChapterIndex"] = self.chapterIndex
+        self.dict["ChapterPath"] = self.path
+        self.dict["ReadTime"] = self.time
+        
+    def launchHistory(self):
+        self.parent.setData(self.manhuaName, self.chapterIndex)
+        self.parent.win_dow.objMainWindow.library.launchReader(self.chapterIndex)
+
+    def setValues(self, chapter, index, path):
+        self.chapter = chapter
+        self.chapterIndex = index
+        self.path = path
+        self.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        self.labelString = f"{self.manhuaName} - {self.chapter}\n{self.time}"
+        self.dict["Chapter"] = self.chapter
+        self.dict["ChapterIndex"] = self.chapterIndex
+        self.dict["ChapterPath"] = self.path
+        self.dict["ReadTime"] = self.time
+        self.setText(self.labelString)
 
 
-            self.clicked.connect(lambda: self.parent.launchReader(self.index))
+
+        
+
+class Chapter(QPushButton):
+    def __init__(self, sTitle, pTitlePath, index, parent):
+        super().__init__()
+        self.title = sTitle
+        self.titlePath = pTitlePath
+        self.parent = parent
+        self.index = index
+        
+        self.labelString = f"{self.title} \n{self.titlePath}"
+        self.setText(self.labelString)
+        self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }")
+        self.setMinimumHeight(50)
+        self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+
+
+        self.clicked.connect(lambda: self.parent.launchReader(self.index))
 
 
 class Manhua(QPushButton):
@@ -1210,6 +1290,7 @@ class Description(QWidget):
         self.nameLabelFont.setBold(True)
         self.nameLabelFont.setPointSize(16)
         self.nameLabel.setFont(self.nameLabelFont)
+        self.currentManhua = self.dataDict["ManhuaTitle"]
 
     def setCover(self, cover):
         w, h = self.coverLabel.width(), self.coverLabel.height()
@@ -1241,7 +1322,7 @@ class Description(QWidget):
             key = list(self.descChapters.keys())[x]
             iPath = self.descChapters.get(key)
             path = self.setPath(self.dataDict["ManhuaPath"], iPath)
-            chap = Library.Chapter(key, path, x, self.parent)
+            chap = Chapter(key, path, x, self.parent)
             self.chapterDescListLayout.addWidget(chap)
 
     def exitPage(self):

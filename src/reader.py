@@ -22,6 +22,8 @@ from PyQt6.QtGui import QCursor, QIcon, QPixmap
 import os
 from pathlib import Path
 
+from mainWindow import History
+
 # from themes import Themes
 
 class Reader(QWidget):
@@ -33,9 +35,12 @@ class Reader(QWidget):
         self.imageCurrent = int()
         self.currentDict = dict()
         self.currentManhuaPath = ''
+        self.currentManhuaName = ''
         self.currentChapterIndex = int()
         self.currentIndexPath = ''
         self.currentManhuaChapterLen = int()
+        self.currentChapterKey = ''
+        self.previousManhuaName = ''
         self.prevPath = ''
         self.manhuaKey = ""
 
@@ -54,19 +59,20 @@ class Reader(QWidget):
         self.fsState = bool()
         self.readerDisplayIndex = int()
         self.initReaderState = []
-        
         self.majorLayout = QVBoxLayout()
 
-    def setData(self):
-        self.currentDict = self.win_dow.objMainWindow.library.descriptionPage.dataDict
+    def setData(self, data, index=0):
+        self.currentDict = self.win_dow.objMainWindow.library.libraryMetadata[data]
+        self.currentManhuaName = data
         self.currentManhuaPath = self.currentDict["ManhuaPath"] 
-        self.currentChapterIndex = 0
+        self.currentChapterIndex = index
         self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))      
         self.currentManhuaChapterLen = self.win_dow.objMainWindow.library.descriptionPage.chapterLen
-
+        self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
 
     def backAction(self):
         self.win_dow.objMainWindow.setFocus()
+        self.previousManhuaName = self.currentManhuaName
         self.obj.talkToStackWidgetIndex(0, self.win_dow)
 
     def calLabelSize(self):
@@ -311,12 +317,14 @@ class Reader(QWidget):
     def prevChapter(self):
         if self.currentChapterIndex > 0:
             self.currentChapterIndex -= 1
+            self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
             self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))
             self.loadChapterPages(self.currentChapterIndex)
 
     def nextChapter(self):
         if self.currentChapterIndex < self.currentManhuaChapterLen:
             self.currentChapterIndex += 1
+            self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
             self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))
             self.loadChapterPages(self.currentChapterIndex)
 
@@ -354,6 +362,7 @@ class Reader(QWidget):
 
     def loadChapterPages(self, index):
         self.currentChapterIndex = index
+        self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
         self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])) 
         self.manhuaKey = self.currentDict["ManhuaTitle"]
         self.imageList = []
@@ -366,6 +375,21 @@ class Reader(QWidget):
         else:
             if self.currentIndexPath != self.prevPath:
                 self.clearLabels()
+        if self.currentIndexPath != self.prevPath:
+            if self.currentManhuaName != self.previousManhuaName:
+                hisT = History(self.currentDict["ManhuaTitle"], self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath, self)
+                self.win_dow.objMainWindow.historyScrollL.insertWidget(0, hisT)
+                self.win_dow.objMainWindow.history.insert(0, hisT)
+                self.win_dow.objMainWindow.historyData.insert(0, hisT.dict)
+                
+            else:
+                if self.win_dow.objMainWindow.historyScrollL.layout().count() != 0:
+                    hisTo = self.win_dow.objMainWindow.historyScrollL.layout().itemAt(0).widget()
+                    hisTo.setValues(self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath)
+                    self.win_dow.objMainWindow.historyData.pop(0)
+                    self.win_dow.objMainWindow.historyData.insert(0, hisTo.dict)
+            self.prevPath = self.currentIndexPath
+        print(self.win_dow.objMainWindow.historyData)
 
     def reScaleMLabel(self):
         for i in range(self.manhuaLayout.count()):
@@ -384,7 +408,6 @@ class Reader(QWidget):
             path = str(self.currentIndexPath) + "\\" + str(x)
             manhuaLabel = Reader.ImageLabel(path, self.screenScrollAreaW.width())
             self.manhuaLayout.addWidget(manhuaLabel)
-        self.prevPath = self.currentIndexPath
         self.screenScrollArea.verticalScrollBar().setMaximum(100)
 
     def clearLabels(self):
