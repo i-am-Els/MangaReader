@@ -40,6 +40,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
 
+from archive import Archiver
 
 
 class MainWindow(QWidget):
@@ -624,9 +625,9 @@ class MainWindow(QWidget):
         elif type == 'structure':
             txt, t_txt = "There are 2 scenarios that raise this error: Bundle Structure Error or No Image Found\nTip 1: Select a Parent folder that has chapters arranged in sub-folders.\nTip 2: The chapter sub-folders MUST contain images.", "Structure or File Error"
         elif type == 'none':
-            txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.cbr' files.", "Not an Archive File"
+            txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.zip' files.\nThe supposed archive file might be a bad or corrupted file...", "Bad/Corrupted/Not an Archive File"
         elif type == 'duplicate':
-             txt, t_txt = "The manhua title already exists in your library, select another title", "Duplicate Action"
+            txt, t_txt = "The manhua title already exists in your library, select another title", "Duplicate Action"
         
         messageBox = QMessageBox()
         messageBox.setIcon(QMessageBox.Icon.Information)
@@ -662,10 +663,10 @@ class MainWindow(QWidget):
                 self.localSearchAction()
 
     def localSearchSingleFormatAction(self):
-        self.localSingleDialog = QFileDialog().getOpenFileName(self, 'Open Archived Manhua File', self.newPath, 'Archived Files (*.cbz *.cbr)')
+        self.localSingleDialog = QFileDialog().getOpenFileName(self, 'Open Archived Manhua File', self.newPath, 'Archived Files (*.cbz *zip)')
         self.localSinglePath = self.convertToPath(self.localSingleDialog[0])
 
-        if os.path.isfile(self.localSinglePath) and Path(self.localSinglePath).suffix in ['.cbr', '.cbz']:  
+        if os.path.isfile(self.localSinglePath) and Path(self.localSinglePath).suffix in ['.cbz', '.zip']:  
             self.localFileName = self.extractFileName(self.localSinglePath)
 
             self.parentLocalSinglePath = self.extractParentFolderPath(self.localSinglePath)
@@ -675,8 +676,8 @@ class MainWindow(QWidget):
 
             self.setting.libraryNewPath = self.newPath
 
-
-            return self.localSingleImport
+            ziper = Archiver()
+            ziper.extractCbz(self.localSinglePath, self.setting.extractionNewPath, self)
 
         elif self.localSingleDialog == ('', ''):
             pass
