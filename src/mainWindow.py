@@ -677,7 +677,10 @@ class MainWindow(QWidget):
             self.setting.libraryNewPath = self.newPath
 
             ziper = Archiver()
-            ziper.extractCbz(self.localSinglePath, self.setting.extractionNewPath, self)
+            inPath = Path(str(self.setting.extractionNewPath) + "\\" + str(self.localFileName))
+            if not os.path.exists(inPath):
+                os.makedirs(inPath)
+            ziper.extractCbz(self.localSinglePath, inPath, self)
 
         elif self.localSingleDialog == ('', ''):
             pass

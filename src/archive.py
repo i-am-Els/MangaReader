@@ -25,6 +25,9 @@ class Archiver:
         else:
             caller.popDialog('none')
             return 0      
+#           File "C:\Users\User\AppData\Local\Programs\Python\Python39\lib\zipfile. py", line 942, in _update_crc
+#     raise BadZipFile("Bad CRC-32 for file %r" % self.name)
+# zipfile.BadZipFile: Bad CRC-32 for file 'Classroom of the Elite - c003 (v01) - p089 [Seven Seas Entertainment] [Digital] [1r0n] {HQ}.jpg'
 
     def writeNewCbz(self):
         with zipfile.ZipFile("hello.zip", mode="w") as archive:
