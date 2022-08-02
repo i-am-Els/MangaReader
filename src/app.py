@@ -18,7 +18,7 @@
 
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QMainWindow, QSizePolicy
 from PyQt6.QtCore import QSize, Qt
-import sys, setup, ctypes
+import sys, creator, ctypes
 from themes import WindowTitleBar, MoveableWindow
 
 def setTaskBarIcon():
@@ -38,7 +38,7 @@ class  App(QMainWindow):
         self.appLayout = QVBoxLayout()
         self.appWidget = QWidget()
 
-        self.stWindow = setup.Window(self)
+        self.stWindow = creator.Window(self)
         self.stWindowLayout = QVBoxLayout()
         self.stWindowLayout.addWidget(self.stWindow)
 

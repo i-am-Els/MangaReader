@@ -599,18 +599,18 @@ class Preference(QWidget):
         self.downloadQueueLayout.setContentsMargins(0, 0, 0, 0)
 
 
-        self.compressArchiveLabel = QLabel("Compress Downloads to Archive File")
+        self.compressArchiveLabel = QLabel("Compress Downloads to Archive File To cbz")
         self.compressArchiveLabel.setSizePolicy(self.sizePolicy)
         
         # self.compressArchiveLabel.setMaximumHeight(60)
 
 
-        self.radioCbz = QRadioButton("To CBZ")
-        self.radioCbz.setChecked(True)
-        self.radioCbz.setSizePolicy(self.sizePolicy)
+        # self.radioCbz = QRadioButton("To CBZ")
+        # self.radioCbz.setChecked(True)
+        # self.radioCbz.setSizePolicy(self.sizePolicy)
 
-        self.radioCbr = QRadioButton("To CBR")
-        self.radioCbr.setSizePolicy(self.sizePolicy)
+        # self.radioCbr = QRadioButton("To CBR")
+        # self.radioCbr.setSizePolicy(self.sizePolicy)
         
         self.compressArchiveToggleBtn = ToggleSwitch()
         self.compressArchiveToggleBtn.setCheckable(True)
@@ -622,14 +622,14 @@ class Preference(QWidget):
         self.compressArchiveLayout = QHBoxLayout()
 
         self.compressArchiveLayout.addWidget(self.compressArchiveLabel)
-        self.compressArchiveLayout.addWidget(self.radioCbz)
-        self.compressArchiveLayout.addWidget(self.radioCbr)
+        # self.compressArchiveLayout.addWidget(self.radioCbz)
+        # self.compressArchiveLayout.addWidget(self.radioCbr)
         self.compressArchiveLayout.addWidget(self.compressArchiveToggleBtn)
 
         self.compressArchiveLayout.setStretch(0, 7)
         self.compressArchiveLayout.setStretch(1, 1)
-        self.compressArchiveLayout.setStretch(2, 1)
-        self.compressArchiveLayout.setStretch(3, 1)
+        # self.compressArchiveLayout.setStretch(2, 1)
+        # self.compressArchiveLayout.setStretch(3, 1)
         self.compressArchiveLayout.setSpacing(0)
 
         self.compressArchiveLayout.setContentsMargins(3, 3, 10, 3)
@@ -653,13 +653,13 @@ class Preference(QWidget):
     def compressSelect(self, btn):
         if btn.isChecked():
             self.setting.compressionState = True
-            self.radioCbr.setDisabled(False)
-            self.radioCbz.setDisabled(False)
+            # self.radioCbr.setDisabled(False)
+            # self.radioCbz.setDisabled(False)
             
         else:
             self.setting.compressionState = False
-            self.radioCbr.setDisabled(True)
-            self.radioCbz.setDisabled(True)
+            # self.radioCbr.setDisabled(True)
+            # self.radioCbz.setDisabled(True)
 
     def setWindowTheme(self, btn):
         if btn.isChecked():

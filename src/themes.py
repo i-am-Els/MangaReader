@@ -220,8 +220,6 @@ class Themes:
             
             objR.setToCoverButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
-            objR.majorWidget.setStyleSheet("background: rgba(0, 0, 0, 80)")
-
             objR.manhuaLabel.setStyleSheet(" padding: 0px;")
             
             if objR.readerDisplayIndex == 1:
