@@ -118,11 +118,12 @@ class Reader(QWidget):
         self.screenLayout = QHBoxLayout()
         self.screenScrollAreaLayout = QVBoxLayout()
         self.screenScrollAreaW = QWidget()
+        self.screenLayout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        self.screenLayout.setContentsMargins(0, 0, 0,0)
+        self.screenScrollAreaLayout.setContentsMargins(0, 0, 0,0)
+        self.screenScrollAreaLayout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
-        # self.screenScrollArea = QScrollArea()
-        # self.screenScrollArea.setWidgetResizable(True)
-        # self.screenScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # self.screenScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.screenScrollAreaW.setContentsMargins(0, 0, 0, 0)
 
         self.setChapterLabels()
 
@@ -273,7 +274,7 @@ class Reader(QWidget):
         self.rightLayout.addLayout(self.setToCoverLayout)
 
         self.rightLayout.setStretch(0, 1)
-        self.rightLayout.setStretch(1, 5)
+        self.rightLayout.setStretch(1, 7)
         self.rightLayout.setStretch(2, 1)
 
         self.mainLayout.addLayout(self.leftLayout)
@@ -349,11 +350,11 @@ class Reader(QWidget):
         self.screenScrollArea.setWidgetResizable(True)
         self.screenScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.screenScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-
         self.manhuaLabel = QWidget()
 
         self.manhuaLayout = QVBoxLayout(self.manhuaLabel)
         self.manhuaLayout.setSpacing(0)
+        self.manhuaLayout.setContentsMargins(0, 0, 0, 0)
         # self.manhuaLabel.setLayout(self.manhuaLayout)
         self.screenScrollArea.setWidget(self.manhuaLabel)
         self.setScrollLabelImages()
@@ -389,7 +390,6 @@ class Reader(QWidget):
                     self.win_dow.objMainWindow.historyData.pop(0)
                     self.win_dow.objMainWindow.historyData.insert(0, hisTo.dict)
             self.prevPath = self.currentIndexPath
-        print(self.win_dow.objMainWindow.historyData)
 
     def reScaleMLabel(self):
         for i in range(self.manhuaLayout.count()):
@@ -443,5 +443,5 @@ class Reader(QWidget):
             self.width = width
             self.setScaledContents(True)
             self.setPixmap(QPixmap(self.path).scaledToWidth(self.width, Qt.TransformationMode.SmoothTransformation))
-            self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.setAlignment(Qt.AlignmentFlag.AlignHCenter)
             self.setStyleSheet("padding: 0px;")

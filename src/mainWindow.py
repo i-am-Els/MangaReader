@@ -1003,14 +1003,18 @@ class Chapter(QPushButton):
         self.parent = parent
         self.index = index
         
-        self.labelString = f"{self.title} \n{self.titlePath}"
+        self.fm = self.fontMetrics()
+        self.pathText = self.titlePath
+        self.elidedText = self.fm.elidedText(self.pathText, Qt.TextElideMode.ElideMiddle, 250)
+
+        self.labelString = f"{self.title} \n{self.elidedText}"
         self.setText(self.labelString)
         self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }")
         self.setMinimumHeight(50)
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-
         self.clicked.connect(lambda: self.parent.launchReader(self.index))
+
 
 
 class Manhua(QPushButton):
