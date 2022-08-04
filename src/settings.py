@@ -50,13 +50,13 @@ class Settings(object):
         self.themeIndex = 0
         self.themeButtonState = False
 
-        self.downloadInitPath = str(os.path.join(Path.home(), "Documents\\Manhua Reader\\downloads"))
+        self.downloadInitPath = str(os.path.join(Path.home(), "Documents\\Manhua Reader\\downloads\\"))
         if not os.path.exists(self.downloadInitPath):
             os.makedirs(self.downloadInitPath)
 
         self.downloadNewPath = self.downloadInitPath
 
-        self.extractionInitPath = str(os.path.join(Path.home(), "Documents\\Manhua Reader\\archives"))
+        self.extractionInitPath = str(os.path.join(Path.home(), "Documents\\Manhua Reader\\archives\\"))
         if not os.path.exists(self.extractionInitPath):
             os.makedirs(self.extractionInitPath)
 

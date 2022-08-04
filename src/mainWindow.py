@@ -54,6 +54,7 @@ class MainWindow(QWidget):
         self.min_button_size = QSize(16, 16)
         self.themeObj = object()
         self.setting = object()
+        self.curZipFileList = list()
 
         self.initPath = object()
         self.newPath = object()
@@ -624,8 +625,10 @@ class MainWindow(QWidget):
             txt, t_txt = "Bundle is empty, Please select a filled directory", "Empty Bundle Error"
         elif type == 'structure':
             txt, t_txt = "There are 2 scenarios that raise this error: Bundle Structure Error or No Image Found\nTip 1: Select a Parent folder that has chapters arranged in sub-folders.\nTip 2: The chapter sub-folders MUST contain images.", "Structure or File Error"
+        elif type == 'badFile':
+            txt, t_txt = "The supposed archive file might contain a bad or corrupted file...\nUnable to completely read archive.", "Bad/Corrupted Archive File"
         elif type == 'none':
-            txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.zip' files.\nThe supposed archive file might be a bad or corrupted file...", "Bad/Corrupted/Not an Archive File"
+            txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.zip' files.", "Not an Archive File"
         elif type == 'duplicate':
             txt, t_txt = "The manhua title already exists in your library, select another title", "Duplicate Action"
         
@@ -677,10 +680,13 @@ class MainWindow(QWidget):
             self.setting.libraryNewPath = self.newPath
 
             ziper = Archiver()
-            inPath = Path(str(self.setting.extractionNewPath) + "\\" + str(self.localFileName))
-            if not os.path.exists(inPath):
-                os.makedirs(inPath)
-            ziper.extractCbz(self.localSinglePath, inPath, self)
+            outPath = Path(self.setting.extractionNewPath + str(Path(self.localFileName).stem) + "\\")
+            print(outPath)
+            if not os.path.exists(outPath):
+                os.makedirs(outPath)
+            # self.curZipFileList = ziper.extractCbz(self.localSinglePath, outPath, self)
+            # self.library.libraryArchiveMetaDataList = self.curZipFileList
+            # Library.launchArchiveReader(self.curZipFileList)
 
         elif self.localSingleDialog == ('', ''):
             pass
@@ -716,6 +722,7 @@ class Library(QStackedWidget):
 
         self.libraryMetadata = dict()
         self.libraryListdata = list()
+        self.libraryArchiveMetaDataList = dict()
 
         self.noItems = QWidget()
         self.libraryShelf = QWidget()
@@ -953,6 +960,10 @@ class Library(QStackedWidget):
         self.libraryListdata[index].manhuaCoverPixmap = QPixmap(str(path)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
 
+    @staticmethod
+    def launchArchiveReader(info):
+        
+        ...
 
 class History(QPushButton):
     def __init__(self, manhuaName, chapter, index, path, parent):

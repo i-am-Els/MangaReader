@@ -1,4 +1,4 @@
-import zipfile
+import zipfile, os
 from pathlib import Path
 from datetime import datetime
 from PyQt6.QtWidgets import QWidget
@@ -18,16 +18,24 @@ class Archiver:
 
     def extractCbz(self, path, outPath, caller:QWidget) -> zipfile.ZipFile:
         self.path = path
-        fileLists = list()
+        if not os.path.exists(outPath):
+            os.makedirs(outPath)
+        rfileList = list()
         if zipfile.is_zipfile(self.path):
             with zipfile.ZipFile(self.path, mode='r') as archive:
-                archive.extractall(outPath)  
+                try:
+                    # Edit the files name by slicing with / character
+                    for x in archive.namelist():
+                        if Path(x).suffix in ['.jpeg', '.jpg', '.png']:
+                            archive.extract(x, outPath)
+                except zipfile.BadZipFile:
+                    caller.popDialog('badFile')
+                except FileNotFoundError:
+                    print("Something unexpected happened... ")
+
         else:
             caller.popDialog('none')
-            return 0      
-#           File "C:\Users\User\AppData\Local\Programs\Python\Python39\lib\zipfile. py", line 942, in _update_crc
-#     raise BadZipFile("Bad CRC-32 for file %r" % self.name)
-# zipfile.BadZipFile: Bad CRC-32 for file 'Classroom of the Elite - c003 (v01) - p089 [Seven Seas Entertainment] [Digital] [1r0n] {HQ}.jpg'
+            return 0 
 
     def writeNewCbz(self):
         with zipfile.ZipFile("hello.zip", mode="w") as archive:
@@ -48,7 +56,6 @@ class Archiver:
                 if Path(x).suffix in ['.jpeg', '.jpg', '.png']:
                     count+=1
                     print(x,"\n")
-            print(count)
 
     def readAllContent(self):
         ...
