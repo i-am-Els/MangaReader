@@ -927,6 +927,7 @@ class Library(QStackedWidget):
             self.descriptionPage.setData(dataDict)
             self.descriptionPage.resetChapters()
             self.win_dow.objReader.setData(dataDict["ManhuaTitle"])
+            self.win_dow.objReader.manhuaChanged = True
             self.win_dow.objReader.previousManhuaName = self.previousOpen
             self.previousOpen = dataDict["ManhuaTitle"]
 

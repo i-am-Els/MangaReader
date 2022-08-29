@@ -43,7 +43,7 @@ class Reader(QWidget):
         self.previousManhuaName = ''
         self.prevPath = ''
         self.manhuaKey = ""
-
+        self.manhuaChanged =  False
         self.themeObj = object()
         self.setting = object()
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -319,14 +319,14 @@ class Reader(QWidget):
         if self.currentChapterIndex > 0:
             self.currentChapterIndex -= 1
             self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
-            self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))
+            # self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))
             self.loadChapterPages(self.currentChapterIndex)
 
     def nextChapter(self):
         if self.currentChapterIndex < self.currentManhuaChapterLen:
             self.currentChapterIndex += 1
             self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
-            self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))
+            # self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))
             self.loadChapterPages(self.currentChapterIndex)
 
     def setToCoverAction(self):
@@ -376,20 +376,21 @@ class Reader(QWidget):
         else:
             if self.currentIndexPath != self.prevPath:
                 self.clearLabels()
-        if self.currentIndexPath != self.prevPath:
-            if self.currentManhuaName != self.previousManhuaName:
-                hisT = History(self.currentDict["ManhuaTitle"], self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath, self)
-                self.win_dow.objMainWindow.historyScrollL.insertWidget(0, hisT)
-                self.win_dow.objMainWindow.history.insert(0, hisT)
-                self.win_dow.objMainWindow.historyData.insert(0, hisT.dict)
-                
-            else:
-                if self.win_dow.objMainWindow.historyScrollL.layout().count() != 0:
+        
+        if self.manhuaChanged == False:
+            if self.currentIndexPath != self.prevPath:
+                if self.win_dow.objMainWindow.historyScrollL.layout().count() != 0:   
                     hisTo = self.win_dow.objMainWindow.historyScrollL.layout().itemAt(0).widget()
                     hisTo.setValues(self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath)
                     self.win_dow.objMainWindow.historyData.pop(0)
                     self.win_dow.objMainWindow.historyData.insert(0, hisTo.dict)
-            self.prevPath = self.currentIndexPath
+        else:
+            hisT = History(self.currentDict["ManhuaTitle"], self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath, self)
+            self.win_dow.objMainWindow.historyScrollL.insertWidget(0, hisT)
+            self.win_dow.objMainWindow.history.insert(0, hisT)
+            self.win_dow.objMainWindow.historyData.insert(0, hisT.dict)   
+            self.manhuaChanged = False  
+        self.prevPath = self.currentIndexPath
 
     def reScaleMLabel(self):
         for i in range(self.manhuaLayout.count()):
