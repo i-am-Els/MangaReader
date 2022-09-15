@@ -1007,7 +1007,9 @@ class History(QPushButton):
         self.dict["ReadTime"] = self.time
         self.setText(self.labelString)
 
-       
+
+
+        
 
 class Chapter(QPushButton):
     def __init__(self, sTitle, pTitlePath, index, parent):
