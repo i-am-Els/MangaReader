@@ -204,6 +204,20 @@ class MainWindow(QWidget):
         self.apiButtonWidget.setLayout(self.apiButtonLayout)
         self.apiButtonWidget.setFixedSize(QSize(120, 36))
 
+
+        self.clearHistoryButton = QPushButton()
+        self.clearHistoryButton.setCheckable(True)
+        self.clearHistoryButton.setSizePolicy(self.sizePolicy)
+        self.clearHistoryButton.setMinimumSize(self.max_button_size)
+        self.clearHistoryButton.setMaximumSize(self.max_button_size)   
+        self.clearHistoryButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))     
+        self.clearHistoryButton.setToolTip("Clear history data")
+        self.clearHistoryButton.setToolTipDuration(3000)
+        
+        self.clearHistoryIcon = QIcon()
+        self.clearHistoryButton.setIconSize(self.icon_size)
+        self.clearHistoryButton.setObjectName("clearHistoryButton")
+
         # Add Widgets to searchLayout
         self.searchLayout.addWidget(self.menuButton)
         self.searchLayout.addWidget(self.refreshButton)
@@ -212,6 +226,7 @@ class MainWindow(QWidget):
         self.searchLayout.addWidget(self.lineEdit)
         self.searchLayout.addWidget(self.searchButton)
         self.searchLayout.addWidget(self.apiButtonWidget)
+        self.searchLayout.addWidget(self.clearHistoryButton)
         
         self.searchLayout.setStretch(0, 1)
         self.searchLayout.setStretch(1, 1)
@@ -220,6 +235,7 @@ class MainWindow(QWidget):
         self.searchLayout.setStretch(4, 6)
         self.searchLayout.setStretch(5, 1)
         self.searchLayout.setStretch(6, 1)
+        self.searchLayout.setStretch(7, 1)
 
         self.searchLayout.setContentsMargins(3, 5, 0, 5)
 
@@ -242,6 +258,7 @@ class MainWindow(QWidget):
         self.scroll = QScrollArea(self.historyListView)
         self.scroll.setWidgetResizable(True)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
 
         self.historyScrollItems()
 

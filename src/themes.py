@@ -87,7 +87,6 @@ class Themes:
         QTabWidget::pane{
             border: 0px;
         }
-
         #historyLabel{
             color: white;
             background-color: rgb(72, 75, 106); 
@@ -156,6 +155,9 @@ class Themes:
         
         objM.refreshIcon.addPixmap(QPixmap("resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.refreshButton.setIcon(objM.refreshIcon)
+
+        objM.clearHistoryIcon.addPixmap(QPixmap("resources/icons/icons8-unpin-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objM.clearHistoryButton.setIcon(objM.clearHistoryIcon)
 
         objM.apiButtonWidget.setStyleSheet("#apiWidget { background-color: rgb(210, 211, 219); border: 2px solid rgb(72, 75, 106); border-radius: 18px;} QPushButton{ background-color: rgb(210, 211, 219); margin: 5px;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
 
