@@ -1007,9 +1007,7 @@ class History(QPushButton):
         self.dict["ReadTime"] = self.time
         self.setText(self.labelString)
 
-
-
-        
+       
 
 class Chapter(QPushButton):
     def __init__(self, sTitle, pTitlePath, index, parent):
@@ -1082,6 +1080,8 @@ class Manhua(QPushButton):
         self.manhuaFavoriteButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.manhuaFavoriteButtonIcon = QIcon()
 
+        if not os.path.exists(self.manhuaCover):
+            self.manhuaCover = self.parent.parent.themeObj.defaultCoverImage
         self.manhuaCoverPixmap = QPixmap(str(self.manhuaCover)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         self.manhuaCoverDisplayLabel.setPixmap(self.manhuaCoverPixmap)
         self.manhuaCoverLayout.addWidget(self.manhuaCoverDisplayLabel)
