@@ -148,6 +148,11 @@ class Themes:
         objM.library.descriptionPage.exitButton.setIcon(objM.library.descriptionPage.exitButtonIcon)
         
         objM.library.descriptionPage.exitButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+
+        objM.library.descriptionPage.deleteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-delete-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        objM.library.descriptionPage.deleteButton.setIcon(objM.library.descriptionPage.deleteButtonIcon)
+        
+        objM.library.descriptionPage.deleteButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
         
         objM.refreshIcon.addPixmap(QPixmap("resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         objM.refreshButton.setIcon(objM.refreshIcon)

@@ -438,13 +438,16 @@ class MainWindow(QWidget):
         self.obj.talkToStackWidgetIndex(2, self.win_dow)
 
     def refreshAction(self):
-        pageToRefreshIndex = self.homeTabStack.currentIndex()
-        if self.homeTabStack.currentIndex() == 0:
-            print("Refused to change Index will refresh instead")
-            self.homeTabStack.setCurrentIndex(0)
+        if self.tabWidget.currentIndex() == 0:
+            pageToRefreshIndex = self.homeTabStack.currentIndex()
+            if self.homeTabStack.currentIndex() == 0:
+                print("Refused to change Index will refresh instead")
+                self.homeTabStack.setCurrentIndex(0)
+            else:
+                self.homeTabStack.setCurrentIndex(0)
+            self.refresh(pageToRefreshIndex)
         else:
-            self.homeTabStack.setCurrentIndex(0)
-        self.refresh(pageToRefreshIndex)
+            self.library.refresh()
 
     def refresh(self, refreshPgIndex):# Much More work
         if (refreshPgIndex == 0) or (refreshPgIndex == 3):
@@ -738,6 +741,29 @@ class Library(QStackedWidget):
 
         self.loadLibraryLayout()
         self.parent.launchDone = True
+        self.testDataForTamper()
+
+    def refresh(self):
+        self.testDataForTamper()    
+        if self.currentIndex() != 0:
+            self.switchLayout()
+        if self.currentIndex() == 2:
+                self.reloadManhuaData(self.descriptionPage.currentManhua)
+                print(self.descriptionPage.dataDict)
+
+
+    def testDataForTamper(self):
+        alt = dict()
+        for x in list(self.libraryMetadata.values()):
+            if os.path.exists(x["ManhuaPath"]):
+                v = self.addToMetaData(x["ManhuaPath"])
+                v["IsFav"] = x["IsFav"]
+                alt.update({x["ManhuaTitle"] : v})
+        if not self.libraryMetadata == alt:
+            self.libraryMetadata = alt
+            
+
+            
 
     def setNoItemsWidget(self):
         self.noItemsLabel = QLabel()
@@ -855,7 +881,8 @@ class Library(QStackedWidget):
                     break
         return correct
 
-    def addToLibrary(self, path):
+    def addToMetaData(self, path):
+        imageExtList = ['.jpeg', '.jpg', '.png']
         manhuaMetaDict = dict()
         manhuaChapterList = list()
 
@@ -865,7 +892,7 @@ class Library(QStackedWidget):
 
         for x in os.listdir(path):
             xPath = os.path.join(path, x)
-            if os.path.isdir(xPath):
+            if os.path.isdir(xPath) and any(Path(os.path.join(xPath, z)).suffix in imageExtList for z in os.listdir(xPath)):
                 # sChapterName = str(Path(xPath).name)
                 sChapterName = Path(xPath).name
                 manhuaChapterList.append(sChapterName)
@@ -877,9 +904,13 @@ class Library(QStackedWidget):
             
         sortedManhuaChapterDict = self.sortChapters(manhuaChapterList)
         manhuaMetaDict["Chapters"] = sortedManhuaChapterDict
-        manhuaMetaDict["IsFav"] = False
         manhuaMetaDict["Status"] = "Local Manhua Bundle"
         manhuaMetaDict["Description"] = "No Description... This file is a locally imported file, metadata consist of no description..."
+        return manhuaMetaDict
+
+    def addToLibrary(self, path):
+        manhuaMetaDict = self.addToMetaData(path)
+        manhuaMetaDict["IsFav"] = False
 
         if not((manhuaMetaDict["ManhuaTitle"]) in self.libraryMetadata):
             self.libraryMetadata.update({manhuaMetaDict["ManhuaTitle"] : manhuaMetaDict})
@@ -914,8 +945,8 @@ class Library(QStackedWidget):
 
     def recreateManhuas(self):
         self.libraryListdata.clear()
-        for k in self.libraryMetadata.keys():
-            self.manhuaObj = Manhua(self.libraryMetadata[k], self)
+        for k in list(self.libraryMetadata.keys()):
+            self.manhuaObj = Manhua(self.libraryMetadata[k], self)            
             self.libraryListdata.append(self.manhuaObj)
 
     def switchLayout(self):
@@ -923,15 +954,18 @@ class Library(QStackedWidget):
         self.loadLibraryItems()
 
     def openDescription(self, dataDict):
-        if dataDict["ManhuaTitle"] != self.previousOpen:
-            self.descriptionPage.setData(dataDict)
-            self.descriptionPage.resetChapters()
-            self.win_dow.objReader.setData(dataDict["ManhuaTitle"])
-            self.win_dow.objReader.manhuaChanged = True
-            self.win_dow.objReader.previousManhuaName = self.previousOpen
-            self.previousOpen = dataDict["ManhuaTitle"]
-
-        self.setCurrentIndex(2)
+        if os.path.exists(dataDict["ManhuaPath"]):
+            if dataDict["ManhuaTitle"] != self.previousOpen:
+                self.descriptionPage.setData(dataDict)
+                self.descriptionPage.resetChapters()
+                self.win_dow.objReader.setData(dataDict["ManhuaTitle"])
+                self.win_dow.objReader.manhuaChanged = True
+                self.win_dow.objReader.previousManhuaName = self.previousOpen
+                self.previousOpen = dataDict["ManhuaTitle"]
+            self.setCurrentIndex(2)
+        else:
+            #pop up error.
+            ...
 
     def calculateLibraryDimension(self):
         dimensionV = self.geometry().width()
@@ -947,19 +981,53 @@ class Library(QStackedWidget):
         spacing = int(spacing / dimension)
         return spacing
 
-    def launchReader(self, index):
-        if(self.win_dow.objReader.fsState == True and self.appW.windowState() != Qt.WindowState.WindowMaximized):
-            self.appW.customTitleBar.toggleRestore()
-        self.win_dow.objReader.loadChapterPages(index)
-        self.win_dow.objReader.setFocus()
-        self.win_dow.setCurrentIndex(1)
+    def launchReader(self, index, path):
+        if os.path.exists(path) and len(os.listdir(path)) != 0 and any(Path(os.path.join(str(path), filename)).suffix in ['.jpg', '.jpeg', '.png'] for filename in os.listdir(path)):
+            if(self.win_dow.objReader.fsState == True and self.appW.windowState() != Qt.WindowState.WindowMaximized):
+                self.appW.customTitleBar.toggleRestore()
+            self.win_dow.objReader.loadChapterPages(index)
+            self.win_dow.objReader.setFocus()
+            self.win_dow.setCurrentIndex(1)
+        else:
+            self.reloadManhuaData(self.descriptionPage.currentManhua, index)
+            #popup error.
+            ...
 
     def setCover(self, path, manhuaName):
-        self.libraryMetadata[manhuaName]["ManhuaCover"] = str(path)
-        manhuasData = list(self.libraryMetadata.keys())
-        index = manhuasData.index(manhuaName)
-        self.libraryListdata[index].manhuaCoverPixmap = QPixmap(str(path)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
-        self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
+        if os.path.exists(path):
+            self.libraryMetadata[manhuaName]["ManhuaCover"] = str(path)
+            manhuasData = list(self.libraryMetadata.keys())
+            index = manhuasData.index(manhuaName)
+            self.libraryListdata[index].manhuaCoverPixmap = QPixmap(str(path)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+            self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
+            
+    def deleteManhua(self, manhuaKey):
+        temp = list(self.libraryMetadata.keys())
+        index =  temp.index(manhuaKey)
+        del self.libraryMetadata[manhuaKey]
+        self.libraryListdata.pop(index)
+        self.libraryScrollAreaWidget.layout().itemAt(index).widget().deleteLater()
+        self.setCurrentIndex(1)
+
+    def reloadManhuaData(self, manhuaKey, index=0):
+        if os.path.exists(self.libraryMetadata[manhuaKey]["ManhuaPath"]):
+            dic = self.addToMetaData(self.libraryMetadata[manhuaKey]["ManhuaPath"])
+            self.libraryMetadata[manhuaKey]["ManhuaTitle"] = dic["ManhuaTitle"]
+            self.libraryMetadata[manhuaKey]["ManhuaCover"] = dic["ManhuaCover"]
+            self.libraryMetadata[manhuaKey]["Chapters"] = dic["Chapters"]
+            self.libraryMetadata[manhuaKey]["Status"] = dic["Status"]
+            self.libraryMetadata[manhuaKey]["Description"] = dic["Description"]
+            
+            self.resetSomeDescData(self.libraryMetadata[manhuaKey], index)
+            
+        else:
+            #popup errro manga deleted, then move back to library.
+            ...
+
+    def resetSomeDescData(self, manhuaKey, index=0):
+        self.descriptionPage.setData(manhuaKey)
+        self.descriptionPage.redisplayChapters()
+        self.win_dow.objReader.setData(manhuaKey["ManhuaTitle"], index)
 
     @staticmethod
     def launchArchiveReader(info):
@@ -992,8 +1060,12 @@ class History(QPushButton):
         self.dict["ReadTime"] = self.time
         
     def launchHistory(self):
-        self.parent.setData(self.manhuaName, self.chapterIndex)
-        self.parent.win_dow.objMainWindow.library.launchReader(self.chapterIndex)
+        if os.path.exists(self.path) and self.manhuaName in self.parent.win_dow.objMainWindow.library.libraryMetadata:
+            self.parent.setData(self.manhuaName, self.chapterIndex)
+            self.parent.win_dow.objMainWindow.library.launchReader(self.chapterIndex, self.path)
+        else:
+            #pop up for file not found
+            ...
 
     def setValues(self, chapter, index, path):
         self.chapter = chapter
@@ -1029,7 +1101,7 @@ class Chapter(QPushButton):
         self.setMinimumHeight(50)
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        self.clicked.connect(lambda: self.parent.launchReader(self.index))
+        self.clicked.connect(lambda: self.parent.launchReader(self.index, self.titlePath))
 
 
 
@@ -1083,8 +1155,9 @@ class Manhua(QPushButton):
         self.manhuaFavoriteButtonIcon = QIcon()
         
         if not os.path.exists(self.manhuaCover):
-            self.manhuaCover = self.parent.parent.themeObj.defaultCoverImage
-        self.manhuaCoverPixmap = QPixmap(str(self.manhuaCover)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+            self.manhuaCoverPixmap = QPixmap(self.parent.parent.themeObj.defaultCoverImage).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+        else:
+            self.manhuaCoverPixmap = QPixmap(str(self.manhuaCover)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         self.manhuaCoverDisplayLabel.setPixmap(self.manhuaCoverPixmap)
         self.manhuaCoverLayout.addWidget(self.manhuaCoverDisplayLabel)
         self.manhuaCoverLayout.setSpacing(0)
@@ -1175,10 +1248,6 @@ class Manhua(QPushButton):
         self.manhuaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"))
         self.manhuaFavoriteButton.setIcon(self.manhuaFavoriteButtonIcon)
         self.parent.libraryMetadata[self.manhuaName]["IsFav"] = False
-
-    def deleteSelf(self):
-        ...
-        
     
 
 class Description(QWidget):
@@ -1197,6 +1266,7 @@ class Description(QWidget):
         self.launchDone = True
 
         self.exitButton.clicked.connect(lambda: self.exitPage())
+        self.deleteButton.clicked.connect(lambda: self.parent.deleteManhua(self.dataDict["ManhuaTitle"]))
         self.setObjectName("descPage")
         
     def createDescriptionWidget(self):
@@ -1220,8 +1290,23 @@ class Description(QWidget):
         self.exitButton.setCheckable(True)
 
         self.modeTag = QLabel()
+        self.deleteButton = QPushButton()
+        self.deleteButton.setObjectName("deleteManhuaButton")
+
+        self.deleteButton.setSizePolicy(self.sizePolicy)
+        self.deleteButton.setMinimumSize(self.min_button_size)
+        self.deleteButton.setMaximumSize(self.max_button_size)
+        self.deleteButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.deleteButton.setGeometry(0, 0, 36, 36)
+        self.deleteButton.setToolTip("Delete Manhua")
+        self.deleteButton.setToolTipDuration(3000)
+        self.deleteButtonIcon = QIcon()
+        self.deleteButton.setIconSize(self.icon_size)
+        self.deleteButton.setCheckable(True)
+
         self.infoHeaderLayout.addWidget(self.exitButton)
         self.infoHeaderLayout.addWidget(self.modeTag)
+        self.infoHeaderLayout.addWidget(self.deleteButton)
 
         self.infoDescriptionLayout = QHBoxLayout()
         self.nameLabel = QLabel()
@@ -1316,7 +1401,10 @@ class Description(QWidget):
 
     def setCover(self, cover):
         w, h = self.coverLabel.width(), self.coverLabel.height()
-        self.coverPixmap = QPixmap(str(cover)).scaled(w, h, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+        if not os.path.exists(cover):
+            self.coverPixmap = QPixmap(self.parent.parent.themeObj.defaultCoverImage).scaled(w, h, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+        else:
+            self.coverPixmap = QPixmap(str(cover)).scaled(w, h, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         self.coverLabel.setPixmap(self.coverPixmap)
         self.coverLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
@@ -1338,6 +1426,13 @@ class Description(QWidget):
     def resetChapters(self):
         self.scrollAreaWidget.deleteLater()
         self.loadDescriptionItems()
+
+    def redisplayChapters(self):
+        if os.path.exists(self.dataDict["ManhuaPath"]) and self.chapterLen != 0:
+            self.resetChapters()
+        else:
+            #popup erro, manga deleted, move to library. "Manga not found on disk"
+            ...
 
     def chapterDescListDisplay(self):
         for x in range(len(self.descChapters)):
