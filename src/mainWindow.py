@@ -1079,7 +1079,7 @@ class Manhua(QPushButton):
         self.manhuaFavoriteButton.setSizePolicy(self.sizePolicy)
         self.manhuaFavoriteButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.manhuaFavoriteButtonIcon = QIcon()
-
+        
         if not os.path.exists(self.manhuaCover):
             self.manhuaCover = self.parent.parent.themeObj.defaultCoverImage
         self.manhuaCoverPixmap = QPixmap(str(self.manhuaCover)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
