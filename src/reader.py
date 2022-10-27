@@ -16,6 +16,7 @@
 
 
 
+from datetime import datetime
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSizePolicy, QScrollArea
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap
@@ -62,6 +63,7 @@ class Reader(QWidget):
         self.majorLayout = QVBoxLayout()
 
     def setData(self, data, index=0):
+        
         self.currentDict = self.win_dow.objMainWindow.library.libraryMetadata[data]
         self.currentManhuaName = data
         self.currentManhuaPath = self.currentDict["ManhuaPath"] 
@@ -385,7 +387,8 @@ class Reader(QWidget):
             else:
                 if self.currentIndexPath != self.prevPath:
                     self.clearLabels()
-            
+                    
+            time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             if self.manhuaChanged == False:
                 if self.currentIndexPath != self.prevPath:
                     if self.win_dow.objMainWindow.historyScrollL.layout().count() != 0:   
@@ -394,9 +397,9 @@ class Reader(QWidget):
                         self.win_dow.objMainWindow.historyData.pop(0)
                         self.win_dow.objMainWindow.historyData.insert(0, hisTo.dict)
             else:
-                hisT = History(self.currentDict["ManhuaTitle"], self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath, self)
+                hisT = History(self.currentDict["ManhuaTitle"], self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath, self, time)
                 self.win_dow.objMainWindow.historyScrollL.insertWidget(0, hisT)
-                self.win_dow.objMainWindow.history.insert(0, hisT)
+                # self.win_dow.objMainWindow.history.insert(0, hisT)
                 self.win_dow.objMainWindow.historyData.insert(0, hisT.dict)   
                 self.manhuaChanged = False  
             self.prevPath = self.currentIndexPath

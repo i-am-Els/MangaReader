@@ -65,8 +65,8 @@ class MainWindow(QWidget):
         self.icon_size = QSize(20, 20)
         self.localDirImport = []
         self.localSingleImport = []
-        self.history = []
-        self.historyData =list()
+        # self.history = []
+        self.historyData = list()
 
         self.apiName = []
         self.firstRun = True
@@ -345,6 +345,7 @@ class MainWindow(QWidget):
         
         self.menuButton.clicked.connect(self.menuAction)
         self.refreshButton.clicked.connect(self.refreshAction)
+        self.clearHistoryButton.clicked.connect(self.clearAllHistoryData)
 
         self.apiButton.clicked.connect(lambda:self.apiComboPopUp())
 
@@ -358,6 +359,12 @@ class MainWindow(QWidget):
         self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj('toggleList'))
 
 
+    def clearAllHistoryData(self):
+        self.historyData.clear()
+        for x in range(self.historyScrollL.layout().count()):
+            self.historyScrollL.layout().itemAt(x).widget().deleteLater()
+
+
     def historyScrollItems(self):
         self.scrollW = QWidget()
 
@@ -365,12 +372,16 @@ class MainWindow(QWidget):
         self.historyScrollL.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.scroll.setWidget(self.scrollW)
         self.historyScrollL.setContentsMargins(5, 10, 5, 10)
-        self.reloadHistory()
+        # if self.launchDone:
+        #     self.themeObj.resetHistoryStyle()
+        if len(self.historyData) != 0:
+            self.reloadHistory()
         self.historyListViewL.addWidget(self.scroll)
         
     def reloadHistory(self):
-        # self.historyStorage
-        ...
+        for x in self.historyData:
+            hist = History(x["ManhuaName"], x["Chapter"], x["ChapterIndex"], x["ChapterPath"], self.win_dow.objReader, x["ReadTime"])
+            self.historyScrollL.addWidget(hist)
 
     def resetHistory(self):
         self.scrollW.deleteLater()
@@ -1052,14 +1063,14 @@ class Library(QStackedWidget):
         ...
 
 class History(QPushButton):
-    def __init__(self, manhuaName, chapter, index, path, parent):
+    def __init__(self, manhuaName, chapter, index, path, parent, time):
         super().__init__()
         self.manhuaName = manhuaName
         # self.dataDict = self.parent.win_dow.objMainWindow.library.libraryMetadata[self.manhuaName]
         self.chapter = chapter
         self.chapterIndex = index
         self.path = path
-        self.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        self.time = time
         self.parent = parent
         self.labelString = f"{self.manhuaName} - {self.chapter}\n{self.time}"
         self.setText(self.labelString)
@@ -1077,11 +1088,21 @@ class History(QPushButton):
         self.dict["ReadTime"] = self.time
         
     def launchHistory(self):
+        self.historyIndex = self.parent.win_dow.objMainWindow.historyScrollL.layout().indexOf(self)
+        # delete history
+        self.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        self.dict["ReadTime"] = self.time
         if os.path.exists(self.path) and self.manhuaName in self.parent.win_dow.objMainWindow.library.libraryMetadata:
+            if self.manhuaName != self.parent.win_dow.objReader.currentManhuaName:
+                self.parent.win_dow.objReader.manhuaChanged = True
             self.parent.setData(self.manhuaName, self.chapterIndex)
+            self.parent.win_dow.objMainWindow.historyScrollL.layout().itemAt(self.historyIndex).widget().deleteLater()
+            self.parent.win_dow.objMainWindow.historyData.pop(self.historyIndex)
             self.parent.win_dow.objMainWindow.library.launchReader(self.chapterIndex, self.path)
+
         else:
-            #pop up for file not found
+            # pop up for file not found
+            # remove widget from layout and delete from historydata
             ...
 
     def setValues(self, chapter, index, path):

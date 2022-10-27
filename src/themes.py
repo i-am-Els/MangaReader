@@ -207,6 +207,11 @@ class Themes:
 
         self.readerStyle(objR, objR.readerDisplayIndex)
 
+    def resetHistoryStyle(self):
+        # if self.themeIndex == 0:    
+        #     self.obj.objMainWindow.scrollW.setStyleSheet("QWidget { background-color: rgb(210, 211, 219); padding: 0px; margin: 0px; border: none;} QPushButton:hover { color: white; }")
+        ...
+        
     def readerStyle(self, objR, index):
         if self.themeIndex == 0:
             objR.style = """ 
@@ -313,7 +318,7 @@ class Themes:
             obj.setting.themeButtonState = True
         obj.objReader.themeObj = self
 
-        # obj.objMainWindow.themeObj = self
+        obj.objMainWindow.themeObj = self
         # obj.objPref.themeObj = self
         
 
