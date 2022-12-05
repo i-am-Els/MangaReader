@@ -662,6 +662,8 @@ class MainWindow(QWidget):
             txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.zip' files.", "Not an Archive File"
         elif type == 'duplicate':
             txt, t_txt = "The manhua title already exists in your library, select another title", "Duplicate Action"
+        elif type == 'permission':
+            txt, t_txt = "The system has denied permission to the selected folder.", "Permission Denied"
         
         messageBox = QMessageBox()
         messageBox.setIcon(QMessageBox.Icon.Information)
@@ -672,29 +674,33 @@ class MainWindow(QWidget):
         messageBox.exec()
 
     def localSearchAction(self):
-        self.localDirDialog = QFileDialog.getExistingDirectory(self,"Select Manhua Title",self.newPath)
+        try:
+            self.localDirDialog = QFileDialog.getExistingDirectory(self,"Select Manhua Title",self.newPath)
 
-        self.localDirPath = self.convertToPath(self.localDirDialog)
-        dir = list(os.listdir(self.localDirPath))
-        
+            self.localDirPath = self.convertToPath(self.localDirDialog)
+            dir = list(os.listdir(self.localDirPath))
+            
 
-        if len(dir) == 0:
-            self.popDialog('empty')
-            self.localSearchAction()
-
-        elif self.localDirDialog == '':
-            pass
-
-        elif self.localDirDialog != '' and len(dir) != 0:
-            rightStructure = self.library.correctDirStructure(self.localDirPath)
-            if rightStructure == True:
-                self.newPath = self.extractParentFolderPath(self.localDirPath)
-                self.setting.libraryNewPath = self.newPath
-
-                self.library.addToLibrary(self.localDirPath)
-            else:
-                self.popDialog('structure')
+            if len(dir) == 0:
+                self.popDialog('empty')
                 self.localSearchAction()
+
+            elif self.localDirDialog == '':
+                pass
+
+            elif self.localDirDialog != '' and len(dir) != 0:
+                rightStructure = self.library.correctDirStructure(self.localDirPath)
+                if rightStructure == True:
+                    self.newPath = self.extractParentFolderPath(self.localDirPath)
+                    self.setting.libraryNewPath = self.newPath
+
+                    self.library.addToLibrary(self.localDirPath)
+                else:
+                    self.popDialog('structure')
+                    self.localSearchAction()
+        except PermissionError:
+            self.popDialog("permission")
+            self.localSearchAction()
 
     def localSearchSingleFormatAction(self):
         self.localSingleDialog = QFileDialog().getOpenFileName(self, 'Open Archived Manhua File', self.newPath, 'Archived Files (*.cbz *zip)')
@@ -838,7 +844,6 @@ class Library(QStackedWidget):
         self.libraryScrollArea = QScrollArea(self.libraryShelf)
         self.libraryScrollArea.setWidgetResizable(True)
         self.libraryScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-
         self.loadLibraryItems()
         self.libraryShelf.setLayout(self.libraryShelfLayout)
 
