@@ -42,7 +42,6 @@ from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
 
 from archive import Archiver
 
-
 class MainWindow(QWidget):
     def __init__(self, obj, win_dow, window_Icon, appW, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -358,12 +357,10 @@ class MainWindow(QWidget):
         self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj('toggleGrid'))
         self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj('toggleList'))
 
-
     def clearAllHistoryData(self):
         self.historyData.clear()
         for x in range(self.historyScrollL.layout().count()):
             self.historyScrollL.layout().itemAt(x).widget().deleteLater()
-
 
     def historyScrollItems(self):
         self.scrollW = QWidget()
@@ -374,14 +371,14 @@ class MainWindow(QWidget):
         self.historyScrollL.setContentsMargins(5, 10, 5, 10)
         # if self.launchDone:
         #     self.themeObj.resetHistoryStyle()
-        if len(self.historyData) != 0:
-            self.reloadHistory()
+        # if len(self.historyData) != 0:
+        #     self.reloadHistory()
         self.historyListViewL.addWidget(self.scroll)
         
-    def reloadHistory(self):
-        for x in self.historyData:
-            hist = History(x["ManhuaName"], x["Chapter"], x["ChapterIndex"], x["ChapterPath"], self.win_dow.objReader, x["ReadTime"])
-            self.historyScrollL.addWidget(hist)
+    # def reloadHistory(self):
+    #     for x in self.historyData:
+    #         hist = History(x["ManhuaName"], x["Chapter"], x["ChapterIndex"], x["ChapterPath"], self.win_dow.objReader, x["ReadTime"])
+    #         self.historyScrollL.addWidget(hist)
 
     def resetHistory(self):
         self.scrollW.deleteLater()
@@ -664,6 +661,9 @@ class MainWindow(QWidget):
             txt, t_txt = "The manhua title already exists in your library, select another title", "Duplicate Action"
         elif type == 'permission':
             txt, t_txt = "The system has denied permission to the selected folder.", "Permission Denied"
+
+        elif type == 'deletedM':
+            txt, t_txt = "The manhua bundle is no longer on drive. The path might be incorrect or the manhua has been deleted.", "Manhua not found on Drive"
         
         messageBox = QMessageBox()
         messageBox.setIcon(QMessageBox.Icon.Information)
@@ -785,7 +785,6 @@ class Library(QStackedWidget):
                 self.reloadManhuaData(self.descriptionPage.currentManhua)
                 print(self.descriptionPage.dataDict)
 
-
     def testDataForTamper(self):
         alt = dict()
         for x in list(self.libraryMetadata.values()):
@@ -796,9 +795,6 @@ class Library(QStackedWidget):
         if not self.libraryMetadata == alt:
             self.libraryMetadata = alt
             
-
-            
-
     def setNoItemsWidget(self):
         self.noItemsLabel = QLabel()
         self.noItemsPixmap = QPixmap("resources/icons/digital-library.png")
@@ -997,7 +993,7 @@ class Library(QStackedWidget):
                 self.previousOpen = dataDict["ManhuaTitle"]
             self.setCurrentIndex(2)
         else:
-            #pop up error.
+            self.parent.popDialog("deletedM")#pop up error.
             ...
 
     def calculateLibraryDimension(self):
@@ -1023,7 +1019,7 @@ class Library(QStackedWidget):
             self.win_dow.setCurrentIndex(1)
         else:
             self.reloadManhuaData(self.descriptionPage.currentManhua, index)
-            #popup error.
+            self.parent.popDialog("deletedM")#popup error.
             ...
 
     def setCover(self, path, manhuaName):
@@ -1067,64 +1063,61 @@ class Library(QStackedWidget):
         
         ...
 
-class History(QPushButton):
-    def __init__(self, manhuaName, chapter, index, path, parent, time):
-        super().__init__()
-        self.manhuaName = manhuaName
-        # self.dataDict = self.parent.win_dow.objMainWindow.library.libraryMetadata[self.manhuaName]
-        self.chapter = chapter
-        self.chapterIndex = index
-        self.path = path
-        self.time = time
-        self.parent = parent
-        self.labelString = f"{self.manhuaName} - {self.chapter}\n{self.time}"
-        self.setText(self.labelString)
+# class History(QPushButton):
+#     def __init__(self, manhuaName, chapter, index, path, parent, time):
+#         super().__init__()
+#         self.manhuaName = manhuaName
+#         # self.dataDict = self.parent.win_dow.objMainWindow.library.libraryMetadata[self.manhuaName]
+#         self.chapter = chapter
+#         self.chapterIndex = index
+#         self.path = path
+#         self.time = time
+#         self.parent = parent
+#         self.labelString = f"{self.manhuaName} - {self.chapter}\n{self.time}"
+#         self.setText(self.labelString)
          
-        self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }")
-        self.setMinimumHeight(50)
-        self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+#         self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }")
+#         self.setMinimumHeight(50)
+#         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        self.clicked.connect(lambda: self.launchHistory())
-        self.dict = dict()
-        self.dict["ManhuaName"] = self.manhuaName
-        self.dict["Chapter"] = self.chapter
-        self.dict["ChapterIndex"] = self.chapterIndex
-        self.dict["ChapterPath"] = self.path
-        self.dict["ReadTime"] = self.time
+#         self.clicked.connect(lambda: self.launchHistory())
+#         self.dict = dict()
+#         self.dict["ManhuaName"] = self.manhuaName
+#         self.dict["Chapter"] = self.chapter
+#         self.dict["ChapterIndex"] = self.chapterIndex
+#         self.dict["ChapterPath"] = self.path
+#         self.dict["ReadTime"] = self.time
         
-    def launchHistory(self):
-        self.historyIndex = self.parent.win_dow.objMainWindow.historyScrollL.layout().indexOf(self)
-        # delete history
-        self.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        self.dict["ReadTime"] = self.time
-        if os.path.exists(self.path) and self.manhuaName in self.parent.win_dow.objMainWindow.library.libraryMetadata:
-            if self.manhuaName != self.parent.win_dow.objReader.currentManhuaName:
-                self.parent.win_dow.objReader.manhuaChanged = True
-            self.parent.setData(self.manhuaName, self.chapterIndex)
-            self.parent.win_dow.objMainWindow.historyScrollL.layout().itemAt(self.historyIndex).widget().deleteLater()
-            self.parent.win_dow.objMainWindow.historyData.pop(self.historyIndex)
-            self.parent.win_dow.objMainWindow.library.launchReader(self.chapterIndex, self.path)
+#     def launchHistory(self):
+#         self.historyIndex = self.parent.win_dow.objMainWindow.historyScrollL.layout().indexOf(self)
+#         # delete history
+#         self.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+#         self.dict["ReadTime"] = self.time
+#         if os.path.exists(self.path) and self.manhuaName in self.parent.win_dow.objMainWindow.library.libraryMetadata:
+#             if self.manhuaName != self.parent.win_dow.objReader.currentManhuaName:
+#                 self.parent.win_dow.objReader.manhuaChanged = True
+#             self.parent.setData(self.manhuaName, self.chapterIndex)
+#             self.parent.win_dow.objMainWindow.historyScrollL.layout().itemAt(self.historyIndex).widget().deleteLater()
+#             self.parent.win_dow.objMainWindow.historyData.pop(self.historyIndex)
+#             self.parent.win_dow.objMainWindow.library.launchReader(self.chapterIndex, self.path)
 
-        else:
-            # pop up for file not found
-            # remove widget from layout and delete from historydata
-            ...
+#         else:
+#             # pop up for file not found
+#             # remove widget from layout and delete from historydata
+#             ...
 
-    def setValues(self, chapter, index, path):
-        self.chapter = chapter
-        self.chapterIndex = index
-        self.path = path
-        self.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        self.labelString = f"{self.manhuaName} - {self.chapter}\n{self.time}"
-        self.dict["Chapter"] = self.chapter
-        self.dict["ChapterIndex"] = self.chapterIndex
-        self.dict["ChapterPath"] = self.path
-        self.dict["ReadTime"] = self.time
-        self.setText(self.labelString)
-
-
-
-        
+#     def setValues(self, chapter, index, path):
+#         self.chapter = chapter
+#         self.chapterIndex = index
+#         self.path = path
+#         self.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+#         self.labelString = f"{self.manhuaName} - {self.chapter}\n{self.time}"
+#         self.dict["Chapter"] = self.chapter
+#         self.dict["ChapterIndex"] = self.chapterIndex
+#         self.dict["ChapterPath"] = self.path
+#         self.dict["ReadTime"] = self.time
+#         self.setText(self.labelString)
+      
 
 class Chapter(QPushButton):
     def __init__(self, sTitle, pTitlePath, index, parent):
@@ -1145,7 +1138,6 @@ class Chapter(QPushButton):
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         self.clicked.connect(lambda: self.parent.launchReader(self.index, self.titlePath))
-
 
 
 class Manhua(QPushButton):

@@ -23,7 +23,7 @@ from PyQt6.QtGui import QCursor, QIcon, QPixmap
 import os
 from pathlib import Path
 
-from mainWindow import History
+# from mainWindow import History
 
 # from themes import Themes
 
@@ -387,21 +387,23 @@ class Reader(QWidget):
             else:
                 if self.currentIndexPath != self.prevPath:
                     self.clearLabels()
-                    
-            time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            if self.manhuaChanged == False:
-                if self.currentIndexPath != self.prevPath:
-                    if self.win_dow.objMainWindow.historyScrollL.layout().count() != 0:   
-                        hisTo = self.win_dow.objMainWindow.historyScrollL.layout().itemAt(0).widget()
-                        hisTo.setValues(self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath)
-                        self.win_dow.objMainWindow.historyData.pop(0)
-                        self.win_dow.objMainWindow.historyData.insert(0, hisTo.dict)
-            else:
-                hisT = History(self.currentDict["ManhuaTitle"], self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath, self, time)
-                self.win_dow.objMainWindow.historyScrollL.insertWidget(0, hisT)
-                # self.win_dow.objMainWindow.history.insert(0, hisT)
-                self.win_dow.objMainWindow.historyData.insert(0, hisT.dict)   
-                self.manhuaChanged = False  
+
+
+            # time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            # if self.manhuaChanged == False:
+            #     if self.currentIndexPath != self.prevPath:
+            #         if self.win_dow.objMainWindow.historyScrollL.layout().count() != 0:   
+            #             hisTo = self.win_dow.objMainWindow.historyScrollL.layout().itemAt(0).widget()
+            #             hisTo.setValues(self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath)
+            #             self.win_dow.objMainWindow.historyData.pop(0)
+            #             self.win_dow.objMainWindow.historyData.insert(0, hisTo.dict)
+            # else:
+            #     hisT = History(self.currentDict["ManhuaTitle"], self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath, self, time)
+            #     self.win_dow.objMainWindow.historyScrollL.insertWidget(0, hisT)
+            #     # self.win_dow.objMainWindow.history.insert(0, hisT)
+            #     self.win_dow.objMainWindow.historyData.insert(0, hisT.dict)   
+            #     self.manhuaChanged = False  
+            
             self.prevPath = self.currentIndexPath
         else:
             self.win_dow.objMainWindow.library.reloadManhuaData(self.manhuaKey, self.currentChapterIndex)
