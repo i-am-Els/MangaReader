@@ -1046,7 +1046,10 @@ class Library(QStackedWidget):
         index =  temp.index(manhuaKey)
         self.deleteManhuaData(manhuaKey, index)
         self.libraryScrollAreaWidget.layout().itemAt(index).widget().deleteLater()
-        self.setCurrentIndex(1)
+        if self.libraryItemLength == 0:
+            self.setCurrentIndex(0)
+        else:
+            self.setCurrentIndex(1)
 
     def deleteManhuaData(self, manhuaKey, index):
         del self.libraryMetadata[manhuaKey]
