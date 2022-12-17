@@ -492,13 +492,11 @@ class MainWindow(QWidget):
         self.loadNoInternetDisplay()
         self.loadNoSearchResult()
         self.loadSearchResultPage()
-        self.loadDescriptionPage()      
 
         self.homeTabStack.addWidget(self.homeDisplay)
         self.homeTabStack.addWidget(self.noInternetDisplay)
         self.homeTabStack.addWidget(self.noSearchResult)
         self.homeTabStack.addWidget(self.searchResultPage)
-        self.homeTabStack.addWidget(self.descriptionPage)
 
         self.homeTabStack.setCurrentIndex(1)
   
@@ -516,8 +514,10 @@ class MainWindow(QWidget):
 
 
         self.noInternetDisplayLabelpix.setSizePolicy(self.sizePolicy) 
-        self.pixPixmap = QPixmap('resources/icons/icons8-without-internet-100.png')
-        self.noInternetDisplayLabelpix.setPixmap(self.pixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
+        #self.pixPixmap = QPixmap('resources/icons/icons8-without-internet-100.png')
+        self.pixPixmap = QPixmap('resources/icons/sammy-no-connection.png')
+        
+        self.noInternetDisplayLabelpix.setPixmap(self.pixPixmap.scaled(250, 250, Qt.AspectRatioMode.KeepAspectRatio))
         self.noInternetDisplayLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.noInternetDisplayLabeltxt.setSizePolicy(self.sizePolicy)
@@ -556,7 +556,7 @@ class MainWindow(QWidget):
 
         self.noSearchResultLabelpix.setSizePolicy(self.sizePolicy) 
         self.spixPixmap = QPixmap('resources/icons/page-not-found.png')
-        self.noSearchResultLabelpix.setPixmap(self.spixPixmap.scaled(50, 50, Qt.AspectRatioMode.KeepAspectRatio))
+        self.noSearchResultLabelpix.setPixmap(self.spixPixmap.scaled(250, 250, Qt.AspectRatioMode.KeepAspectRatio))
         self.noSearchResultLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.noSearchResultLabeltxt.setSizePolicy(self.sizePolicy)
@@ -588,10 +588,6 @@ class MainWindow(QWidget):
 
     def loadSearchResultPage(self):
         self.resultLayout = QGridLayout()
-
-    def loadDescriptionPage(self):
-        self.descriptionLayout = QHBoxLayout()
-        pass
 
     def viewTypeAction(self, gridView):
         if gridView == True:
@@ -650,20 +646,27 @@ class MainWindow(QWidget):
    
     def popDialog(self, type):
         if type == 'empty':
-            txt, t_txt = "Bundle is empty, Please select a filled directory", "Empty Bundle Error"
+            txt, t_txt = "Bundle is empty, Please select a filled directory.", "Empty Bundle Error!"
         elif type == 'structure':
-            txt, t_txt = "There are 2 scenarios that raise this error: Bundle Structure Error or No Image Found\nTip 1: Select a Parent folder that has chapters arranged in sub-folders.\nTip 2: The chapter sub-folders MUST contain images.", "Structure or File Error"
+            txt, t_txt = "There are 2 scenarios that raise this error: Bundle Structure Error or No Image Found\nTip 1: Select a Parent folder that has chapters arranged in sub-folders.\nTip 2: The chapter sub-folders MUST contain images.", "Structure or File Error!"
         elif type == 'badFile':
-            txt, t_txt = "The supposed archive file might contain a bad or corrupted file...\nUnable to completely read archive.", "Bad/Corrupted Archive File"
+            txt, t_txt = "The supposed archive file might contain a bad or corrupted file...\nUnable to completely read archive.", "Bad/Corrupted Archive File!"
         elif type == 'none':
-            txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.zip' files.", "Not an Archive File"
+            txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.zip' files.", "Not an Archive File!"
         elif type == 'duplicate':
-            txt, t_txt = "The manhua title already exists in your library, select another title", "Duplicate Action"
+            txt, t_txt = "The manhua title already exists in your library, select another title.", "Duplicate Action!"
         elif type == 'permission':
-            txt, t_txt = "The system has denied permission to the selected folder.", "Permission Denied"
+            txt, t_txt = "The system has denied permission to the selected folder.", "Permission Denied!"
 
         elif type == 'deletedM':
-            txt, t_txt = "The manhua bundle is no longer on drive. The path might be incorrect or the manhua has been deleted.", "Manhua not found on Drive"
+            txt, t_txt = "The manhua bundle is no longer on drive. The path might be incorrect or the manhua has been deleted. The directory might also be folder-less or has no image in it's structure.", "Manhua not found on Drive!"
+
+        elif type == 'deletedC':
+            txt, t_txt = "The selected Chapter is no longer on drive or Does not contain any image file. It might also be empty. Check the above conditions...", "Unable to read Chapter!"
+
+        elif type == 'deletedI':
+            txt, t_txt = "Image not Found, it must have been deleted just now.", "Missing Image!"
+
         
         messageBox = QMessageBox()
         messageBox.setIcon(QMessageBox.Icon.Information)
@@ -984,17 +987,18 @@ class Library(QStackedWidget):
 
     def openDescription(self, dataDict):
         if os.path.exists(dataDict["ManhuaPath"]):
-            if dataDict["ManhuaTitle"] != self.previousOpen:
-                self.descriptionPage.setData(dataDict)
-                self.descriptionPage.resetChapters()
-                self.win_dow.objReader.setData(dataDict["ManhuaTitle"])
-                self.win_dow.objReader.manhuaChanged = True
-                self.win_dow.objReader.previousManhuaName = self.previousOpen
-                self.previousOpen = dataDict["ManhuaTitle"]
+            #if dataDict["ManhuaTitle"] != self.previousOpen:
+            self.reloadManhuaData(dataDict["ManhuaTitle"])
+            #self.descriptionPage.setData(dataDict)
+            #self.descriptionPage.resetChapters()
+            #self.win_dow.objReader.setData(dataDict["ManhuaTitle"])
+            self.win_dow.objReader.manhuaChanged = True
+            self.win_dow.objReader.previousManhuaName = self.previousOpen
+            self.previousOpen = dataDict["ManhuaTitle"]
             self.setCurrentIndex(2)
         else:
-            self.parent.popDialog("deletedM")#pop up error.
-            ...
+            self.parent.popDialog("deletedM")
+            self.deleteManhua(dataDict["ManhuaTitle"])
 
     def calculateLibraryDimension(self):
         dimensionV = self.geometry().width()
@@ -1018,9 +1022,8 @@ class Library(QStackedWidget):
             self.win_dow.objReader.setFocus()
             self.win_dow.setCurrentIndex(1)
         else:
+            self.parent.popDialog("deletedC")
             self.reloadManhuaData(self.descriptionPage.currentManhua, index)
-            self.parent.popDialog("deletedM")#popup error.
-            ...
 
     def setCover(self, path, manhuaName):
         if os.path.exists(path):
@@ -1029,14 +1032,26 @@ class Library(QStackedWidget):
             index = manhuasData.index(manhuaName)
             self.libraryListdata[index].manhuaCoverPixmap = QPixmap(str(path)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
             self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
+        else:
+            self.parent.popDialog("deletedI")
+            self.libraryMetadata[manhuaName]["ManhuaCover"] = str(self.parent.themeObj.defaultCoverImage)
+            manhuasData = list(self.libraryMetadata.keys())
+            index = manhuasData.index(manhuaName)
+            self.libraryListdata[index].manhuaCoverPixmap = QPixmap(self.parent.themeObj.defaultCoverImage).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+            self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
+            ...
             
     def deleteManhua(self, manhuaKey):
         temp = list(self.libraryMetadata.keys())
         index =  temp.index(manhuaKey)
-        del self.libraryMetadata[manhuaKey]
-        self.libraryListdata.pop(index)
+        self.deleteManhuaData(manhuaKey, index)
         self.libraryScrollAreaWidget.layout().itemAt(index).widget().deleteLater()
         self.setCurrentIndex(1)
+
+    def deleteManhuaData(self, manhuaKey, index):
+        del self.libraryMetadata[manhuaKey]
+        self.libraryListdata.pop(index)
+        self.libraryItemLength = len(self.libraryListdata)
 
     def reloadManhuaData(self, manhuaKey, index=0):
         if os.path.exists(self.libraryMetadata[manhuaKey]["ManhuaPath"]):
@@ -1050,10 +1065,11 @@ class Library(QStackedWidget):
             self.resetSomeDescData(self.libraryMetadata[manhuaKey], index)
             
         else:
-            #popup errro manga deleted, then move back to library.
-            ...
+            self.parent.popDialog("deletedM")
+            self.deleteManhua(manhuaKey)
+            self.setCurrentIndex(1)
 
-    def resetSomeDescData(self, manhuaKey, index=0):
+    def resetSomeDescData(self, manhuaKey: dict, index=0):
         self.descriptionPage.setData(manhuaKey)
         self.descriptionPage.redisplayChapters()
         self.win_dow.objReader.setData(manhuaKey["ManhuaTitle"], index)
@@ -1416,7 +1432,7 @@ class Description(QWidget):
 
         self.selectionLayout.addWidget(self.scrollArea)
 
-    def setData(self, dataDict):
+    def setData(self, dataDict: dict):
         self.dataDict = dataDict
         self.setName(dataDict["ManhuaTitle"])
         self.setCover(dataDict["ManhuaCover"])
@@ -1466,7 +1482,9 @@ class Description(QWidget):
         if os.path.exists(self.dataDict["ManhuaPath"]) and self.chapterLen != 0:
             self.resetChapters()
         else:
-            #popup erro, manga deleted, move to library. "Manga not found on disk"
+            self.parent.parent.popDialog("deletedM")
+            self.parent.deleteManhua(self.dataDict["ManhuaTitle"])
+            self.parent.setCurrentIndex(1)
             ...
 
     def chapterDescListDisplay(self):

@@ -78,6 +78,9 @@ class Preference(QWidget):
         self.initPath = object()
         self.newPath = object()
         
+        self.numCurrent = 0
+        self.numDownloaded = 0
+        self.totalDownloads = 0
         
 
         self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
@@ -566,9 +569,11 @@ class Preference(QWidget):
         self.downloadQueueHeadLabel.setSizePolicy(self.sizePolicy)
         
         # self.downloadQueueHeadLabel.setMaximumHeight(60)
-
-
-        self.downloadQueueStatusLabel = QLabel("Downloading 0 of 0")
+        if self.totalDownloads != 0:
+            percentDone = self.percentDone()
+        else:
+            percentDone = 0
+        self.downloadQueueStatusLabel = QLabel(f"Downloading {self.numCurrent} of {self.totalDownloads} : {percentDone}% Done")
         self.downloadQueueStatusLabel.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.downloadQueueStatusLabel.setSizePolicy(self.sizePolicy)
 
@@ -599,7 +604,7 @@ class Preference(QWidget):
         self.downloadQueueLayout.setContentsMargins(0, 0, 0, 0)
 
 
-        self.compressArchiveLabel = QLabel("Compress Downloads to Archive File To cbz")
+        self.compressArchiveLabel = QLabel("Compress Downloads to Archive File *.cbz")
         self.compressArchiveLabel.setSizePolicy(self.sizePolicy)
         
         # self.compressArchiveLabel.setMaximumHeight(60)
@@ -691,6 +696,9 @@ class Preference(QWidget):
         self.themesLayout.addLayout(self.spaceEL)
 
         self.themesBtn.clicked.connect(lambda: self.setWindowTheme(self.themesBtn))
+
+    def percentDone(self):
+        return ((self.numDownloaded/self.totalDownloads) * 100 )
 
     def convertToPath(self, path):
         path_n = Path(path)
