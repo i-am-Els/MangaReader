@@ -17,124 +17,128 @@
 
 
 from pathlib import Path
-import os
+import os, consts
 
 class Settings(object):
-    def __init__(self, obj):
-        super().__init__()
-        self.obj = obj
-        self.objM = self.obj.objMainWindow
-        self.objP = self.obj.objPref
-        self.objR = self.obj.objReader
+    obj = object()
+    objM = object()
+    objP = object()
+    objR = object()
 
-        self.picklePath = str(os.path.join(Path.home(), "Manhua Reader"))
+    picklePath = str(os.path.join(Path.home(), "Manhua Reader"))
+            
+    libraryInitPath = "C:\\"
+    libraryNewPath = libraryInitPath
+    localManhuaTitleDict = dict()
 
-        if not os.path.exists(self.picklePath):
-            os.makedirs(self.picklePath)
+    updateChapter = True
+    updateOther = True
+    hideNav = True
+    fsState = False
+    readerDisplayIndex = 1
 
+    compressionState = True
+
+    themeIndex = consts.E_THEME_LIGHT_MODE
+    themeButtonState = False
+
+    downloadInitPath = str(os.path.join(Path.home(), "Documents\\Manhua Reader\\downloads\\"))
+
+    downloadNewPath = downloadInitPath
+
+    extractionInitPath = str(os.path.join(Path.home(), "Documents\\Manhua Reader\\archives\\"))
+
+    extractionNewPath = extractionInitPath
+    apiName = ['Asura Scan', 'Mangabat', 'HolyManga']
+    apiIndex = 1
+
+    def init() -> None: 
+        if not os.path.exists(Settings.picklePath):
+            os.makedirs(Settings.picklePath)
         
-        self.libraryInitPath = "C:\\"
-        self.libraryNewPath = self.libraryInitPath
-        self.localManhuaTitleDict = dict()
+        if not os.path.exists(Settings.downloadInitPath):
+            os.makedirs(Settings.downloadInitPath)
+
+        if not os.path.exists(Settings.extractionInitPath):
+            os.makedirs(Settings.extractionInitPath)
+
+    def initObjs(obj: object) -> None:
+        Settings.obj = obj
+        Settings.objM = obj.objMainWindow
+        Settings.objR = obj.objReader
+        Settings.objP = obj.objPref
 
 
+    def setMainWindowVariables() -> None:
+        Settings.objM.initPath = Settings.libraryInitPath
 
-        self.updateChapter = True
-        self.updateOther = True
-        self.hideNav = True
-        self.fsState = False
-        self.readerDisplayIndex = 1
+        Settings.objM.newPath = Settings.libraryNewPath
 
-        self.compressionState = True
+        Settings.objM.apiName = Settings.apiName
+        Settings.objM.apiIndex = Settings.apiIndex
+        Settings.objM.localManhuaTitleDict = Settings.localManhuaTitleDict
+
+    def setPrefVariables() -> None:
+        Settings.objP.compressionState = Settings.compressionState
+
+        Settings.objP.updateChapter = Settings.updateChapter
+
+        Settings.objP.updateOther = Settings.updateOther
+
+        Settings.objP.themeButtonState = Settings.themeButtonState
+
+        Settings.objP.hideNav = Settings.hideNav
+
+        Settings.objP.fsState = Settings.fsState
+
+        Settings.objP.readerDisplayIndex = Settings.readerDisplayIndex
+
+        Settings.objP.initPath = Settings.downloadInitPath
+
+        Settings.objP.newPath = Settings.downloadNewPath
+
+        Settings.objP.initReaderState = [Settings.readerDisplayIndex, Settings.hideNav, Settings.fsState]
+
+    def setReaderInits() -> None:
+        Settings.objR.hideNav = Settings.hideNav
+
+        Settings.objR.fsState = Settings.fsState
+
+        Settings.objR.readerDisplayIndex = Settings.readerDisplayIndex
+        Settings.objR.initReaderState = [Settings.readerDisplayIndex, Settings.hideNav, Settings.fsState]
+
+    def setObjMState() -> None:
+        Settings.apiIndex = Settings.objM.apiIndex
+        Settings.objM.apiButton.setText(Settings.apiName[Settings.apiIndex])
+
+    def setStates() -> None:
+        Settings.setMainWindowVariables()
+        Settings.setPrefVariables()
+        Settings.setReaderInits()
+        Settings.objR.selfInit()
+
+        Settings.objM.apiCombo.addItems(Settings.apiName)
+
+        Settings.objM.apiIndex = Settings.apiIndex
+        Settings.setObjMState()
+
+        Settings.objM.apiCombo.setCurrentIndex(Settings.objM.apiIndex)
+        if Settings.apiIndex == 0:
+            Settings.objM.setApiIndex(Settings.apiIndex)
         
-        self.themeIndex = 0
-        self.themeButtonState = False
+        Settings.objP.downloadDirPathDisplay.setText(str(Settings.downloadNewPath))
 
-        self.downloadInitPath = str(os.path.join(Path.home(), "Documents\\Manhua Reader\\downloads\\"))
-        if not os.path.exists(self.downloadInitPath):
-            os.makedirs(self.downloadInitPath)
+        Settings.objP.compressArchiveToggleBtn.setChecked(Settings.objP.compressionState)
 
-        self.downloadNewPath = self.downloadInitPath
+        Settings.objP.toggleOne.setChecked(Settings.objP.updateChapter)
 
-        self.extractionInitPath = str(os.path.join(Path.home(), "Documents\\Manhua Reader\\archives\\"))
-        if not os.path.exists(self.extractionInitPath):
-            os.makedirs(self.extractionInitPath)
+        Settings.objP.toggleTwo.setChecked(Settings.objP.updateOther)
 
-        self.extractionNewPath = self.extractionInitPath
+        Settings.objP.readerNavtoggle.setChecked(Settings.objP.hideNav)
 
-        self.apiName = ['Asura Scan', 'Mangabat', 'HolyManga']
-        self.apiIndex = 1
-        
-    def setMainWindowVariables(self):
-        self.objM.initPath = self.libraryInitPath
+        Settings.objP.readerFStoggle.setChecked(Settings.objP.fsState)
 
-        self.objM.newPath = self.libraryNewPath
+        Settings.objP.readerDisplayList[Settings.objP.readerDisplayIndex].setChecked(True)
 
-        self.objM.apiName = self.apiName
-        self.objM.apiIndex = self.apiIndex
-        self.objM.localManhuaTitleDict = self.localManhuaTitleDict
-
-    def setPrefVariables(self):
-        self.objP.compressionState = self.compressionState
-
-        self.objP.updateChapter = self.updateChapter
-
-        self.objP.updateOther = self.updateOther
-
-        self.objP.themeButtonState = self.themeButtonState
-
-        self.objP.hideNav = self.hideNav
-
-        self.objP.fsState = self.fsState
-
-        self.objP.readerDisplayIndex = self.readerDisplayIndex
-
-        self.objP.initPath = self.downloadInitPath
-
-        self.objP.newPath = self.downloadNewPath
-
-        self.objP.initReaderState = [self.readerDisplayIndex, self.hideNav, self.fsState]
-
-    def setReaderInits(self):
-        self.objR.hideNav = self.hideNav
-
-        self.objR.fsState = self.fsState
-
-        self.objR.readerDisplayIndex = self.readerDisplayIndex
-        self.objR.initReaderState = [self.readerDisplayIndex, self.hideNav, self.fsState]
-
-    def setObjMState(self):
-        self.apiIndex = self.objM.apiIndex
-        self.objM.apiButton.setText(self.apiName[self.apiIndex])
-
-    def setStates(self):
-        self.setMainWindowVariables()
-        self.setPrefVariables()
-        self.setReaderInits()
-        self.objR.selfInit()
-
-        self.objM.apiCombo.addItems(self.apiName)
-
-        self.objM.apiIndex = self.apiIndex
-        self.setObjMState()
-
-        self.objM.apiCombo.setCurrentIndex(self.objM.apiIndex)
-        if self.apiIndex == 0:
-            self.objM.setApiIndex(self.apiIndex)
-        
-        self.objP.downloadDirPathDisplay.setText(str(self.downloadNewPath))
-
-        self.objP.compressArchiveToggleBtn.setChecked(self.objP.compressionState)
-
-        self.objP.toggleOne.setChecked(self.objP.updateChapter)
-
-        self.objP.toggleTwo.setChecked(self.objP.updateOther)
-
-        self.objP.readerNavtoggle.setChecked(self.objP.hideNav)
-
-        self.objP.readerFStoggle.setChecked(self.objP.fsState)
-
-        self.objP.readerDisplayList[self.objP.readerDisplayIndex].setChecked(True)
-
-        self.objP.themesBtn.setChecked(self.objP.themeButtonState)
+        Settings.objP.themesBtn.setChecked(Settings.objP.themeButtonState)
         

@@ -37,3 +37,8 @@ Find a way to create a standard and working history model...
 
 ## External
 Show ***"Open folder as Bundle in ManhuaReader"*** among other options upon folder rightclick...
+
+## Internal & serializing
+* Create a `config.bin` file for serialization upon first load, and read from it upon every other loads of the program. Pickle your data into it upon every exit of the program and pickle from it upon every start up. If deleted from it's program directory, recreate one with the default configs.
+
+* Have a seperate file for pickling metadata from and into.

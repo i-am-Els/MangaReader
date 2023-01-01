@@ -15,23 +15,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-
-from datetime import datetime
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, QSizePolicy, QScrollArea
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QPixmap
-import os
+import os, consts, resources
+from themes import Themes
+from linker import Link 
 from pathlib import Path
 
-# from mainWindow import History
-
-# from themes import Themes
-
 class Reader(QWidget):
-    def __init__(self, obj, win_dow):
-        super().__init__()
-        self.obj = obj
-        self.win_dow = win_dow
+    def __init__(self, parent: QWidget) -> None:
+        super().__init__(parent)
         self.imageList = []
         self.imageCurrent = int()
         self.currentDict = dict()
@@ -45,14 +39,11 @@ class Reader(QWidget):
         self.prevPath = ''
         self.manhuaKey = ""
         self.manhuaChanged =  False
-        self.themeObj = object()
-        self.setting = object()
-        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         self.max_button_size = QSize(36, 36)
         self.min_button_size = QSize(36, 36)
         self.icon_size = QSize(20, 20)
-        self.themeIndex = object()
 
         self.ifSameChapter = False
 
@@ -62,36 +53,35 @@ class Reader(QWidget):
         self.initReaderState = []
         self.majorLayout = QVBoxLayout()
 
-    def setData(self, data, index=0):
-        
-        self.currentDict = self.win_dow.objMainWindow.library.libraryMetadata[data]
+    def setData(self, data: str, index: int = 0) -> None:
+        self.currentDict: dict = Link.fetchAttribute(consts.OBJ_LIB_NAME, "libraryMetadata")[data]
         self.currentManhuaName = data
         self.currentManhuaPath = self.currentDict["ManhuaPath"] 
         self.currentChapterIndex = index
         self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex]))      
-        self.currentManhuaChapterLen = len(os.listdir(self.currentManhuaPath))
+        self.currentManhuaChapterLen = len(self.currentDict["Chapters"])
         self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
 
-    def backAction(self):
-        self.win_dow.objMainWindow.setFocus()
+    def backAction(self) -> None:
+        Link.callBack(consts.OBJ_MW_NAME, "setFocus")
         self.previousManhuaName = self.currentManhuaName
-        self.obj.talkToStackWidgetIndex(0, self.win_dow)
+        Link.callBack(consts.OBJ_WINDOW, "changeStackIndex", consts.E_WINDOW_STACK_MW)
 
-    def calLabelSize(self):
-        if self.win_dow.currentIndex() == 1 and self.readerDisplayIndex == 1:
+    def calLabelSize(self) -> None:
+        if Link.fetchAttribute(consts.OBJ_WINDOW, "currentIndex", True) == consts.E_WINDOW_STACK_READER and self.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
             self.reScaleMLabel()
 
-    def setState(self, state):
+    def setState(self, state: list) -> None:
         self.readerDisplayIndex = state[0]
         self.hideNav = state[1]
         self.fsState = state[2]
         self.initReaderState = state
 
-    def selfInit(self):
+    def selfInit(self) -> None:
         self.majorWidget = QWidget()
         self.setLayout(self.majorLayout)
         self.mainLayout = QHBoxLayout()
-        if self.readerDisplayIndex == 1:
+        if self.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
             self.scrollingLayoutInit()
         else:
             self.pagingLayoutInit()
@@ -99,17 +89,17 @@ class Reader(QWidget):
         self.majorLayout.addWidget(self.majorWidget)
         self.majorWidget.setLayout(self.mainLayout)
 
-    def scrollingLayoutInit(self):
+    def scrollingLayoutInit(self) -> None:
         self.leftLayout = QVBoxLayout()
         self.backButton = QPushButton()
-        self.backButton.setObjectName("backButton")
-        self.backButton.setSizePolicy(self.sizePolicy)
+        self.backButton.setObjectName(consts.OBJ_READER_BACK_BTN)
+        self.backButton.setSizePolicy(self.size_policy)
         self.backButton.setMinimumSize(self.min_button_size)
         self.backButton.setMaximumSize(self.max_button_size)
         self.backButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.backButton.setGeometry(0, 0, 36, 36)
         self.backButton.setToolTip("Return to Description Page")
-        self.backButton.setToolTipDuration(3000)
+        self.backButton.setToolTipDuration(consts.TOOLTIP_DURATION)
 
         self.backIcon = QIcon()
         self.backButton.setIconSize(self.icon_size)
@@ -143,14 +133,14 @@ class Reader(QWidget):
 
         self.rightLayout = QVBoxLayout()
         self.setToCoverButton = QPushButton()
-        self.setToCoverButton.setObjectName("setToCoverButton")
-        self.setToCoverButton.setSizePolicy(self.sizePolicy)
+        self.setToCoverButton.setObjectName(consts.OBJ_READER_SET_TO_COVER_BTN)
+        self.setToCoverButton.setSizePolicy(self.size_policy)
         self.setToCoverButton.setMinimumSize(self.min_button_size)
         self.setToCoverButton.setMaximumSize(self.max_button_size)
         self.setToCoverButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.setToCoverButton.setGeometry(0, 0, 36, 36)
         self.setToCoverButton.setToolTip("Set Current Image as Manhua Cover")
-        self.setToCoverButton.setToolTipDuration(3000)
+        self.setToCoverButton.setToolTipDuration(consts.TOOLTIP_DURATION)
 
         self.setToCoverIcon = QIcon()
         self.setToCoverButton.setIconSize(self.icon_size)
@@ -169,28 +159,28 @@ class Reader(QWidget):
         self.backButton.clicked.connect(lambda: self.backAction())
         self.setToCoverButton.clicked.connect(lambda: self.setToCoverAction())
 
-    def pagingLayoutInit(self):
+    def pagingLayoutInit(self) -> None:
         self.leftLayout = QVBoxLayout()
         self.leftDummyLayout = QVBoxLayout()
         self.backLayout = QVBoxLayout()
         self.previousLayout = QVBoxLayout()
         self.backButton = QPushButton()
-        self.backButton.setObjectName("backButton")
-        self.backButton.setSizePolicy(self.sizePolicy)
+        self.backButton.setObjectName(consts.OBJ_READER_BACK_BTN)
+        self.backButton.setSizePolicy(self.size_policy)
         self.backButton.setMinimumSize(self.min_button_size)
         self.backButton.setMaximumSize(self.max_button_size)
         self.backButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.backButton.setGeometry(0, 0, 36, 36)
         self.backButton.setToolTip("Return to Description Page")
-        self.backButton.setToolTipDuration(3000)
+        self.backButton.setToolTipDuration(consts.TOOLTIP_DURATION)
 
         self.backIcon = QIcon()
         self.backButton.setIconSize(self.icon_size)
         self.backButton.setCheckable(True)
 
         self.previousButton = QPushButton()
-        self.previousButton.setObjectName("previousButton")
-        self.previousButton.setSizePolicy(self.sizePolicy)
+        self.previousButton.setObjectName(consts.OBJ_READER_PREVIOUS_BTN)
+        self.previousButton.setSizePolicy(self.size_policy)
         self.previousButton.setMinimumSize(self.min_button_size)
         self.previousButton.setMaximumSize(self.max_button_size)
         self.previousButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
@@ -237,8 +227,8 @@ class Reader(QWidget):
         self.nextLayout = QVBoxLayout()
         self.setToCoverLayout = QVBoxLayout()
         self.nextButton = QPushButton()
-        self.nextButton.setObjectName("nextButton")
-        self.nextButton.setSizePolicy(self.sizePolicy)
+        self.nextButton.setObjectName(consts.OBJ_READER_NEXT_BTN)
+        self.nextButton.setSizePolicy(self.size_policy)
         self.nextButton.setMinimumSize(self.min_button_size)
         self.nextButton.setMaximumSize(self.max_button_size)
         self.nextButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
@@ -249,14 +239,14 @@ class Reader(QWidget):
         self.nextButton.setCheckable(True)
 
         self.setToCoverButton = QPushButton()
-        self.setToCoverButton.setObjectName("setToCoverButton")
-        self.setToCoverButton.setSizePolicy(self.sizePolicy)
+        self.setToCoverButton.setObjectName(consts.OBJ_READER_SET_TO_COVER_BTN)
+        self.setToCoverButton.setSizePolicy(self.size_policy)
         self.setToCoverButton.setMinimumSize(self.min_button_size)
         self.setToCoverButton.setMaximumSize(self.max_button_size)
         self.setToCoverButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.setToCoverButton.setGeometry(0, 0, 36, 36)
         self.setToCoverButton.setToolTip("Set Current Image as Manhua Cover")
-        self.setToCoverButton.setToolTipDuration(3000)
+        self.setToCoverButton.setToolTipDuration(consts.TOOLTIP_DURATION)
 
         self.setToCoverIcon = QIcon()
         self.setToCoverButton.setIconSize(self.icon_size)
@@ -292,56 +282,55 @@ class Reader(QWidget):
         self.nextButton.clicked.connect(lambda: self.nextAction(self.readerDisplayIndex))
         self.setToCoverButton.clicked.connect(lambda: self.setToCoverAction())
 
-    def updateLayout(self):
+    def updateLayout(self) -> None:
         self.majorWidget.deleteLater()
         self.selfInit()
-        self.themeObj.readerStyle(self, self.readerDisplayIndex)
+        Themes.readerStyle(self.readerDisplayIndex)
 
-    def previousAction(self, typeIndex):
-        if typeIndex == 0:
+    def previousAction(self, typeIndex: int) -> None:
+        if typeIndex == consts.E_RADIO_SELECTED_LTR:
             if self.imageCurrent > 0:
                 self.imageCurrent -= 1
                 self.setImageToLabel(self.imageCurrent)
-        elif typeIndex == 2:
+        elif typeIndex == consts.E_RADIO_SELECTED_RTL:
             if self.imageCurrent < (len(self.imageList) - 1):
                 self.imageCurrent += 1
                 self.setImageToLabel(self.imageCurrent)
     
-    def nextAction(self, typeIndex):
-        if typeIndex == 0:
+    def nextAction(self, typeIndex: int) -> None:
+        if typeIndex == consts.E_RADIO_SELECTED_LTR:
             if self.imageCurrent < (len(self.imageList) - 1):
                 self.imageCurrent += 1
                 self.setImageToLabel(self.imageCurrent)
-        elif typeIndex == 2:
+        elif typeIndex == consts.E_RADIO_SELECTED_RTL:
             if self.imageCurrent > 0:
                 self.imageCurrent -= 1
                 self.setImageToLabel(self.imageCurrent)
 
-    def prevChapter(self):
+    def prevChapter(self) -> None:
         if self.currentChapterIndex > 0:
             currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex - 1]))
-            if os.path.exists(currentIndexPath) and len(os.listdir(currentIndexPath)) != 0:
+            if os.path.exists(currentIndexPath) and len(os.listdir(currentIndexPath)) != consts.EMPTY:
                 self.currentChapterIndex -= 1
                 self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
                 self.loadChapterPages(self.currentChapterIndex)
             else:
-                self.win_dow.objMainWindow.library.reloadManhuaData(self.manhuaKey, self.currentChapterIndex - 1)
+                Link.callBack(consts.OBJ_LIB_NAME, "reloadManhuaData", self.manhuaKey, (self.currentChapterIndex - 1))
                 self.prevChapter()
 
-    def nextChapter(self):
+    def nextChapter(self) -> None:
         if self.currentChapterIndex < (self.currentManhuaChapterLen - 1):
             currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex + 1]))
-            if os.path.exists(currentIndexPath) and len(os.listdir(currentIndexPath)) != 0:
+            if os.path.exists(currentIndexPath) and len(os.listdir(currentIndexPath)) != consts.EMPTY:
                 self.currentChapterIndex += 1
                 self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
                 self.loadChapterPages(self.currentChapterIndex)
             else:
-                self.win_dow.objMainWindow.library.reloadManhuaData(self.manhuaKey, self.currentChapterIndex)
+                Link.callBack(consts.OBJ_LIB_NAME, "reloadManhuaData", self.manhuaKey, self.currentChapterIndex)
                 self.nextChapter()
 
-
-    def setToCoverAction(self):
-        if self.readerDisplayIndex == 1:
+    def setToCoverAction(self) -> None:
+        if self.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
             n = len(self.imageList)
             v = self.screenScrollArea.verticalScrollBar().value()
             max = self.screenScrollArea.verticalScrollBar().maximum()
@@ -349,14 +338,14 @@ class Reader(QWidget):
             x = int((p/100) * n)
             if x < n:
                 imagePath = str(self.currentIndexPath) + "\\" + self.imageList[x]
-                self.win_dow.objMainWindow.library.setCover(imagePath, self.manhuaKey)
-                self.win_dow.objMainWindow.library.descriptionPage.setCover(imagePath)
+                Link.callBack(consts.OBJ_LIB_NAME, "setCover", imagePath, self.manhuaKey)
+                Link.callBackDeep(consts.OBJ_LIB_NAME, "descriptionPage", "setCover", imagePath)
         else:
             imagePath = str(self.currentIndexPath)  + "\\" + self.imageList[self.imageCurrent]
-            self.win_dow.objMainWindow.library.setCover(imagePath, self.manhuaKey)
-            self.win_dow.objMainWindow.library.descriptionPage.setCover(imagePath)
+            Link.callBack(consts.OBJ_LIB_NAME, "setCover", imagePath, self.manhuaKey)
+            Link.callBackDeep(consts.OBJ_LIB_NAME, "descriptionPage", "setCover", imagePath)
 
-    def setChapterLabels(self):
+    def setChapterLabels(self) -> None:
         self.screenScrollArea = QScrollArea()
         self.screenScrollArea.setWidgetResizable(True)
         self.screenScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -372,7 +361,7 @@ class Reader(QWidget):
         self.manhuaLayout.setSpacing(0)
         self.screenScrollAreaLayout.addWidget(self.screenScrollArea)
 
-    def loadChapterPages(self, index):
+    def loadChapterPages(self, index: int) -> None:
         self.setFocus()
         self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[index])) 
         if os.path.exists(self.currentIndexPath):
@@ -382,40 +371,22 @@ class Reader(QWidget):
             self.imageList = []
             self.loadImageList()       
             self.imageCurrent = 0
-            if self.readerDisplayIndex != 1:
+            if self.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
                 self.setImageToLabel(self.imageCurrent)
             else:
                 if self.currentIndexPath != self.prevPath:
                     self.clearLabels()
-
-
-            # time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            # if self.manhuaChanged == False:
-            #     if self.currentIndexPath != self.prevPath:
-            #         if self.win_dow.objMainWindow.historyScrollL.layout().count() != 0:   
-            #             hisTo = self.win_dow.objMainWindow.historyScrollL.layout().itemAt(0).widget()
-            #             hisTo.setValues(self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath)
-            #             self.win_dow.objMainWindow.historyData.pop(0)
-            #             self.win_dow.objMainWindow.historyData.insert(0, hisTo.dict)
-            # else:
-            #     hisT = History(self.currentDict["ManhuaTitle"], self.currentChapterKey, self.currentChapterIndex, self.currentIndexPath, self, time)
-            #     self.win_dow.objMainWindow.historyScrollL.insertWidget(0, hisT)
-            #     # self.win_dow.objMainWindow.history.insert(0, hisT)
-            #     self.win_dow.objMainWindow.historyData.insert(0, hisT.dict)   
-            #     self.manhuaChanged = False  
-            
             self.prevPath = self.currentIndexPath
         else:
-            self.win_dow.objMainWindow.library.reloadManhuaData(self.manhuaKey, self.currentChapterIndex)
+            Link.callBack(consts.OBJ_LIB_NAME, "reloadManhuaData", self.manhuaKey, self.currentChapterIndex)
 
-    def loadImageList(self):
+    def loadImageList(self) -> None:
         if os.path.exists(self.currentIndexPath):
             for x in os.listdir(self.currentIndexPath):
-                if Path(x).suffix in ['.jpeg', '.jpg', '.png']:
+                if Path(x).suffix in consts.IMG_EXT_LIST:
                     self.imageList.append(str(x))
 
-
-    def reScaleMLabel(self):
+    def reScaleMLabel(self) -> None:
         self.setFocus()
         for i in range(self.manhuaLayout.count()):
             layout = self.manhuaLayout.layout()
@@ -424,22 +395,22 @@ class Reader(QWidget):
                 pix = item.pixmap()
                 item.setPixmap(pix.scaledToWidth(self.screenScrollAreaW.width(), Qt.TransformationMode.SmoothTransformation))
 
-    def setImageToLabel(self, index):
+    def setImageToLabel(self, index: int) -> None:
         path = str(self.currentIndexPath) + "\\" + str(self.imageList[index])
         if os.path.exists(path):
             self.manhuaLabel.setPixmap(QPixmap(path))
         else:
             self.imageList.clear()
             self.loadImageList()
-            if len(self.imageList) != 0:
+            if len(self.imageList) != consts.EMPTY:
                 self.imageCurrent = 0
                 self.setImageToLabel(self.imageCurrent)
             else:
-                self.win_dow.objMainWindow.library.descriptionPage.redisplayChapters()
-                self.win_dow.setCurrentIndex(0)
-                self.win_dow.objMainWindow.library.setCurrentIndex(2)
+                Link.callBackDeep(consts.OBJ_LIB_NAME, "descriptionPage", "redisplayChapters")
+                Link.callBack(consts.OBJ_WINDOW, "setCurrentIndex", consts.E_WINDOW_STACK_MW)
+                Link.callBack(consts.OBJ_LIB_NAME, "setCurrentIndex", consts.E_TAB_LIBRARY_DESCRIPTION_PAGE)
 
-    def setScrollLabelImages(self):
+    def setScrollLabelImages(self) -> None:
         self.setFocus()
         for x in self.imageList: 
             path = str(self.currentIndexPath) + "\\" + str(x)
@@ -450,25 +421,25 @@ class Reader(QWidget):
                 self.imageList.remove(x)
         self.screenScrollArea.verticalScrollBar().setMaximum(100)
 
-    def clearLabels(self):
+    def clearLabels(self) -> None:
         self.screenScrollArea.deleteLater()
         self.setChapterLabels()
-        self.themeObj.readerStyle(self, self.readerDisplayIndex)
+        Themes.readerStyle(self.readerDisplayIndex)
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event) -> None:
         if self.hideNav:
-            if self.win_dow.currentIndex() == 1: 
-                if event.key() == Qt.Key.Key_A and self.readerDisplayIndex != 1:
-                    if self.readerDisplayIndex == 0:
-                        self.previousAction(0)
+            if Link.fetchAttribute(consts.OBJ_WINDOW, "currentIndex", True) == consts.E_WINDOW_STACK_READER: 
+                if event.key() == Qt.Key.Key_A and self.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
+                    if self.readerDisplayIndex == consts.E_RADIO_SELECTED_LTR:
+                        self.previousAction(consts.E_RADIO_SELECTED_LTR)
                     else:
-                        self.previousAction(2)
+                        self.previousAction(consts.E_RADIO_SELECTED_RTL)
 
-                elif event.key() == Qt.Key.Key_D and self.readerDisplayIndex != 1:
-                    if self.readerDisplayIndex == 0:
-                        self.nextAction(0)
+                elif event.key() == Qt.Key.Key_D and self.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
+                    if self.readerDisplayIndex == consts.E_RADIO_SELECTED_LTR:
+                        self.nextAction(consts.E_RADIO_SELECTED_LTR)
                     else:
-                        self.nextAction(2)
+                        self.nextAction(consts.E_RADIO_SELECTED_RTL)
 
                 elif event.key() == Qt.Key.Key_Q:
                     self.prevChapter()
@@ -477,7 +448,7 @@ class Reader(QWidget):
                     self.nextChapter()
 
     class ImageLabel(QLabel):
-        def __init__(self, path, width):
+        def __init__(self, path: str | Path, width: int):
             super().__init__()
             self.path = path
             self.width = width

@@ -18,40 +18,43 @@
 
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QMainWindow, QSizePolicy
 from PyQt6.QtCore import QSize, Qt
-import sys, creator, ctypes
+from PyQt6.QtGui import QIcon
+import sys, create, ctypes, consts
 from themes import WindowTitleBar, MoveableWindow
+from linker import Link
 
-def setTaskBarIcon():
-    myappid = u"El's.native_app.manhua_reader.v1.0.01" # arbitrary string
+def setTaskBarIcon() -> None:
+    myappid = u"El's.native_app.manhua_reader.v1.0.21" # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 
 class  App(QMainWindow):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint|Qt.WindowType.WindowMaximizeButtonHint|Qt.WindowType.WindowMinimizeButtonHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.titleCustom = self.selfTitle = "Manhua Reader"
+        self.title: str = consts.APP_NAME
 
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         self.appLayout = QVBoxLayout()
         self.appWidget = QWidget()
 
-        self.stWindow = creator.Window(self)
+        self.stWindow = create.Window()
+
         self.stWindowLayout = QVBoxLayout()
         self.stWindowLayout.addWidget(self.stWindow)
 
-        self.customTitleBar = WindowTitleBar(self, self.titleCustom, self.stWindow)
+        self.customTitleBar = WindowTitleBar(self, self.title, self.stWindow)
         self.cLayout = QVBoxLayout()
         self.cWidget = MoveableWindow(self, self.stWindow)
         self.cWidget.setSizePolicy(sizePolicy)
-        self.cWidget.setFixedHeight(30)
+        self.cWidget.setFixedHeight(consts.C_W_HEIGHT)
         self.cWidget.refIcon = self.customTitleBar.restoreIcon
         self.cWidget.refIconIcon = self.customTitleBar.restoreIconIcon
         
         self.cWidget.setLayout(self.customTitleBar)
-        self.cWidget.setMaximumHeight(30)
+        self.cWidget.setMaximumHeight(consts.C_W_HEIGHT)
         self.cWidget.setStyleSheet("QWidget{background-color: rgba(72, 75, 106, 0.65); color: white;}")
         self.cLayout.addWidget(self.cWidget)
         self.cLayout.setSpacing(0)
@@ -66,18 +69,15 @@ class  App(QMainWindow):
 
         self.appLayout.setContentsMargins(0,0,0,0)
 
-        self.appWidget.setLayout(self.appLayout)
-
-        # self.setWindowIcon(stWindow.windowIcon)
-        
+        self.appWidget.setLayout(self.appLayout)        
         
         self.setCentralWidget(self.appWidget)
 
-        self.min_screen_width = 1092
-        self.min_screen_height = 614
+        self.setMinimumSize(QSize(consts.MIN_SCREEN_WIDTH, consts.MIN_SCREEN_HEIGHT))
+        self.setWindowTitle(self.title)
 
-        self.setMinimumSize(QSize(self.min_screen_width, self.min_screen_height))
-        self.setWindowTitle(self.selfTitle)
+    def getWindowIcon(self) -> QIcon:
+        return self.stWindow.window_icon
 
         
 
@@ -85,14 +85,18 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
 
-    app.setOrganizationName("El's")
-    app.setOrganizationDomain("els.ng")
-    app.setApplicationName("Manhua Reader")
+    app.setOrganizationName(consts.ORG_NAME)
+    app.setOrganizationDomain(consts.APP_DOMAIN)
+    app.setApplicationName(consts.APP_NAME)
     
 
     setTaskBarIcon()
+    global appWindow 
     appWindow = App()
-    app.setWindowIcon(appWindow.stWindow.windowIcon)
+
+    Link.setAppWindow(appWindow)
+
+    app.setWindowIcon(appWindow.getWindowIcon())
     appWindow.showMaximized()
 
     sys.exit(app.exec())

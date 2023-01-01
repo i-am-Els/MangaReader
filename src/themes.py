@@ -16,7 +16,6 @@
 
 
 # from pathlib import Path
-# from color import Color
 
 from PyQt6.QtCore import QPoint, QPointF, Qt, QRect, QSize
 
@@ -24,22 +23,31 @@ from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush, QCursor,
 
 from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QWidget, QSizePolicy, QVBoxLayout
 
+import consts, resources
+from linker import Link
+from settings import Settings
+
 class Themes:
-    def __init__(self, obj):
-        self.obj = obj    
-        self.themeIndex = int()    
-        self.prevObjButton = 0;
-        self.prefSelectedButtonIndex = 0
-        self.prefButtonList = [self.obj.objPref.settingsButton, self.obj.objPref.downloadButton, self.obj.objPref.themesButton]
+    objM = object()
+    objP = object()
+    objR = object()
+    prevObjButton = object()
+    prefSelectedButtonIndex = 0
+    prefButtonList = list()
+    style = str()
 
-        self.defaultCoverImage = "resources/logo/thumbnailCoverless.png"
-        self.defaultCoverPixmap = QPixmap(self.defaultCoverImage).scaled(60, 80, Qt.AspectRatioMode.KeepAspectRatio)
-        # self.objP.spaceE.setPixmap(self.objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
-        self.scrollbarStyleLight = "QScrollArea { background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QScrollBar:vertical { width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;} QScrollBar::handle:vertical { background: rgb(128, 128, 128); min-height:0px; border-radius: 3px;} QScrollBar::add-line:vertical { background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical {  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }"
+    # self.Themes.objP.spaceE.setPixmap(self.Themes.objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
+    scrollbarStyleLight = "QScrollArea { background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QScrollBar:vertical { width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;} QScrollBar::handle:vertical { background: rgb(128, 128, 128); min-height:0px; border-radius: 3px;} QScrollBar::add-line:vertical { background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical {  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }"
 
-    def prefButtonActiveLight(self, obj, indexB):
-        if type(self.prevObjButton) == QPushButton:
-            self.prevObjButton.setStyleSheet(
+    def themeInit() -> None:
+        Themes.objM = Link.typeTest(consts.OBJ_MW_NAME)
+        Themes.objR = Link.typeTest(consts.OBJ_READER_NAME)
+        Themes.objP = Link.typeTest(consts.OBJ_PREF_NAME)
+        Themes.prefButtonList = [Themes.objP.settingsButton, Themes.objP.downloadButton, Themes.objP.themesButton]
+
+    def prefButtonActiveLight(obj, indexB: int) -> None:
+        if type(Themes.prevObjButton) == QPushButton:
+            Themes.prevObjButton.setStyleSheet(
                 "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250, 250, 250);} QPushButton:hover { color:white; background-color:rgb(210, 211, 219);} #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}")
         else:
             pass
@@ -47,14 +55,14 @@ class Themes:
         obj.setStyleSheet(
             "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210, 211, 219);}#backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
         )
-        self.prefButtonList[indexB].setStyleSheet(
+        Themes.prefButtonList[indexB].setStyleSheet(
             "QPushButton { color:white;background-color:rgb(147, 148, 165); } #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
         )
 
-        self.prevObjButton = self.prefButtonList[indexB]
+        Themes.prevObjButton = Themes.prefButtonList[indexB]
 
-    def lightMode(self, obj):
-        style ="""
+    def lightMode(obj) -> None:
+        Themes.style ="""
         *{
             color: Black;
             background-color: rgb(250, 250, 250);
@@ -104,66 +112,63 @@ class Themes:
         }
         """
 
-        obj.setStyleSheet(style)
-        objM = obj.objMainWindow
-        objP = obj.objPref
-        objR = obj.objReader
+        obj.setStyleSheet(Themes.style)
         
-        objM.tabWidget.tabBar().setStyleSheet("QTabBar::tab { background-color: rgb(250, 250, 250); width: 200px; padding: 1px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }  QTabBar::tab:bottom{ background: rgb(235, 235, 235);}  QTabBar::tab:bottom:selected { background-color: rgb(72, 75, 106); color: rgb(250, 250, 250);}")
+        Themes.objM.tabWidget.tabBar().setStyleSheet("QTabBar::tab { background-color: rgb(250, 250, 250); width: 200px; padding: 1px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }  QTabBar::tab:bottom{ background: rgb(235, 235, 235);}  QTabBar::tab:bottom:selected { background-color: rgb(72, 75, 106); color: rgb(250, 250, 250);}")
 
-        objM.tabWidget.setStyleSheet("QTabWidget::pane { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
+        Themes.objM.tabWidget.setStyleSheet("QTabWidget::pane { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
 
-        objM.homeTabStack.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
+        Themes.objM.homeTabStack.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
-        objM.library.setStyleSheet("#libraryOrigin { background:transparent; border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
+        Themes.objM.library.setStyleSheet("#libraryOrigin { background:transparent; border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
         
-        objM.library.noItems.setStyleSheet(" QWidget{ background: rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QLabel { border: none; }")
+        Themes.objM.library.noItems.setStyleSheet(" QWidget{ background: rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QLabel { border: none; }")
         
-        objM.library.descriptionPage.setStyleSheet("QWidget#descPage { background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } QPushButton:hover { background-color: rgb(147, 148, 165);}")
+        Themes.objM.library.descriptionPage.setStyleSheet("QWidget#descPage { background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } QPushButton:hover { background-color: rgb(147, 148, 165);}")
 
-        objM.library.libraryShelf.setStyleSheet(" background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+        Themes.objM.library.libraryShelf.setStyleSheet(" background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
-        objM.library.libraryScrollArea.setStyleSheet(self.scrollbarStyleLight)
-        objM.library.descriptionPage.scrollArea.setStyleSheet(self.scrollbarStyleLight)
-        objM.scroll.setStyleSheet(self.scrollbarStyleLight)
+        Themes.objM.library.libraryScrollArea.setStyleSheet(Themes.scrollbarStyleLight)
+        Themes.objM.library.descriptionPage.scrollArea.setStyleSheet(Themes.scrollbarStyleLight)
+        Themes.objM.scroll.setStyleSheet(Themes.scrollbarStyleLight)
 
-        # self.objM.library.libraryScrollAreaWidget.setStyleSheet("QSCrollArea{ border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } ")
+        # self.Themes.objM.library.libraryScrollAreaWidget.setStyleSheet("QSCrollArea{ border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } ")
 
-        objM.apiButton.setStyleSheet("QPushButton{ border-radius: 18px;}")
+        Themes.objM.apiButton.setStyleSheet("QPushButton{ border-radius: 18px;}")
         
-        objM.menuIcon.addPixmap(QPixmap("resources/icons/icons8-menu-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objM.menuButton.setIcon(objM.menuIcon)
+        Themes.objM.menuIcon.addPixmap(QPixmap(resources.menu_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.menuButton.setIcon(Themes.objM.menuIcon)
 
-        objM.searchIcon.addPixmap(QPixmap("resources/icons/icons8-search-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objM.searchButton.setIcon(objM.searchIcon)
+        Themes.objM.searchIcon.addPixmap(QPixmap(resources.search_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.searchButton.setIcon(Themes.objM.searchIcon)
 
-        objM.localSearchIcon.addPixmap(QPixmap("resources/icons/icons8-add-folder-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objM.localSearchButton.setIcon(objM.localSearchIcon)
+        Themes.objM.localSearchIcon.addPixmap(QPixmap(resources.local_search_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.localSearchButton.setIcon(Themes.objM.localSearchIcon)
 
-        objM.localSearchIconSingleFormat.addPixmap(QPixmap("resources/icons/icons8-cbr-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objM.localSearchButtonSingleFormat.setIcon(objM.localSearchIconSingleFormat)
+        Themes.objM.localSearchIconSingleFormat.addPixmap(QPixmap(resources.local_search_single_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.localSearchButtonSingleFormat.setIcon(Themes.objM.localSearchIconSingleFormat)
 
-        objM.library.descriptionPage.exitButtonIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objM.library.descriptionPage.exitButton.setIcon(objM.library.descriptionPage.exitButtonIcon)
+        Themes.objM.library.descriptionPage.exitButtonIcon.addPixmap(QPixmap(resources.exit_button), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.library.descriptionPage.exitButton.setIcon(Themes.objM.library.descriptionPage.exitButtonIcon)
         
-        objM.library.descriptionPage.exitButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+        Themes.objM.library.descriptionPage.exitButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
-        objM.library.descriptionPage.deleteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-delete-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objM.library.descriptionPage.deleteButton.setIcon(objM.library.descriptionPage.deleteButtonIcon)
+        Themes.objM.library.descriptionPage.deleteButtonIcon.addPixmap(QPixmap(resources.delete_manhua), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.library.descriptionPage.deleteButton.setIcon(Themes.objM.library.descriptionPage.deleteButtonIcon)
         
-        objM.library.descriptionPage.deleteButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+        Themes.objM.library.descriptionPage.deleteButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
         
-        objM.refreshIcon.addPixmap(QPixmap("resources/icons/icons8-refresh-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objM.refreshButton.setIcon(objM.refreshIcon)
+        Themes.objM.refreshIcon.addPixmap(QPixmap(resources.refresh_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.refreshButton.setIcon(Themes.objM.refreshIcon)
 
-        objM.clearHistoryIcon.addPixmap(QPixmap("resources/icons/icons8-unpin-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objM.clearHistoryButton.setIcon(objM.clearHistoryIcon)
+        Themes.objM.clearHistoryIcon.addPixmap(QPixmap(resources.clear_history_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.clearHistoryButton.setIcon(Themes.objM.clearHistoryIcon)
 
-        objM.apiButtonWidget.setStyleSheet("#apiWidget { background-color: rgb(210, 211, 219); border: 2px solid rgb(72, 75, 106); border-radius: 18px;} QPushButton{ background-color: rgb(210, 211, 219); margin: 5px;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
+        Themes.objM.apiButtonWidget.setStyleSheet("#apiWidget { background-color: rgb(210, 211, 219); border: 2px solid rgb(72, 75, 106); border-radius: 18px;} QPushButton{ background-color: rgb(210, 211, 219); margin: 5px;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
 
-        objM.apiCombo.setStyleSheet(" QComboBox{  border: 0px; background-color: rgb(210, 211, 219);} QComboBox::drop-down{ border: 0px; width: 70px;} QComboBox:selected{ background-color: white;}")
+        Themes.objM.apiCombo.setStyleSheet(" QComboBox{  border: 0px; background-color: rgb(210, 211, 219);} QComboBox::drop-down{ border: 0px; width: 70px;} QComboBox:selected{ background-color: white;}")
 
-        objP.style = """   
+        Themes.objP.style = """   
             #settingsButton, #downloadButton, #themesButton{
                 border-radius: 15px;
             }
@@ -173,100 +178,100 @@ class Themes:
             }
             
         """
-        objP.setStyleSheet(objP.style)
+        Themes.objP.setStyleSheet(Themes.objP.style)
 
-        objP.headerLabel.setMaximumHeight(48)
+        Themes.objP.headerLabel.setMaximumHeight(48)
         
-        objP.stackedWidget.setStyleSheet("background-color: rgb(210, 211, 219); border-radius: 10px;")
+        Themes.objP.stackedWidget.setStyleSheet("background-color: rgb(210, 211, 219); border-radius: 10px;")
         
-        objP.headerBackgroundWidget.setMaximumHeight(60)
-        objP.headerBackgroundWidget.setStyleSheet("background-color: rgb(147, 148, 165); border-radius: 25px; color: white; padding-top: 0px;")
+        Themes.objP.headerBackgroundWidget.setMaximumHeight(60)
+        Themes.objP.headerBackgroundWidget.setStyleSheet("background-color: rgb(147, 148, 165); border-radius: 25px; color: white; padding-top: 0px;")
         
-        objP.backIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-        objP.backButton.setIcon(objP.backIcon)
+        Themes.objP.backIcon.addPixmap(QPixmap(resources.back_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objP.backButton.setIcon(Themes.objP.backIcon)
         
-        objP.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+        Themes.objP.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
-        objP.radioButtonOne.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px;}")
+        Themes.objP.radioButtonOne.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px;}")
 
-        objP.radioButtonTwo.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px; }")
+        Themes.objP.radioButtonTwo.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px; }")
 
-        objP.radioButtonThree.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px;}")
+        Themes.objP.radioButtonThree.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px;}")
 
-        objP.downloadQueue.setStyleSheet("background-color: white;")
+        Themes.objP.downloadQueue.setStyleSheet("background-color: white;")
 
-        # self.objP.spaceE.setPixmap(QPixmap("resources/icons/lightModeTheme.png"))
+        # self.Themes.objP.spaceE.setPixmap(QPixmap("resources/icons/lightModeTheme.png"))
 
-        objP.downloadDirPathBtn.setStyleSheet("background: rgb(147, 148, 165); margin-top: 5px; margin-right: 5px; color: white;")
-        objP.downloadDirPathBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        Themes.objP.downloadDirPathBtn.setStyleSheet("background: rgb(147, 148, 165); margin-top: 5px; margin-right: 5px; color: white;")
+        Themes.objP.downloadDirPathBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        objP.pixPixmap = QPixmap("resources/icons/lightModeTheme.png")
-        objP.spaceE.setPixmap(objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
+        Themes.objP.pixPixmap = QPixmap(resources.light_mode)
+        Themes.objP.spaceE.setPixmap(Themes.objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
 
-        self.prefButtonActiveLight(objP, self.prefSelectedButtonIndex)
+        Themes.prefButtonActiveLight(Themes.objP, Themes.prefSelectedButtonIndex)
 
-        self.readerStyle(objR, objR.readerDisplayIndex)
+        Themes.readerStyle(Themes.objR.readerDisplayIndex)
 
-    def resetHistoryStyle(self):
-        # if self.themeIndex == 0:    
-        #     self.obj.objMainWindow.scrollW.setStyleSheet("QWidget { background-color: rgb(210, 211, 219); padding: 0px; margin: 0px; border: none;} QPushButton:hover { color: white; }")
+    def resetHistoryStyle() -> None:
+        # if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:    
+        #     self.obj.Themes.objMainWindow.scrollW.setStyleSheet("QWidget { background-color: rgb(210, 211, 219); padding: 0px; margin: 0px; border: none;} QPushButton:hover { color: white; }")
         ...
         
-    def readerStyle(self, objR, index):
-        if self.themeIndex == 0:
-            objR.style = """ 
+    def readerStyle(index: int) -> None:
+        if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:
+            Themes.objR.style = """ 
                 QPushButton{
                     border-radius: 18px;
                     color: red;
                 }
             """
-            objR.setStyleSheet(objR.style)
+            Themes.objR.setStyleSheet(Themes.objR.style)
 
-            objR.backIcon.addPixmap(QPixmap("resources/icons/icons8-go-back-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            objR.backButton.setIcon(objR.backIcon)
+            Themes.objR.backIcon.addPixmap(QPixmap(resources.exit_button), QIcon.Mode.Normal, QIcon.State.Off)
+            Themes.objR.backButton.setIcon(Themes.objR.backIcon)
             
-            objR.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+            Themes.objR.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
-            objR.setToCoverIcon.addPixmap(QPixmap("resources/icons/icons8-download-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-            objR.setToCoverButton.setIcon(objR.setToCoverIcon)
+            Themes.objR.setToCoverIcon.addPixmap(QPixmap(resources.download_icon), QIcon.Mode.Normal, QIcon.State.Off)
+            Themes.objR.setToCoverButton.setIcon(Themes.objR.setToCoverIcon)
             
-            objR.setToCoverButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+            Themes.objR.setToCoverButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
-            objR.manhuaLabel.setStyleSheet(" padding: 0px;")
+            Themes.objR.manhuaLabel.setStyleSheet(" padding: 0px;")
             
-            if objR.readerDisplayIndex == 1:
-                objR.screenScrollArea.setStyleSheet("border: 0px")
+            if Themes.objR.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
+                Themes.objR.screenScrollArea.setStyleSheet("border: 0px")
 
-            if index != 1:
-                objR.nextIcon.addPixmap(QPixmap("resources/icons/icons8-next-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-                objR.nextButton.setIcon(objR.nextIcon)
+            if index != consts.E_RADIO_SELECTED_WEBTOON:
+                Themes.objR.nextIcon.addPixmap(QPixmap(resources.next_icon), QIcon.Mode.Normal, QIcon.State.Off)
+                Themes.objR.nextButton.setIcon(Themes.objR.nextIcon)
             
-                objR.nextButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+                Themes.objR.nextButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
-                objR.previousIcon.addPixmap(QPixmap("resources/icons/icons8-previous-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
-                objR.previousButton.setIcon(objR.previousIcon)
+                Themes.objR.previousIcon.addPixmap(QPixmap(resources.previous_icon), QIcon.Mode.Normal, QIcon.State.Off)
+                Themes.objR.previousButton.setIcon(Themes.objR.previousIcon)
             
-                objR.previousButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+                Themes.objR.previousButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
 
         else:
             ...
     
-    def changeTabBarIconLight(obj):
+    def changeTabBarIconLight(obj) -> None:
         obj.tabIndex = obj.tabWidget.currentIndex()
-        if obj.tabIndex == 0:
-            obj.homeIcon.addPixmap(QPixmap("resources/icons/icons8-home-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        if obj.tabIndex == consts.E_TAB_HOME_INDEX:
+            obj.homeIcon.addPixmap(QPixmap(resources.home_icon_dark), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabWidget.setTabIcon(obj.tabIndex, obj.homeIcon)
 
-            obj.libraryIcon.addPixmap(QPixmap("resources/icons/icons8-library-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.libraryIcon.addPixmap(QPixmap(resources.library_icon), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabWidget.setTabIcon(1, obj.libraryIcon)
         else:
-            obj.homeIcon.addPixmap(QPixmap("resources/icons/icons8-home-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.homeIcon.addPixmap(QPixmap(resources.home_icon), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabWidget.setTabIcon(0, obj.homeIcon)
 
-            obj.libraryIcon.addPixmap(QPixmap("resources/icons/icons8-library-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.libraryIcon.addPixmap(QPixmap(resources.library_icon_dark), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabWidget.setTabIcon(obj.tabIndex, obj.libraryIcon)
 
-    def prefButtonActiveDark(self, obj, indexB):
+    def prefButtonActiveDark(obj, indexB) -> None:
         # if type(self.prevObjButton) == PyQt6.QtWidgets.QPushButton:
         #     self.prevObjButton.setStyleSheet(
         #         "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250, 250, 250);} QPushButton:hover { color:white; background-color:rgb(210, 211, 219);} #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
@@ -284,52 +289,36 @@ class Themes:
         # self.prevObjButton = self.prefButtonList[indexB]
         pass
 
-    def darkMode(self, obj):
-        objM = obj.objMainWindow
-        objP = obj.objPref
-        objR = obj.objReader
-        objP.pixPixmap = QPixmap("resources/icons/darkModeTheme.png")
-        objP.spaceE.setPixmap(objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
+    def darkMode(obj) -> None:
+        Themes.objP.pixPixmap = QPixmap(resources.dark_mode)
+        Themes.objP.spaceE.setPixmap(Themes.objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
 
-    def changeTabBarIconDark(obj):
+    def changeTabBarIconDark(obj) -> None:
         pass
 
-    def prefButtonActive(self, indexB, themeIndex):
-        self.prefSelectedButtonIndex = indexB
-        if themeIndex == 0:
-            self.prefButtonActiveLight(self.obj.objPref, indexB)
+    def prefButtonActive(indexB, themeIndex: int) -> None:
+        Themes.prefSelectedButtonIndex = indexB
+        if themeIndex == consts.E_THEME_LIGHT_MODE:
+            Themes.prefButtonActiveLight(Themes.objP, indexB)
         else:
-            self.prefButtonActiveDark(self.obj.objPref, indexB)
+            Themes.prefButtonActiveDark(Themes.objP, indexB)
 
-    def declareTheme(self, obj, themeIndex):
-        self.themeIndex = themeIndex
-        if themeIndex == 0:
-            obj.objMainWindow.themeIndex = themeIndex
-            obj.objReader.themeIndex = themeIndex
-            obj.objPref.themeIndex = themeIndex
-            obj.setting.themeIndex = themeIndex
-            obj.setting.themeButtonState = False
-
+    def declareTheme(themeIndex: int) -> None:
+        Settings.themeIndex = themeIndex
+        if themeIndex == consts.E_THEME_LIGHT_MODE:
+            Settings.themeButtonState = False
         else:
-            obj.objMainWindow.themeIndex = themeIndex
-            obj.objReader.themeIndex = themeIndex
-            obj.objPref.themeIndex = themeIndex
-            obj.setting.themeIndex = themeIndex
-            obj.setting.themeButtonState = True
-        obj.objReader.themeObj = self
-
-        obj.objMainWindow.themeObj = self
-        # obj.objPref.themeObj = self
+            Settings.themeButtonState = True
         
 
 class ToggleSwitch(QPushButton):
-    def __init__(self, parent = None):
-        super().__init__(parent)
+    def __init__(self) -> None:
+        super().__init__()
         self.setCheckable(True)
         self.setMinimumWidth(66)
         self.setMinimumHeight(22)
 
-    def paintEvent(self, event):
+    def paintEvent(self, event) -> None:
         label = "on" if self.isChecked() else "off"
         bg_color = QColor(72, 75, 106) if self.isChecked() else QColor(147, 148, 165)
 
@@ -355,13 +344,13 @@ class ToggleSwitch(QPushButton):
         painter.drawText(sw_rect, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop, label)
 
 class WindowTitleBar(QHBoxLayout):
-    def __init__(self, obj, widgetTitle, widget):
+    def __init__(self, obj, widgetTitle, widget) -> None:
         super().__init__()
         
         self.obj = obj
         self.widgetTitle = widgetTitle
         self.widget = widget # StsckedWidgetWindow or stWindow
-        self.widgetIcon = widget.windowIcon
+        self.widgetIcon = widget.window_icon
         self.widgetMainW = self.widget.objMainWindow
         self.widgetLibrary = self.widget.objMainWindow.library
         self.widgetReader = self.widget.objReader
@@ -372,7 +361,7 @@ class WindowTitleBar(QHBoxLayout):
         self.resize_width = 1092
         self.resize_height = 614
 
-        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         # self.majorLayout = QHBoxLayout()
         self.logoLayout = QHBoxLayout()
@@ -391,19 +380,19 @@ class WindowTitleBar(QHBoxLayout):
 
         self.customWindowTitle = QLabel(widgetTitle)
         self.customWindowTitle.setFixedHeight(30)
-        self.customWindowTitle.setSizePolicy(self.sizePolicy)
+        self.customWindowTitle.setSizePolicy(self.size_policy)
         self.customWindowTitle.setStyleSheet("padding-left: 8px;")
 
         self.minimizeIcon = QPushButton()
-        self.minimizeIcon.setSizePolicy(self.sizePolicy)
+        self.minimizeIcon.setSizePolicy(self.size_policy)
         self.minimizeIcon.setCheckable(True)
 
         self.restoreIcon = QPushButton()
-        self.restoreIcon.setSizePolicy(self.sizePolicy)
+        self.restoreIcon.setSizePolicy(self.size_policy)
         self.restoreIcon.setCheckable(True)
 
         self.closeIcon = QPushButton()
-        self.closeIcon.setSizePolicy(self.sizePolicy)
+        self.closeIcon.setSizePolicy(self.size_policy)
         self.closeIcon.setCheckable(True)
 
         self.minimizeIcon.setMaximumSize(iconsizew, iconsize)
@@ -454,7 +443,7 @@ class WindowTitleBar(QHBoxLayout):
         self.restoreIcon.clicked.connect(lambda: self.toggleRestore())
         self.closeIcon.clicked.connect(self.obj.close)
 
-    def toggleRestore(self):
+    def toggleRestore(self) -> None:
         if self.obj.windowState() == Qt.WindowState.WindowMaximized:
             self.obj.resize(QSize(self.resize_width, self.resize_height))
             self.obj.setWindowState(Qt.WindowState.WindowActive)
@@ -474,7 +463,7 @@ class WindowTitleBar(QHBoxLayout):
         self.widgetReader.calLabelSize()
 
 class MoveableWindow(QWidget):
-    def __init__(self, obj, widget):
+    def __init__(self, obj, widget) -> None:
         super().__init__()
         self.refIcon = QPushButton()
         self.refIconIcon = QIcon()
@@ -486,12 +475,12 @@ class MoveableWindow(QWidget):
         self.prevGeo = self.obj.geometry()
         self.oldPosition = self.geometry()
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event) -> None:
         layOut = self.obj.customTitleBar.buttonsLayout
         if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count()))) :
             self.oldPosition = event.scenePosition()
 
-    def mouseDoubleClickEvent(self, event):
+    def mouseDoubleClickEvent(self, event) -> None:
         layOut = self.obj.customTitleBar.buttonsLayout
         if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count())))  :
             if self.obj.windowState() == Qt.WindowState.WindowMaximized or self.obj.windowState() == Qt.WindowState.WindowFullScreen:
@@ -513,7 +502,7 @@ class MoveableWindow(QWidget):
                 self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
                 self.refIcon.setIcon(self.refIconIcon)
         
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event) -> None:
         layOut = self.obj.customTitleBar.buttonsLayout
         if not any((layOut.itemAt(i).widget().underMouse() for i in range(layOut.count()))) :
             # self.obj.resize(QSize(1092, 614))
@@ -536,7 +525,7 @@ class MoveableWindow(QWidget):
             self.refIconIcon.addPixmap(QPixmap("resources/icons/icons8-maximize-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
             self.refIcon.setIcon(self.refIconIcon)
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event) -> None:
         if event.globalPosition().y() < 10:
             self.prevGeo = self.obj.geometry()
             self.obj.setWindowState(Qt.WindowState.WindowMaximized)

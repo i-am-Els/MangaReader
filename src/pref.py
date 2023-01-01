@@ -33,29 +33,21 @@ from PyQt6.QtWidgets import (
 
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QCursor, QIcon, QFont
-
+from linker import Link
+import consts
 from pathlib import Path
 # import os
-
-from themes import ToggleSwitch
+from settings import Settings
+from themes import ToggleSwitch, Themes
 
 class Preference(QWidget):
-    def __init__(self, obj, win_dow):
+    def __init__(self) -> None:
         super().__init__()
-        self.obj = obj
-        self.win_dow = win_dow
-
-        self.themeObj = object()
-        self.setting = object()
-        
-        # self.themeObj = self.win_dow.theme
-        # self.setting = self.win_dow.setting
 
         self.max_button_size = QSize(36, 36)
         self.min_button_size = QSize(36, 36)
         self.icon_size = QSize(20, 20)
         self.active = 0
-        self.themeIndex = int()
 
         self.fontSize1 = 11
         self.fontSize2 = 9
@@ -81,30 +73,28 @@ class Preference(QWidget):
         self.numCurrent = 0
         self.numDownloaded = 0
         self.totalDownloads = 0
+        self.style = str()
         
 
-        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
-        #-----------------------------------------------
         self.gridLayout = QGridLayout()
 
         # Create baseLayout
         self.baseLayout = QVBoxLayout()        
         self.baseLayout.setSpacing(9)
 
-        #-----------------------------------------------
         # Create an horizontal headerLayout
         self.headerLayout = QHBoxLayout()
         self.headerLayout.setContentsMargins(-1, 10, -1, 10)
 
         self.bodyLayout = QHBoxLayout()
 
-        #-----------------------------------------------
         # Create a backButton
         self.backButton = QPushButton()
-        self.backButton.setObjectName("backButton")
+        self.backButton.setObjectName(consts.OBJ_PREF_BACK_BTN)
 
-        self.backButton.setSizePolicy(self.sizePolicy)
+        self.backButton.setSizePolicy(self.size_policy)
         self.backButton.setMinimumSize(self.min_button_size)
         self.backButton.setMaximumSize(self.max_button_size)
         self.backButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
@@ -116,12 +106,11 @@ class Preference(QWidget):
         self.backButton.setIconSize(self.icon_size)
         self.backButton.setCheckable(True)
         self.backButton.setToolTip("Return to Home")
-        self.backButton.setToolTipDuration(3000)
+        self.backButton.setToolTipDuration(consts.TOOLTIP_DURATION)
 
-        #-----------------------------------------------
         self.headerLabel = QLabel("Preference | Settings")
-        self.headerLabel.setObjectName("headerLabel")
-        self.headerLabel.setSizePolicy(self.sizePolicy)
+        self.headerLabel.setObjectName(consts.OBJ_PREF_HEADER_LABEL)
+        self.headerLabel.setSizePolicy(self.size_policy)
         
         self.headerLabelFont = QFont()
         self.headerLabelFont.setPointSize(self.fontSize1)
@@ -129,36 +118,35 @@ class Preference(QWidget):
         self.headerLabel.setFont(self.headerLabelFont)
         self.headerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        #-----------------------------------------------
         self.headerLayout.addWidget(self.backButton)
         self.headerLayout.addWidget(self.headerLabel)
 
         self.headerLayout.setStretch(0, 1)
         self.headerLayout.setStretch(1, 9)
-        #-----------------------------------------------
+        
         self.buttonsLayout = QVBoxLayout()
         self.buttonsLayout.setSpacing(5)
 
         self.settingsButton = QPushButton("Settings")
         self.settingsButton.setCheckable(True)
-        self.settingsButton.setSizePolicy(self.sizePolicy)
+        self.settingsButton.setSizePolicy(self.size_policy)
         self.settingsButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.settingsButton.setObjectName("settingsButton")
+        self.settingsButton.setObjectName(consts.OBJ_PREF_SETTINGS_BTN)
 
         self.downloadButton = QPushButton("Downloads")
         self.downloadButton.setCheckable(True)
-        self.downloadButton.setSizePolicy(self.sizePolicy)
+        self.downloadButton.setSizePolicy(self.size_policy)
         self.downloadButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.downloadButton.setObjectName("downloadButton")
+        self.downloadButton.setObjectName(consts.OBJ_PREF_DOWNLOAD_BTN)
 
         self.themesButton = QPushButton("Themes")
         self.themesButton.setCheckable(True)
-        self.themesButton.setSizePolicy(self.sizePolicy)
+        self.themesButton.setSizePolicy(self.size_policy)
         self.themesButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.themesButton.setObjectName("themesButton")
+        self.themesButton.setObjectName(consts.OBJ_PREF_THEME_BTN)
 
         self.spaceEater = QWidget()
-        self.spaceEater.setSizePolicy(self.sizePolicy)
+        self.spaceEater.setSizePolicy(self.size_policy)
 
         self.buttonsLayout.addWidget(self.settingsButton)
         self.buttonsLayout.addWidget(self.downloadButton)
@@ -172,16 +160,14 @@ class Preference(QWidget):
         self.buttonsLayout.setStretch(2, 1)
         self.buttonsLayout.setStretch(3, 12)
 
-
-        #-----------------------------------------------
         self.stackLayout = QVBoxLayout()
         self.stackedWidget = QStackedWidget()
-        self.stackedWidget.setSizePolicy(self.sizePolicy)
-        self.stackedWidget.setObjectName(u"prefStacked")
+        self.stackedWidget.setSizePolicy(self.size_policy)
+        self.stackedWidget.setObjectName(consts.OBJ_PREF_STACK)
 
         self.settingsWidget = QWidget()
-        self.settingsWidget.setObjectName("settingsWidget")
-        self.settingsWidget.setSizePolicy(self.sizePolicy)
+        self.settingsWidget.setObjectName(consts.OBJ_PREF_STACK_SETTINGS)
+        self.settingsWidget.setSizePolicy(self.size_policy)
         self.settingsLayout = QVBoxLayout()
         
         self.settingsWidgetObj()
@@ -190,8 +176,8 @@ class Preference(QWidget):
         
 
         self.downloadsWidget = QWidget()
-        self.downloadsWidget.setObjectName("downloadsWidget")
-        self.downloadsWidget.setSizePolicy(self.sizePolicy)
+        self.downloadsWidget.setObjectName(consts.OBJ_PREF_STACK_DOWNLOAD)
+        self.downloadsWidget.setSizePolicy(self.size_policy)
         self.downloadsLayout = QVBoxLayout()
 
         self.downloadWidgetObj()
@@ -199,8 +185,8 @@ class Preference(QWidget):
         self.downloadsWidget.setLayout(self.downloadsLayout)
 
         self.themesWidget = QWidget()
-        self.themesWidget.setObjectName("themesWidget")
-        self.themesWidget.setSizePolicy(self.sizePolicy)
+        self.themesWidget.setObjectName(consts.OBJ_PREF_STACK_THEME)
+        self.themesWidget.setSizePolicy(self.size_policy)
         self.themesLayout = QVBoxLayout()
 
         self.themesWidgetObj()
@@ -211,15 +197,13 @@ class Preference(QWidget):
         self.stackedWidget.addWidget(self.downloadsWidget)
         self.stackedWidget.addWidget(self.themesWidget)
 
-        #---------------------------------------------------
         self.stackLayout.addWidget(self.stackedWidget)
 
-        #-----------------------------------------------
         self.bodyLayout.addLayout(self.buttonsLayout)
         self.bodyLayout.addLayout(self.stackLayout)
         self.bodyLayout.setStretch(0, 2)
         self.bodyLayout.setStretch(1, 8)
-        #-----------------------------------------------
+        
         self.headerBackgroundWidget = QWidget()
         self.headerBackgroundLayout = QVBoxLayout()
         self.headerBackgroundWidget.setLayout(self.headerLayout)
@@ -230,46 +214,43 @@ class Preference(QWidget):
 
         self.baseLayout.setStretch(0, 1)
         self.baseLayout.setStretch(1, 11)
-        #-----------------------------------------------
+        
 
         self.gridLayout.addLayout(self.baseLayout, 0, 0, 1, 1)
 
         self.setLayout(self.gridLayout)
-        #-----------------------------------------------
+        
 
         self.backButton.clicked.connect(self.backAction)
 
-        self.settingsButton.clicked.connect(lambda: self.setActive(0))
+        self.settingsButton.clicked.connect(lambda: self.setActive(consts.E_ACTIVE_STACK_SETTINGS))
 
-        self.downloadButton.clicked.connect(lambda: self.setActive(1))
+        self.downloadButton.clicked.connect(lambda: self.setActive(consts.E_ACTIVE_STACK_DOWNLOAD))
         
-        self.themesButton.clicked.connect(lambda: self.setActive(2))
+        self.themesButton.clicked.connect(lambda: self.setActive(consts.E_ACTIVE_STACK_THEME))
 
-    def backAction(self):
-        self.setting.setPrefVariables()
+    def backAction(self) -> None:
+        Settings.setPrefVariables()
         self.updateReaderState()
-        self.obj.talkToStackWidgetIndex(0, self.win_dow)
+        Link.callBack(consts.OBJ_WINDOW, "changeStackIndex", consts.E_WINDOW_STACK_MW)
 
-    def updateReaderState(self):
-        if self.initReaderState != self.win_dow.objReader.initReaderState:
+    def updateReaderState(self) -> None:
+        if self.initReaderState != Link.fetchAttribute(consts.OBJ_READER_NAME, "initReaderState"):
             self.updatedReaderState = self.initReaderState
-            self.win_dow.objReader.setState(self.updatedReaderState)
-            self.win_dow.objReader.updateLayout()
+            Link.callBack(consts.OBJ_READER_NAME, "setState", self.updatedReaderState)
+            Link.callBack(consts.OBJ_READER_NAME, "updateLayout")
 
-    def changeStackIndex(self, obj, w_index):
-        obj.setCurrentIndex(w_index)
-
-    def setActive(self, activeIndex):
+    def setActive(self, activeIndex: int) -> None:
         self.active = activeIndex
         
-        self.themeObj.prefButtonActive(self.active, self.themeIndex)
+        Themes.prefButtonActive(self.active, Settings.themeIndex)
 
         self.stackedWidget.setCurrentIndex(self.active)
 
     def settingsWidgetObj(self):
         self.libraryLabel = QLabel("Library")
         self.libraryLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.libraryLabel.setSizePolicy(self.sizePolicy)
+        self.libraryLabel.setSizePolicy(self.size_policy)
 
         self.libraryLabelFont = QFont()
         self.libraryLabelFont.setBold(True)
@@ -280,21 +261,20 @@ class Preference(QWidget):
         self.libraryLabelLayout = QVBoxLayout()
         self.libraryLabelLayout.addWidget(self.libraryLabel)
 
-        #----------------------------------------------
 
         self.autoUpdateLabel = QLabel("Auto Update Library")
         self.autoUpdateLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.autoUpdateLabel.setSizePolicy(self.sizePolicy)
+        self.autoUpdateLabel.setSizePolicy(self.size_policy)
         self.autoUpdateLabelFont = QFont()
         self.autoUpdateLabelFont.setPointSize(self.fontSize2)
         self.autoUpdateLabel.setFont(self.autoUpdateLabelFont)
 
         self.autoUpdateLabelLayout = QVBoxLayout()
         self.autoUpdateLabelLayout.addWidget(self.autoUpdateLabel)
-        #------------------
+        
 
         self.autoUpdateLabelOne = QLabel("Chapters")
-        self.autoUpdateLabelOne.setSizePolicy(self.sizePolicy)
+        self.autoUpdateLabelOne.setSizePolicy(self.size_policy)
 
         self.autoUpdateLabelOneFont = QFont()
         self.autoUpdateLabelOneFont.setPointSize(self.fontSize3)
@@ -304,15 +284,14 @@ class Preference(QWidget):
         
         self.toggleOne = ToggleSwitch()
         self.toggleOne.setCheckable(True)
-        self.toggleOne.setSizePolicy(self.sizePolicy)
+        self.toggleOne.setSizePolicy(self.size_policy)
 
         self.autoUpdateLabelOneLayout.addWidget(self.autoUpdateLabelOne)
         self.autoUpdateLabelOneLayout.addWidget(self.toggleOne)
 
-        #------------------
 
         self.autoUpdateLabelTwo = QLabel("Cover Image and Description")
-        self.autoUpdateLabelTwo.setSizePolicy(self.sizePolicy)
+        self.autoUpdateLabelTwo.setSizePolicy(self.size_policy)
 
         self.autoUpdateLabelTwoFont = QFont()
         self.autoUpdateLabelTwoFont.setPointSize(self.fontSize3)
@@ -322,7 +301,7 @@ class Preference(QWidget):
 
         self.toggleTwo = ToggleSwitch()
         self.toggleTwo.setCheckable(True)
-        self.toggleTwo.setSizePolicy(self.sizePolicy)
+        self.toggleTwo.setSizePolicy(self.size_policy)
 
         self.autoUpdateLabelTwoLayout.addWidget(self.autoUpdateLabelTwo)
         self.autoUpdateLabelTwoLayout.addWidget(self.toggleTwo)
@@ -335,7 +314,7 @@ class Preference(QWidget):
 
         self.autoUpdateLabelTwoLayout.setStretch(0, 10)
         self.autoUpdateLabelTwoLayout.setStretch(1, 1)
-        #------------------
+        
 
         self.autoUpdateLayout = QVBoxLayout()
         self.autoUpdateLayoutInner = QVBoxLayout()
@@ -355,10 +334,9 @@ class Preference(QWidget):
         self.libraryLayout.addLayout(self.autoUpdateLayout)
 
 
-        #---------------------------------------------------
         self.readerLabel = QLabel("Reader")
         self.readerLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.readerLabel.setSizePolicy(self.sizePolicy)
+        self.readerLabel.setSizePolicy(self.size_policy)
 
         self.readerLabelFont = QFont()
         self.readerLabelFont.setBold(True)
@@ -370,10 +348,9 @@ class Preference(QWidget):
         self.readerLabelLayout = QVBoxLayout()
         self.readerLabelLayout.addWidget(self.readerLabel)
 
-        #------------------------
         self.readingModeLabel = QLabel("Default Reading Mode")
         self.readingModeLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.readingModeLabel.setSizePolicy(self.sizePolicy)
+        self.readingModeLabel.setSizePolicy(self.size_policy)
         self.readingModeLabelFont = QFont()
         self.readingModeLabelFont.setPointSize(self.fontSize2)
         self.readingModeLabel.setFont(self.readingModeLabelFont)
@@ -381,16 +358,15 @@ class Preference(QWidget):
         self.readingModeLabelLayout = QVBoxLayout()
         self.readingModeLabelLayout.addWidget(self.readingModeLabel)
 
-        #------------------------
 
         self.radioButtonOne = QRadioButton("Left-to-Right")
-        self.radioButtonOne.setSizePolicy(self.sizePolicy)
+        self.radioButtonOne.setSizePolicy(self.size_policy)
 
         self.radioButtonTwo = QRadioButton("Webtoon/Vertical")
-        self.radioButtonTwo.setSizePolicy(self.sizePolicy)
+        self.radioButtonTwo.setSizePolicy(self.size_policy)
         
         self.radioButtonThree = QRadioButton("Right-to-Left")
-        self.radioButtonThree.setSizePolicy(self.sizePolicy)
+        self.radioButtonThree.setSizePolicy(self.size_policy)
 
         
         self.radioButtonOne.adjustSize()
@@ -407,7 +383,6 @@ class Preference(QWidget):
         self.radioButtonLayout.addWidget(self.radioButtonOne)
         self.radioButtonLayout.addWidget(self.radioButtonTwo)
         self.radioButtonLayout.addWidget(self.radioButtonThree)
-        #------------------
 
         self.radioButtonLayout.setStretch(0, 1)
         self.radioButtonLayout.setStretch(1, 1)
@@ -430,11 +405,10 @@ class Preference(QWidget):
         self.readerLayout.addLayout(self.readerLabelLayout)
         self.readerLayout.addLayout(self.readerChoiceInnerLayout)
 
-        #----------------------------------------------
 
         self.readerNavLabel = QLabel("Use Key shortcuts For Navigation\n\tA -> Previous Page | D -> Next Page\n\tQ -> Previous Chapter | E -> Next Chapter")
         self.readerNavLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.readerNavLabel.setSizePolicy(self.sizePolicy)
+        self.readerNavLabel.setSizePolicy(self.size_policy)
         self.readerNavLabelFont = QFont()
         self.readerNavLabelFont.setPointSize(self.fontSize2)
         self.readerNavLabel.setFont(self.readerNavLabelFont)
@@ -442,7 +416,7 @@ class Preference(QWidget):
         self.readerNavtoggle = ToggleSwitch()
         self.readerNavtoggle.setCheckable(True)
         
-        self.readerNavtoggle.setSizePolicy(self.sizePolicy)
+        self.readerNavtoggle.setSizePolicy(self.size_policy)
 
         self.readerNavLayout = QHBoxLayout()
 
@@ -453,11 +427,10 @@ class Preference(QWidget):
         self.readerNavLayout.setStretch(1, 1)
 
 
-        #----------------------------------------------
 
         self.readerFSLabel = QLabel("Open reader in fullscreen")
         self.readerFSLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.readerFSLabel.setSizePolicy(self.sizePolicy)
+        self.readerFSLabel.setSizePolicy(self.size_policy)
         self.readerFSLabelFont = QFont()
         self.readerFSLabelFont.setPointSize(self.fontSize2)
         self.readerFSLabel.setFont(self.readerFSLabelFont)
@@ -465,7 +438,7 @@ class Preference(QWidget):
         self.readerFStoggle = ToggleSwitch()
         self.readerFStoggle.setCheckable(True)
         
-        self.readerFStoggle.setSizePolicy(self.sizePolicy)
+        self.readerFStoggle.setSizePolicy(self.size_policy)
 
         self.readerFSLayout = QHBoxLayout()
 
@@ -479,10 +452,9 @@ class Preference(QWidget):
 
         self.settingsToggleList = [self.toggleOne, self.toggleTwo, self.readerNavtoggle, self.readerFStoggle]
 
-        #----------------------------------------------
     
         self.spaceEaterForSettings = QWidget()
-        self.spaceEaterForSettings.setSizePolicy(self.sizePolicy)
+        self.spaceEaterForSettings.setSizePolicy(self.size_policy)
 
 
         # self.spaceEaterForLayout = QVBoxLayout()
@@ -503,55 +475,54 @@ class Preference(QWidget):
         self.settingsLayout.setStretch(4, 10)
         self.settingsLayout.setSpacing(0)
 
-        #--------------------------------------------------
-        self.radioButtonOne.toggled.connect(lambda: self.onRadioClicked(0))
-        self.radioButtonTwo.toggled.connect(lambda: self.onRadioClicked(1))
-        self.radioButtonThree.toggled.connect(lambda: self.onRadioClicked(2))
 
-        self.toggleOne.clicked.connect(lambda: self.onToggleClicked(0, self.toggleOne))
-        self.toggleTwo.clicked.connect(lambda: self.onToggleClicked(1, self.toggleTwo))
-        self.readerNavtoggle.clicked.connect(lambda: self.onToggleClicked(2, self.readerNavtoggle))
-        self.readerFStoggle.clicked.connect(lambda: self.onToggleClicked(3, self.readerFStoggle))
+        self.radioButtonOne.toggled.connect(lambda: self.onRadioClicked(consts.E_RADIO_SELECTED_LTR))
+        self.radioButtonTwo.toggled.connect(lambda: self.onRadioClicked(consts.E_RADIO_SELECTED_WEBTOON))
+        self.radioButtonThree.toggled.connect(lambda: self.onRadioClicked(consts.E_RADIO_SELECTED_RTL))
 
-    def onRadioClicked(self, radioIndex):
+        self.toggleOne.clicked.connect(lambda: self.onToggleClicked(consts.E_TOGGLE_AUTO_UPDATE, self.toggleOne))
+        self.toggleTwo.clicked.connect(lambda: self.onToggleClicked(consts.E_TOGGLE_AUTO_UPDATE_OTHER, self.toggleTwo))
+        self.readerNavtoggle.clicked.connect(lambda: self.onToggleClicked(consts.E_TOGGLE_HIDE_NAV, self.readerNavtoggle))
+        self.readerFStoggle.clicked.connect(lambda: self.onToggleClicked(consts.E_TOGGLE_FULLSCREEN, self.readerFStoggle))
+
+    def onRadioClicked(self, radioIndex: int) -> None:
         radioBtn = self.sender()
         self.readerDisplayIndex = radioIndex
         if radioBtn.isChecked():
-            self.setting.readerDisplayIndex = radioIndex
+            Settings.readerDisplayIndex = radioIndex
         
-    def onToggleClicked(self, btnIndex, btn):
+    def onToggleClicked(self, btnIndex: int, btn: QWidget) -> None:
         self.toggleBtnState = btn.isChecked()
         self.btnIndex = btnIndex
-        if self.btnIndex == 0:
-            self.setting.updateChapter = self.toggleBtnState
-        elif self.btnIndex == 1:
-            self.setting.updateOther = self.toggleBtnState
-        elif self.btnIndex == 2:
-            self.setting.hideNav = self.toggleBtnState
+        if self.btnIndex == consts.E_TOGGLE_AUTO_UPDATE:
+            Settings.updateChapter = self.toggleBtnState    
+        elif self.btnIndex == consts.E_TOGGLE_AUTO_UPDATE_OTHER:
+            Settings.updateOther = self.toggleBtnState  
+        elif self.btnIndex == consts.E_TOGGLE_HIDE_NAV:
+            Settings.hideNav = self.toggleBtnState  
         else:
-            self.setting.fsState = self.toggleBtnState
+            Settings.fsState = self.toggleBtnState  
 
-    def selectDownloadDir(self):
+    def selectDownloadDir(self) -> None:
         self.downloadDirDialog = QFileDialog.getExistingDirectory(self,"Select Download Location", self.newPath)
 
         self.downloadDirPath = self.convertToPath(self.downloadDirDialog)
         if self.downloadDirDialog != "":
-            self.setting.downloadNewPath = str(self.downloadDirPath)
+            Settings.downloadNewPath = str(self.downloadDirPath)
 
-            self.newPath = self.setting.downloadNewPath
+            self.newPath = Settings.downloadNewPath 
 
             self.downloadDirPathDisplay.setText(str(self.newPath))
                      
-    def downloadWidgetObj(self):
+    def downloadWidgetObj(self) -> None:
         self.downloadDirPathLabel = QLabel("Select Download Location")
         
-        self.downloadDirPathLabel.setSizePolicy(self.sizePolicy)
-        
+        self.downloadDirPathLabel.setSizePolicy(self.size_policy)
 
         self.downloadDirPathDisplay = QLabel(str(self.newPath))
-        self.downloadDirPathDisplay.setSizePolicy(self.sizePolicy)
+        self.downloadDirPathDisplay.setSizePolicy(self.size_policy)
         self.downloadDirPathBtn = QPushButton("Choose")
-        self.downloadDirPathBtn.setSizePolicy(self.sizePolicy)
+        self.downloadDirPathBtn.setSizePolicy(self.size_policy)
 
         self.downloadDirPathLayout = QHBoxLayout()
         
@@ -561,26 +532,25 @@ class Preference(QWidget):
         self.downloadDirPathLayout.setStretch(0, 3)
         self.downloadDirPathLayout.setStretch(1, 6)
         self.downloadDirPathLayout.setStretch(2, 1)
-
         
         self.downloadDirPathLayout.setContentsMargins(0, 5, 0, 0)
 
         self.downloadQueueHeadLabel = QLabel("Download Queue")
-        self.downloadQueueHeadLabel.setSizePolicy(self.sizePolicy)
+        self.downloadQueueHeadLabel.setSizePolicy(self.size_policy)
         
         # self.downloadQueueHeadLabel.setMaximumHeight(60)
-        if self.totalDownloads != 0:
+        if self.totalDownloads != consts.EMPTY:
             percentDone = self.percentDone()
         else:
-            percentDone = 0
+            percentDone = consts.EMPTY
         self.downloadQueueStatusLabel = QLabel(f"Downloading {self.numCurrent} of {self.totalDownloads} : {percentDone}% Done")
         self.downloadQueueStatusLabel.setAlignment(Qt.AlignmentFlag.AlignRight)
-        self.downloadQueueStatusLabel.setSizePolicy(self.sizePolicy)
+        self.downloadQueueStatusLabel.setSizePolicy(self.size_policy)
 
         # self.downloadQueueStatusLabel.setMaximumHeight(60)
 
         self.downloadQueue = QListWidget()
-        self.downloadQueue.setSizePolicy(self.sizePolicy)
+        self.downloadQueue.setSizePolicy(self.size_policy)
         
         # self.downloadQueue.setMaximumHeight(200)
         
@@ -605,23 +575,13 @@ class Preference(QWidget):
 
 
         self.compressArchiveLabel = QLabel("Compress Downloads to Archive File *.cbz")
-        self.compressArchiveLabel.setSizePolicy(self.sizePolicy)
-        
-        # self.compressArchiveLabel.setMaximumHeight(60)
-
-
-        # self.radioCbz = QRadioButton("To CBZ")
-        # self.radioCbz.setChecked(True)
-        # self.radioCbz.setSizePolicy(self.sizePolicy)
-
-        # self.radioCbr = QRadioButton("To CBR")
-        # self.radioCbr.setSizePolicy(self.sizePolicy)
+        self.compressArchiveLabel.setSizePolicy(self.size_policy)
         
         self.compressArchiveToggleBtn = ToggleSwitch()
         self.compressArchiveToggleBtn.setCheckable(True)
         
-        self.compressArchiveToggleBtn.setSizePolicy(self.sizePolicy)
-        self.compressArchiveToggleBtn.setObjectName("compressButton")
+        self.compressArchiveToggleBtn.setSizePolicy(self.size_policy)
+        self.compressArchiveToggleBtn.setObjectName(consts.OBJ_PREF_COMPRESSED_BTN)
         
 
         self.compressArchiveLayout = QHBoxLayout()
@@ -655,25 +615,21 @@ class Preference(QWidget):
 
         self.compressArchiveToggleBtn.clicked.connect(lambda: self.compressSelect(self.compressArchiveToggleBtn))
 
-    def compressSelect(self, btn):
+    def compressSelect(self, btn) -> None:
         if btn.isChecked():
-            self.setting.compressionState = True
-            # self.radioCbr.setDisabled(False)
-            # self.radioCbz.setDisabled(False)
+            Settings.compressionState = True
             
         else:
-            self.setting.compressionState = False
-            # self.radioCbr.setDisabled(True)
-            # self.radioCbz.setDisabled(True)
+            Settings.compressionState = False
 
-    def setWindowTheme(self, btn):
+    def setWindowTheme(self, btn) -> None:
         if btn.isChecked():
-            self.win_dow.setTheme(1)
+            Link.callBack(consts.OBJ_WINDOW, "setTheme", consts.E_THEME_DARK_MODE)
         else:
-            self.win_dow.setTheme(0)
-        self.setting.setPrefVariables()
+            Link.callBack(consts.OBJ_WINDOW, "setTheme", consts.E_THEME_LIGHT_MODE)
+        Settings.setPrefVariables()
             
-    def themesWidgetObj(self):
+    def themesWidgetObj(self) -> None:
         self.themesLabel = QLabel("Dark Theme")
         self.themesBtn = ToggleSwitch()
 
@@ -697,10 +653,13 @@ class Preference(QWidget):
 
         self.themesBtn.clicked.connect(lambda: self.setWindowTheme(self.themesBtn))
 
-    def percentDone(self):
+    def percentDone(self) -> int:
         return ((self.numDownloaded/self.totalDownloads) * 100 )
 
-    def convertToPath(self, path):
+    def convertToPath(self, path: str) -> Path:
         path_n = Path(path)
         return path_n
+    
+    def setThemesBtnChecked(self, bool_value: bool) -> None:
+        self.themesBtn.setChecked(bool_value)
         

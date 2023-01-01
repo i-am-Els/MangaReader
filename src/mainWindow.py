@@ -17,10 +17,11 @@
 
 
 
-from datetime import datetime
+from linker import Link
 from pathlib import Path
-import os, re
+import os, re, consts, resources
 from themes import Themes
+from settings import Settings
 from PyQt6.QtWidgets import (
     QStackedWidget,
     QHBoxLayout,
@@ -43,25 +44,20 @@ from PyQt6.QtGui import QCursor, QIcon, QPixmap, QFont
 from archive import Archiver
 
 class MainWindow(QWidget):
-    def __init__(self, obj, win_dow, window_Icon, appW, parent=None):
+    def __init__(self, parent: QStackedWidget) -> None:
         super(MainWindow, self).__init__(parent)
-        self.obj = obj
-        self.win_dow = win_dow
-        self.window_Icon = window_Icon 
-        self.appW = appW
-        self.max_button_size = QSize(36, 36)
-        self.min_button_size = QSize(16, 16)
-        self.themeObj = object()
-        self.setting = object()
+        self.parent: QStackedWidget = parent
+        self.max_button_size: QSize = QSize(consts.MAX_BTN_SIZE, consts.MAX_BTN_SIZE)
+        self.min_button_size: QSize = QSize(consts.MIN_BTN_SIZE, consts.MIN_BTN_SIZE)
+
         self.curZipFileList = list()
 
         self.initPath = object()
         self.newPath = object()
-        self.themeIndex = int()
-        self.tabIndex = 0
+        self.tabIndex: int = consts.E_TAB_HOME_INDEX
         self.apiIndex = int()
 
-        self.icon_size = QSize(20, 20)
+        self.icon_size: QSize = QSize(consts.ICON_SIZE, consts.ICON_SIZE)
         self.localDirImport = []
         self.localSingleImport = []
         # self.history = []
@@ -74,12 +70,14 @@ class MainWindow(QWidget):
         self.localManhuaTitleDict = dict()
         self.manhuaObj = object()
 
-        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        
+        self.size_policy: QSizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
         self.create_widgets()
+    
+    def getWindowIcon(self) -> QIcon:
+        return self.parent.window_icon
 
-    def create_widgets(self):
+    def create_widgets(self) -> None:
         self.gridLayout = QGridLayout()
 
         # Create a centralLayout to hold all other layouts
@@ -95,83 +93,83 @@ class MainWindow(QWidget):
         self.menuButton = QPushButton()
         self.menuButton.setCheckable(True)
         
-        self.menuButton.setSizePolicy(self.sizePolicy)
+        self.menuButton.setSizePolicy(self.size_policy)
         self.menuButton.setMinimumSize(self.min_button_size)
         self.menuButton.setMaximumSize(self.max_button_size)
         self.menuButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         self.menuIcon = QIcon()
         self.menuButton.setIconSize(self.icon_size)
-        self.menuButton.setObjectName("menuButton")
+        self.menuButton.setObjectName(consts.OBJ_MW_MENU_BTN)
         self.menuButton.setToolTip("Preference Menu")
-        self.menuButton.setToolTipDuration(3000)
+        self.menuButton.setToolTipDuration(consts.TOOLTIP_DURATION)
 
         # TextBox
         self.lineEdit = QLineEdit()
         self.lineEdit.setPlaceholderText("Enter Search keyword here... e.g 'Shinkeji no Kyojin', 'Bleach', 'Kimetsu no yaiba' etc...")
         
-        self.lineEdit.setSizePolicy(self.sizePolicy)
+        self.lineEdit.setSizePolicy(self.size_policy)
         self.lineEdit.setMinimumSize(QSize(0, 36))
         self.lineEdit.setMaximumSize(QSize(1366, 36))
         self.lineEdit.setMaxLength(36)
         self.lineEdit.setClearButtonEnabled(True)
-        self.lineEdit.setObjectName("lineEdit") 
+        self.lineEdit.setObjectName(consts.OBJ_MW_LINE_EDIT) 
 
         # Search Button
         self.searchButton = QPushButton()
         self.searchButton.setCheckable(True)
         
-        self.searchButton.setSizePolicy(self.sizePolicy)
+        self.searchButton.setSizePolicy(self.size_policy)
         self.searchButton.setMinimumSize(self.min_button_size)
         self.searchButton.setMaximumSize(self.max_button_size)
         self.searchButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.searchButton.setToolTip("Search Manhua")
-        self.searchButton.setToolTipDuration(3000)
+        self.searchButton.setToolTipDuration(consts.TOOLTIP_DURATION)
 
         self.searchIcon = QIcon()
         self.searchButton.setIconSize(self.icon_size)
-        self.searchButton.setObjectName("searchButton")
+        self.searchButton.setObjectName(consts.OBJ_MW_SEARCH_BTN)
 
         # Local Search
         self.localSearchButton = QPushButton()
         self.localSearchButton.setCheckable(True)
         
-        self.localSearchButton.setSizePolicy(self.sizePolicy)
+        self.localSearchButton.setSizePolicy(self.size_policy)
         self.localSearchButton.setMinimumSize(self.min_button_size)
         self.localSearchButton.setMaximumSize(self.max_button_size)
         self.localSearchButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.localSearchButton.setToolTip("Load Manhua Bundle from local disk")
-        self.localSearchButton.setToolTipDuration(3000)
+        self.localSearchButton.setToolTipDuration(consts.TOOLTIP_DURATION)
 
         self.localSearchIcon = QIcon()
         self.localSearchButton.setIconSize(self.icon_size)
-        self.localSearchButton.setObjectName("localSearchButton")
+        self.localSearchButton.setObjectName(consts.OBJ_MW_LOCAL_SEARCH_BTN)
 
         self.localSearchButtonSingleFormat = QPushButton()
         self.localSearchButtonSingleFormat.setCheckable(True)
-        self.localSearchButtonSingleFormat.setSizePolicy(self.sizePolicy)
+        self.localSearchButtonSingleFormat.setSizePolicy(self.size_policy)
         self.localSearchButtonSingleFormat.setMinimumSize(self.min_button_size)
         self.localSearchButtonSingleFormat.setMaximumSize(self.max_button_size)
         self.localSearchButtonSingleFormat.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.localSearchButtonSingleFormat.setToolTip("Load Manhua in Archive formats from local disk")
-        self.localSearchButtonSingleFormat.setToolTipDuration(3000)
+        self.localSearchButtonSingleFormat.setToolTipDuration(consts.TOOLTIP_DURATION)
 
         self.localSearchIconSingleFormat = QIcon()
         self.localSearchButtonSingleFormat.setIconSize(self.icon_size)
-        self.localSearchButtonSingleFormat.setObjectName("localSearcButtonSingleFormat")
+        self.localSearchButtonSingleFormat.setObjectName(consts.OBJ_MW_LOCAL_SEARCH_ARCHIVE_BTN)
 
         self.refreshButton = QPushButton()
         self.refreshButton.setCheckable(True)
-        self.refreshButton.setSizePolicy(self.sizePolicy)
+        self.refreshButton.setSizePolicy(self.size_policy)
         self.refreshButton.setMinimumSize(self.max_button_size)
         self.refreshButton.setMaximumSize(self.max_button_size)
         self.refreshButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.refreshButton.setToolTip("Refresh Home tab")
-        self.refreshButton.setToolTipDuration(3000)
+        self.refreshButton.setToolTipDuration(consts.TOOLTIP_DURATION)
         
         self.refreshIcon = QIcon()
         self.refreshButton.setIconSize(self.icon_size)
-        self.refreshButton.setObjectName("refreshButton")
+        self.refreshButton.setObjectName(consts.OBJ_MW_REFRESH_BTN)
 
         self.apiButton = QPushButton()
         # self.apiButton.addItems(self.apiName)
@@ -179,13 +177,13 @@ class MainWindow(QWidget):
         self.apiButton.setToolTip("Manhua plugin dropdown here...")
 
         self.apiButton.setCheckable(True)
-        self.apiButton.setSizePolicy(self.sizePolicy)
+        self.apiButton.setSizePolicy(self.size_policy)
         self.apiButton.setFixedHeight(36)
         self.apiButton.setFixedWidth(100)
         
         self.apiCombo = QComboBox()
         
-        self.apiCombo.setSizePolicy(self.sizePolicy)
+        self.apiCombo.setSizePolicy(self.size_policy)
         self.apiCombo.setFixedHeight(3)
         self.apiCombo.setFixedWidth(3)
 
@@ -199,23 +197,23 @@ class MainWindow(QWidget):
         self.apiButtonLayout.setStretch(1, 1)
 
         self.apiButtonWidget = QWidget()
-        self.apiButtonWidget.setObjectName("apiWidget")
+        self.apiButtonWidget.setObjectName(consts.OBJ_MW_API_BTN_WIDGET)
         self.apiButtonWidget.setLayout(self.apiButtonLayout)
         self.apiButtonWidget.setFixedSize(QSize(120, 36))
 
 
         self.clearHistoryButton = QPushButton()
         self.clearHistoryButton.setCheckable(True)
-        self.clearHistoryButton.setSizePolicy(self.sizePolicy)
+        self.clearHistoryButton.setSizePolicy(self.size_policy)
         self.clearHistoryButton.setMinimumSize(self.max_button_size)
         self.clearHistoryButton.setMaximumSize(self.max_button_size)   
         self.clearHistoryButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))     
         self.clearHistoryButton.setToolTip("Clear history data")
-        self.clearHistoryButton.setToolTipDuration(3000)
+        self.clearHistoryButton.setToolTipDuration(consts.TOOLTIP_DURATION)
         
         self.clearHistoryIcon = QIcon()
         self.clearHistoryButton.setIconSize(self.icon_size)
-        self.clearHistoryButton.setObjectName("clearHistoryButton")
+        self.clearHistoryButton.setObjectName(consts.OBJ_MW_CLEAR_HISTORY_BTN)
 
         # Add Widgets to searchLayout
         self.searchLayout.addWidget(self.menuButton)
@@ -249,7 +247,7 @@ class MainWindow(QWidget):
         # Create widgets for the historyLayout
         self.historyLabel = QLabel()
         self.historyLabel.setText("Recent Manhua")
-        self.historyLabel.setObjectName("historyLabel")
+        self.historyLabel.setObjectName(consts.OBJ_MW_HISTORY_LABEL)
         self.historyLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.historyListView = QWidget()
@@ -265,43 +263,40 @@ class MainWindow(QWidget):
         self.historyListView.setLayout(self.historyListViewL)
 
         self.historyListView.setMinimumWidth(320)
-        self.historyListView.setObjectName("historyListView")
-        self.scrollW.setObjectName("historyScroll")
-        self.scroll.setObjectName("scroll")
+        self.historyListView.setObjectName(consts.OBJ_MW_HISTORY_LIST)
+        self.scrollW.setObjectName(consts.OBJ_MW_HISTORY_SCROLL_W)
+        self.scroll.setObjectName(consts.OBJ_MW_SCROLL)
 
         self.toggleLayout = QHBoxLayout()
 
         self.toggleGridView = QPushButton()
         self.toggleGridView.setCheckable(True)
-        self.toggleGridView.setObjectName("toggleGridView")
+        self.toggleGridView.setObjectName(consts.OBJ_MW_TOGGLE_GRID_BTN)
 
         self.toggleListView = QPushButton()
         self.toggleListView.setCheckable(True)
-        self.toggleListView.setObjectName("toggleListView")
+        self.toggleListView.setObjectName(consts.OBJ_MW_TOGGLE_LIST_BTN)
         
-        self.toggleGridView.setSizePolicy(self.sizePolicy)
+        self.toggleGridView.setSizePolicy(self.size_policy)
         self.toggleGridView.setMinimumSize(self.min_button_size * 1.75)
         self.toggleGridView.setMaximumSize(self.min_button_size * 1.75)
         self.toggleGridView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         
-        self.toggleListView.setSizePolicy(self.sizePolicy)
+        self.toggleListView.setSizePolicy(self.size_policy)
         self.toggleListView.setMinimumSize(self.min_button_size * 1.75)
         self.toggleListView.setMaximumSize(self.min_button_size * 1.75)
         self.toggleListView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        self.toggleList = [self.toggleGridView, self.toggleListView]
-        self.toggleViewValue = ["Grid View", "List View"]
+        self.previousViewOptionIndex = consts.E_MW_GRID_VIEW
+        self.viewOptionIndex = consts.E_MW_LIST_VIEW
 
-        self.previousViewOptionIndex = 0
-        self.viewOptionIndex = 1
-
-        self.view = QLabel(self.toggleViewValue[self.viewOptionIndex])
+        self.view = QLabel(consts.E_MW_GRID_TEXT if self.viewOptionIndex == consts.E_MW_GRID_VIEW else consts.E_MW_LIST_TEXT)
 
         self.selectView(self.viewOptionIndex)
 
         self.toggleLayout.addWidget(self.view)
-        self.toggleLayout.addWidget(self.toggleList[0])
-        self.toggleLayout.addWidget(self.toggleList[1])
+        self.toggleLayout.addWidget(self.toggleGridView)
+        self.toggleLayout.addWidget(self.toggleListView)
 
         self.toggleLayout.setStretch(0, 4)
         self.toggleLayout.setStretch(1, 1)
@@ -351,18 +346,17 @@ class MainWindow(QWidget):
         self.apiCombo.currentIndexChanged.connect(self.setApiIndex)
 
         self.localSearchButton.clicked.connect(self.localSearchAction)
-        # self.localSearchButton.clicked.connect(self.autoAdd)
         self.localSearchButtonSingleFormat.clicked.connect(self.localSearchSingleFormatAction)
         self.tabWidget.currentChanged.connect(lambda:self.changeTabBarIcon())
-        self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj('toggleGrid'))
-        self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj('toggleList'))
+        self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj(consts.E_MW_GRID_VIEW))
+        self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj(consts.E_MW_LIST_VIEW))
 
-    def clearAllHistoryData(self):
+    def clearAllHistoryData(self) -> None:
         self.historyData.clear()
         for x in range(self.historyScrollL.layout().count()):
             self.historyScrollL.layout().itemAt(x).widget().deleteLater()
 
-    def historyScrollItems(self):
+    def historyScrollItems(self) -> None:
         self.scrollW = QWidget()
 
         self.historyScrollL = QVBoxLayout(self.scrollW)
@@ -380,11 +374,11 @@ class MainWindow(QWidget):
     #         hist = History(x["ManhuaName"], x["Chapter"], x["ChapterIndex"], x["ChapterPath"], self.win_dow.objReader, x["ReadTime"])
     #         self.historyScrollL.addWidget(hist)
 
-    def resetHistory(self):
+    def resetHistory(self) -> None:
         self.scrollW.deleteLater()
         self.historyScrollItems()
 
-    def setApiIndex(self, intIndex):
+    def setApiIndex(self, intIndex: int) -> None:
         clickedIndex = intIndex
 
         self.apiIndex = clickedIndex
@@ -392,13 +386,13 @@ class MainWindow(QWidget):
         if self.firstRun == True and self.apiIndex == 0:
             self.firstRun = False
         else:
-            self.setting.setObjMState()
+            Settings.setObjMState()
             self.loadApi(intIndex)
 
-    def apiComboPopUp(self):
+    def apiComboPopUp(self) -> None:
         self.apiCombo.showPopup()
 
-    def create_home_widgets(self):
+    def create_home_widgets(self) -> None:
         self.tabWidget = QTabWidget()
 
         self.home = QWidget()
@@ -417,19 +411,19 @@ class MainWindow(QWidget):
 
         self.home.setLayout(self.homeTabStackLayout)
 
-        self.library = Library(self.appW, self.win_dow, parent=self)
-        self.library.setObjectName("libraryOrigin")
+        self.library = Library(self)
+        self.library.setObjectName(consts.OBJ_MW_LIBRARY)
         self.libraryIcon = QIcon() 
 
         self.tabWidget.addTab(self.home, self.homeIcon, "Home")
         self.tabWidget.addTab(self.library, self.libraryIcon, "Library")
-        self.tabWidget.setCurrentIndex(0)
-        if self.themeIndex == 0:
-            Themes.changeTabBarIconLight(self) # Changes selected tabbar icon
+        self.tabWidget.setCurrentIndex(consts.E_TAB_HOME_INDEX)
+        if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:
+            Themes.changeTabBarIconLight(self)
         else:
             Themes.changeTabBarIconDark(self)
 
-        self.tabWidget.setSizePolicy(self.sizePolicy)
+        self.tabWidget.setSizePolicy(self.size_policy)
         self.tabWidget.setTabPosition(QTabWidget.TabPosition.South)
         self.tabWidget.setTabsClosable(False)
         self.tabWidget.setMovable(False)
@@ -437,56 +431,52 @@ class MainWindow(QWidget):
 
         self.homeLayout.addWidget(self.tabWidget)
 
-    def changeTabBarIcon(self):
+    def changeTabBarIcon(self) -> None:
         self.tabIndex = self.tabWidget.currentIndex()
-        if self.themeIndex == 0:
+        if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:
             Themes.changeTabBarIconLight(self)
         else:
             Themes.changeTabBarIconDark(self)
 
-    def loadApi(self, api_Index):
+    def loadApi(self, api_Index) -> None:
         ...
 
-    def loadHomeItems(self):# More Work 'Online Mode'
+    def loadHomeItems(self) -> None:# More Work 'Online Mode'
         # self.loadApi(self.apiIndex)
         ...
 
-    def loadHomeLocalItems(self):# More Work 'Offline Mode'
+    def loadHomeLocalItems(self)  -> None:# More Work 'Offline Mode'
         pass
 
-    def search(self):# More Work
+    def search(self) -> None:# More Work
         self.keyword = self.lineEdit.text()
         if self.keyword != "":
             print(self.keyword)
 
-    def menuAction(self):
-        self.obj.talkToStackWidgetIndex(2, self.win_dow)
+    def menuAction(self) -> None:
+        Link.callBack(consts.OBJ_WINDOW, "changeStackIndex", consts.E_WINDOW_STACK_PREF)
 
-    def refreshAction(self):
-        if self.tabWidget.currentIndex() == 0:
+    def refreshAction(self) -> None:
+        if self.tabWidget.currentIndex() == consts.E_TAB_HOME_INDEX:
             pageToRefreshIndex = self.homeTabStack.currentIndex()
-            if self.homeTabStack.currentIndex() == 0:
+            if self.homeTabStack.currentIndex() == consts.E_TAB_HOME_INNER_MAIN:
                 print("Refused to change Index will refresh instead")
-                self.homeTabStack.setCurrentIndex(0)
+                self.homeTabStack.setCurrentIndex(consts.E_TAB_HOME_INNER_MAIN)
             else:
-                self.homeTabStack.setCurrentIndex(0)
+                self.homeTabStack.setCurrentIndex(consts.E_TAB_HOME_INNER_MAIN)
             self.refresh(pageToRefreshIndex)
         else:
             self.library.refresh()
 
-    def refresh(self, refreshPgIndex):# Much More work
-        if (refreshPgIndex == 0) or (refreshPgIndex == 3):
+    def refresh(self, refreshPgIndex: int) -> None:# Much More work
+        if (refreshPgIndex == consts.E_TAB_HOME_INNER_MAIN) or (refreshPgIndex == consts.E_TAB_HOME_RESULT_PAGE):
             self.loadApi(self.apiIndex)
 
-    def changeStackIndex(self, obj, w_index):
-        obj.setCurrentIndex(w_index)
-
-    def loadHomeTab(self):
+    def loadHomeTab(self) -> None:
         self.homeDisplay = QWidget()
         self.noInternetDisplay = QWidget()
         self.noSearchResult = QWidget()
         self.searchResultPage = QWidget()
-        self.descriptionPage = QWidget()
         
         self.loadHomeDisplay()
         self.loadNoInternetDisplay()
@@ -498,29 +488,28 @@ class MainWindow(QWidget):
         self.homeTabStack.addWidget(self.noSearchResult)
         self.homeTabStack.addWidget(self.searchResultPage)
 
-        self.homeTabStack.setCurrentIndex(1)
+        self.homeTabStack.setCurrentIndex(consts.E_TAB_HOME_NO_INTERNET)
   
-    def loadHomeDisplay(self):# More Work
+    def loadHomeDisplay(self) -> None:# More Work
         self.homeDisplayLayout = QGridLayout()
         
 
         self.homeDisplay.setLayout(self.homeDisplayLayout)
 
-    def loadNoInternetDisplay(self):
+    def loadNoInternetDisplay(self) -> None:
         self.noInternetDisplayLayout = QVBoxLayout()
 
         self.noInternetDisplayLabelpix = QLabel()
         self.noInternetDisplayLabeltxt = QLabel("No Internet Connection")
 
 
-        self.noInternetDisplayLabelpix.setSizePolicy(self.sizePolicy) 
-        #self.pixPixmap = QPixmap('resources/icons/icons8-without-internet-100.png')
-        self.pixPixmap = QPixmap('resources/icons/sammy-no-connection.png')
+        self.noInternetDisplayLabelpix.setSizePolicy(self.size_policy)
+        self.pixPixmap = QPixmap(resources.no_internet)
         
         self.noInternetDisplayLabelpix.setPixmap(self.pixPixmap.scaled(250, 250, Qt.AspectRatioMode.KeepAspectRatio))
         self.noInternetDisplayLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.noInternetDisplayLabeltxt.setSizePolicy(self.sizePolicy)
+        self.noInternetDisplayLabeltxt.setSizePolicy(self.size_policy)
         #self.noInternetDisplayLabeltxt.setMaximumHeight(50)
         self.noInternetDisplayLabelFont = QFont()
         self.noInternetDisplayLabelFont.setPointSize(16)
@@ -529,10 +518,10 @@ class MainWindow(QWidget):
         self.noInternetDisplayLabeltxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.spaceEater1 = QWidget()
-        self.spaceEater1.setSizePolicy(self.sizePolicy)
+        self.spaceEater1.setSizePolicy(self.size_policy)
 
         self.spaceEater2 = QWidget()
-        self.spaceEater2.setSizePolicy(self.sizePolicy)
+        self.spaceEater2.setSizePolicy(self.size_policy)
 
         self.noInternetDisplayLayout.addWidget(self.spaceEater1)
         self.noInternetDisplayLayout.addWidget(self.noInternetDisplayLabelpix)
@@ -547,20 +536,19 @@ class MainWindow(QWidget):
 
         self.noInternetDisplay.setLayout(self.noInternetDisplayLayout)
 
-    def loadNoSearchResult(self):
+    def loadNoSearchResult(self) -> None:
         self.noSearchResultLayout = QVBoxLayout()
 
         self.noSearchResultLabelpix = QLabel()
         self.noSearchResultLabeltxt = QLabel("Keyword not Found")
 
 
-        self.noSearchResultLabelpix.setSizePolicy(self.sizePolicy) 
-        self.spixPixmap = QPixmap('resources/icons/page-not-found.png')
+        self.noSearchResultLabelpix.setSizePolicy(self.size_policy) 
+        self.spixPixmap = QPixmap(resources.page_not_found)
         self.noSearchResultLabelpix.setPixmap(self.spixPixmap.scaled(250, 250, Qt.AspectRatioMode.KeepAspectRatio))
         self.noSearchResultLabelpix.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.noSearchResultLabeltxt.setSizePolicy(self.sizePolicy)
-        #self.noInternetDisplayLabeltxt.setMaximumHeight(50)
+        self.noSearchResultLabeltxt.setSizePolicy(self.size_policy)
         self.noSearchResultLabelFont = QFont()
         self.noSearchResultLabelFont.setPointSize(16)
         self.noSearchResultLabelFont.setBold(False)
@@ -568,10 +556,10 @@ class MainWindow(QWidget):
         self.noSearchResultLabeltxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.spaceEater1 = QWidget()
-        self.spaceEater1.setSizePolicy(self.sizePolicy)
+        self.spaceEater1.setSizePolicy(self.size_policy)
 
         self.spaceEater2 = QWidget()
-        self.spaceEater2.setSizePolicy(self.sizePolicy)
+        self.spaceEater2.setSizePolicy(self.size_policy)
 
         self.noSearchResultLayout.addWidget(self.spaceEater1)
         self.noSearchResultLayout.addWidget(self.noSearchResultLabelpix)
@@ -586,86 +574,88 @@ class MainWindow(QWidget):
 
         self.noSearchResult.setLayout(self.noSearchResultLayout)
 
-    def loadSearchResultPage(self):
+    def loadSearchResultPage(self) -> None:
         self.resultLayout = QGridLayout()
 
-    def viewTypeAction(self, gridView):
+    def viewTypeAction(self, gridView: bool) -> None:
         if gridView == True:
             self.toggleGridIcon = QIcon()
-            self.toggleGridIcon.addPixmap(QPixmap("resources/icons/icons8-grid-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleGridIcon.addPixmap(QPixmap(resources.grid_icon), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleGridView.setIcon(self.toggleGridIcon)
             self.toggleGridView.setIconSize(self.icon_size * 1.1)
             
-            self.toggleListDisabledIcon =QIcon()
-            self.toggleListDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-list-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleListDisabledIcon = QIcon()
+            self.toggleListDisabledIcon.addPixmap(QPixmap(resources.grid_icon_disabled), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleListView.setIcon(self.toggleListDisabledIcon)
             self.toggleListView.setIconSize(self.icon_size * 1.1)
 
-            self.view.setText("Grid View")
-            self.previousViewOptionIndex = 0
+            self.view.setText(consts.E_MW_GRID_TEXT)
+            self.previousViewOptionIndex = consts.E_MW_GRID_VIEW
 
             if self.launchDone:
                 self.library.switchLayout()
-                
-            return self.viewOptionIndex, self.previousViewOptionIndex
 
         else:
             self.toggleListIcon = QIcon()
-            self.toggleListIcon.addPixmap(QPixmap("resources/icons/icons8-list-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleListIcon.addPixmap(QPixmap(resources.list_icon), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleListView.setIcon(self.toggleListIcon)
             self.toggleListView.setIconSize(self.icon_size * 1.1)
             
             self.toggleGridDisabledIcon = QIcon()
-            self.toggleGridDisabledIcon.addPixmap(QPixmap("resources/icons/icons8-grid-disabled-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
+            self.toggleGridDisabledIcon.addPixmap(QPixmap(resources.list_icon_disabled), QIcon.Mode.Normal, QIcon.State.Off)
             self.toggleGridView.setIcon(self.toggleGridDisabledIcon)
             self.toggleGridView.setIconSize(self.icon_size * 1.1)
 
-            self.view.setText("List View")
-            self.previousViewOptionIndex = 1
+            self.view.setText(consts.E_MW_LIST_TEXT)
+            self.previousViewOptionIndex = consts.E_MW_LIST_VIEW
 
             if self.launchDone:
                 self.library.switchLayout()
-            return self.viewOptionIndex, self.previousViewOptionIndex
     
-    def selectViewTypeByObj(self, objName):
-        if objName == "toggleGrid":
-            self.viewOptionIndex = 0
+    def selectViewTypeByObj(self, objName)  -> None:
+        if objName == consts.E_MW_GRID_VIEW:
+            self.viewOptionIndex = consts.E_MW_GRID_VIEW
             self.selectView(self.viewOptionIndex)
         else:
-            self.viewOptionIndex = 1
+            self.viewOptionIndex = consts.E_MW_LIST_VIEW
             self.selectView(self.viewOptionIndex)
 
-    def selectView(self, view_index):
-        if view_index == 0 and view_index != self.previousViewOptionIndex:
+    def selectView(self, view_index) -> None:
+        if view_index == consts.E_MW_GRID_VIEW and view_index != self.previousViewOptionIndex:
             self.viewIsGrid = True
             self.viewTypeAction(self.viewIsGrid)
         else:
-            if view_index == 1 and view_index != self.previousViewOptionIndex:
+            if view_index == consts.E_MW_LIST_VIEW and view_index != self.previousViewOptionIndex:
                 self.viewIsGrid = False
                 self.viewTypeAction(self.viewIsGrid)
    
-    def popDialog(self, type):
-        if type == 'empty':
+    def popDialog(self, type: str) -> None:
+        if type == consts.E_DIALOG_EMPTY:
             txt, t_txt = "Bundle is empty, Please select a filled directory.", "Empty Bundle Error!"
-        elif type == 'structure':
+        elif type == consts.E_DIALOG_STRUCTURE:
             txt, t_txt = "There are 2 scenarios that raise this error: Bundle Structure Error or No Image Found\nTip 1: Select a Parent folder that has chapters arranged in sub-folders.\nTip 2: The chapter sub-folders MUST contain images.", "Structure or File Error!"
-        elif type == 'badFile':
+        elif type == consts.E_DIALOG_BADFILE:
             txt, t_txt = "The supposed archive file might contain a bad or corrupted file...\nUnable to completely read archive.", "Bad/Corrupted Archive File!"
-        elif type == 'none':
+        elif type == consts.E_DIALOG_NONE:
             txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.zip' files.", "Not an Archive File!"
-        elif type == 'duplicate':
+
+        elif type == consts.E_DIALOG_DUPLICATE:
             txt, t_txt = "The manhua title already exists in your library, select another title.", "Duplicate Action!"
-        elif type == 'permission':
+
+        elif type == consts.E_DIALOG_PERMISSION:
             txt, t_txt = "The system has denied permission to the selected folder.", "Permission Denied!"
 
-        elif type == 'deletedM':
+        elif type == consts.E_DIALOG_DELETED_MANHUA:
             txt, t_txt = "The manhua bundle is no longer on drive. The path might be incorrect or the manhua has been deleted. The directory might also be folder-less or has no image in it's structure.", "Manhua not found on Drive!"
 
-        elif type == 'deletedC':
+        elif type == consts.E_DIALOG_DELETED_CHAPTER:
             txt, t_txt = "The selected Chapter is no longer on drive or Does not contain any image file. It might also be empty. Check the above conditions...", "Unable to read Chapter!"
 
-        elif type == 'deletedI':
+        elif type == consts.E_DIALOG_DELETED_IMAGE:
             txt, t_txt = "Image not Found, it must have been deleted just now.", "Missing Image!"
+
+        elif type == consts.E_DIALOG_REGEX:
+            txt, t_txt = "Directories failed the chapter regex test... \n[FIX] Rename at least one sub-directory of the bundle something like 'chapter 1', 'chap 1" or 'ch 1', "ReGex Failed!"
 
         
         messageBox = QMessageBox()
@@ -673,10 +663,10 @@ class MainWindow(QWidget):
         messageBox.setText(txt)
         messageBox.setWindowTitle(t_txt)
         messageBox.setStandardButtons(QMessageBox.StandardButton.Ok)
-        messageBox.setWindowIcon(self.window_Icon)
+        messageBox.setWindowIcon(self.getWindowIcon())
         messageBox.exec()
 
-    def localSearchAction(self):
+    def localSearchAction(self) -> None:
         try:
             self.localDirDialog = QFileDialog.getExistingDirectory(self,"Select Manhua Title",self.newPath)
 
@@ -684,28 +674,28 @@ class MainWindow(QWidget):
             dir = list(os.listdir(self.localDirPath))
             
 
-            if len(dir) == 0:
-                self.popDialog('empty')
+            if len(dir) == consts.EMPTY:
+                self.popDialog(consts.E_DIALOG_EMPTY)
                 self.localSearchAction()
 
             elif self.localDirDialog == '':
                 pass
 
-            elif self.localDirDialog != '' and len(dir) != 0:
+            elif self.localDirDialog != '' and len(dir) != consts.EMPTY:
                 rightStructure = self.library.correctDirStructure(self.localDirPath)
                 if rightStructure == True:
                     self.newPath = self.extractParentFolderPath(self.localDirPath)
-                    self.setting.libraryNewPath = self.newPath
+                    Settings.libraryNewPath = self.newPath
 
                     self.library.addToLibrary(self.localDirPath)
                 else:
-                    self.popDialog('structure')
+                    self.popDialog(consts.E_DIALOG_STRUCTURE)
                     self.localSearchAction()
         except PermissionError:
-            self.popDialog("permission")
+            self.popDialog(consts.E_DIALOG_PERMISSION)
             self.localSearchAction()
 
-    def localSearchSingleFormatAction(self):
+    def localSearchSingleFormatAction(self) -> None:
         self.localSingleDialog = QFileDialog().getOpenFileName(self, 'Open Archived Manhua File', self.newPath, 'Archived Files (*.cbz *zip)')
         self.localSinglePath = self.convertToPath(self.localSingleDialog[0])
 
@@ -717,10 +707,10 @@ class MainWindow(QWidget):
             self.localSingleImport = [self.localSinglePath, self.localFileName, self.parentLocalSinglePath]
             self.newPath = self.parentLocalSinglePath
 
-            self.setting.libraryNewPath = self.newPath
+            Settings.libraryNewPath = self.newPath
 
             ziper = Archiver()
-            outPath = Path(self.setting.extractionNewPath + str(Path(self.localFileName).stem) + "\\")
+            outPath = Path(Settings.extractionNewPath + str(Path(self.localFileName).stem) + "\\")
             print(outPath)
             if not os.path.exists(outPath):
                 os.makedirs(outPath)
@@ -732,32 +722,32 @@ class MainWindow(QWidget):
             pass
 
         elif not(os.path.isfile(self.localSinglePath)):
-            self.popDialog('none')
+            self.popDialog(consts.E_DIALOG_NONE)
             self.localSearchSingleFormatAction()
         
-    def convertToPath(self, path):
+    def convertToPath(self, path: str) -> Path:
         path_n = Path(path)
         return path_n
 
-    def extractParentFolderPath(self, path):
+    def extractParentFolderPath(self, path: str) -> str:
         path_n = os.path.dirname(path)
         return path_n
 
-    def extractFileName(self, path):
+    def extractFileName(self, path: str) -> str:
         file_n = os.path.basename(path)
         return file_n
 
+    def setTabIndex(self, tabIndex: int) -> None:
+        self.tabWidget.setCurrentIndex(tabIndex)
 
 class Library(QStackedWidget):
-    def __init__(self, appW, window, parent):
+    def __init__(self, parent) -> None:
         super(Library, self).__init__(parent)
+        self.size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.parent = parent
-        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.gridX = 0
         self.gridY = 0
         self.gridYLimit = 7
-        self.appW = appW
-        self.win_dow = window
         self.previousOpen = ""
 
         self.libraryMetadata = dict()
@@ -766,13 +756,13 @@ class Library(QStackedWidget):
 
         self.noItems = QWidget()
         self.libraryShelf = QWidget()
-        self.descriptionPage = Description(self)
+        self.descriptionPage = Description()
         
         self.addWidget(self.noItems)
         self.addWidget(self.libraryShelf)
         self.addWidget(self.descriptionPage)
         
-        self.setCurrentIndex(0)
+        self.setCurrentIndex(consts.E_TAB_LIBRARY_NO_ITEM)
 
         self.setNoItemsWidget()
 
@@ -780,15 +770,15 @@ class Library(QStackedWidget):
         self.parent.launchDone = True
         self.testDataForTamper()
 
-    def refresh(self):
+    def refresh(self) -> None:
         self.testDataForTamper()    
-        if self.currentIndex() != 0:
+        if self.currentIndex() != consts.E_TAB_LIBRARY_NO_ITEM:
             self.switchLayout()
-        if self.currentIndex() == 2:
+        if self.currentIndex() == consts.E_TAB_LIBRARY_DESCRIPTION_PAGE:
                 self.reloadManhuaData(self.descriptionPage.currentManhua)
                 print(self.descriptionPage.dataDict)
 
-    def testDataForTamper(self):
+    def testDataForTamper(self) -> None:
         alt = dict()
         for x in list(self.libraryMetadata.values()):
             if os.path.exists(x["ManhuaPath"]):
@@ -798,18 +788,18 @@ class Library(QStackedWidget):
         if not self.libraryMetadata == alt:
             self.libraryMetadata = alt
             
-    def setNoItemsWidget(self):
+    def setNoItemsWidget(self) -> None:
         self.noItemsLabel = QLabel()
-        self.noItemsPixmap = QPixmap("resources/icons/digital-library.png")
+        self.noItemsPixmap = QPixmap(resources.lib_no_item)
         self.noItemsLabel.setPixmap(self.noItemsPixmap.scaled(256, 256, Qt.AspectRatioMode.KeepAspectRatio))
         self.noItemsLayout = QVBoxLayout()
         self.noItemsLayout.addWidget(self.noItemsLabel, alignment=Qt.AlignmentFlag.AlignCenter)
 
         self.noItems.setLayout(self.noItemsLayout)
 
-    def loadLibraryItems(self):
+    def loadLibraryItems(self) -> None:
         self.libraryScrollAreaWidget = QWidget()
-
+        
         if self.parent.viewIsGrid:
             self.libraryShelfGridLayout = QGridLayout(self.libraryScrollAreaWidget)
             self.libraryScrollArea.setWidget(self.libraryScrollAreaWidget)
@@ -825,18 +815,19 @@ class Library(QStackedWidget):
             self.libraryShelfListLayout.setContentsMargins(5, 10, 5, 10)
 
         self.recreateManhuas()
-
+        
         if self.parent.viewIsGrid:
-            if self.appW.windowState() == Qt.WindowState.WindowMaximized or self.appW.windowState() == Qt.WindowState.WindowFullScreen:
+            test = Link.fetchAttribute(consts.OBJ_APP, "windowState", True)
+            if test == Qt.WindowState.WindowMaximized or test == Qt.WindowState.WindowFullScreen:
                 self.libraryMaximized()
-            elif self.appW.windowState() == Qt.WindowState.WindowNoState or self.appW.windowState() == Qt.WindowState.WindowActive:
+            elif test == Qt.WindowState.WindowNoState or test == Qt.WindowState.WindowActive:
                 self.libraryResized()
         else:
             self.libraryListReDisplay()
 
         self.libraryShelfLayout.addWidget(self.libraryScrollArea)
         
-    def loadLibraryLayout(self):
+    def loadLibraryLayout(self) -> None:
         self.libraryShelfLayout = QVBoxLayout(self.libraryShelf)
         self.libraryShelfLayout.setContentsMargins(0, 0, 0, 0)
 
@@ -846,10 +837,10 @@ class Library(QStackedWidget):
         self.loadLibraryItems()
         self.libraryShelf.setLayout(self.libraryShelfLayout)
 
-    def addToLibraryAction(self, manhuaObj):
+    def addToLibraryAction(self, manhuaObj: QWidget) -> None:
         self.calculateLibraryDimension()
         spacing = self.calculateLibrarySpacing()
-        if self.parent.viewIsGrid:
+        if Link.fetchAttribute(consts.OBJ_MW_NAME, "viewIsGrid"):
             self.libraryShelfGridLayout.setSpacing(spacing)
             if self.gridYLimit >= self.gridY: 
                 self.libraryShelfGridLayout.addWidget(manhuaObj, self.gridX, self.gridY)
@@ -860,26 +851,26 @@ class Library(QStackedWidget):
             self.gridY += 1
         else:
             self.libraryShelfListLayout.addWidget(manhuaObj)
-        self.parent.tabWidget.setCurrentIndex(1)
-        self.setCurrentIndex(1)
+        Link.callBack(consts.OBJ_MW_NAME, "setTabIndex", consts.E_TAB_LIBRARY_INDEX)
+        self.setCurrentIndex(consts.E_TAB_LIBRARY_SHELF)
 
-    def libraryMaximized(self):
+    def libraryMaximized(self) -> None:
         dimension = self.calculateLibraryDimension()
         spacing = self.calculateLibrarySpacing()
         self.libraryDisplayChangeAction(dimension, spacing)
         
-    def libraryResized(self):
+    def libraryResized(self) -> None:
         dimension = self.calculateLibraryDimension()
         spacing = self.calculateLibrarySpacing()
         self.libraryDisplayChangeAction(dimension, spacing)
 
-    def libraryDisplayChangeAction(self, limit, spacing):
+    def libraryDisplayChangeAction(self, limit: int, spacing: int) -> None:
         self.gridYLimit = limit
         self.libraryItemLength = len(self.libraryListdata)
         
         self.libraryShelfGridLayout.setSpacing(spacing)
 
-        if self.libraryItemLength != 0:
+        if self.libraryItemLength != consts.EMPTY:
             xLen = int(self.libraryItemLength / (limit + 1))
             if self.libraryItemLength % (limit + 1) != 0:
                 xLen += 1
@@ -894,16 +885,16 @@ class Library(QStackedWidget):
                     else:
                         break
 
-    def libraryListReDisplay(self):
+    def libraryListReDisplay(self) -> None:
         self.libraryItemLength = len(self.libraryListdata)
-        if self.libraryItemLength != 0:
+        if self.libraryItemLength != consts.EMPTY:
             for x in range(self.libraryItemLength):
                 # self.libraryListdata[x].switchVariant("grid")
                 self.libraryShelfListLayout.addWidget(self.libraryListdata[x])
 
-    def correctDirStructure(self, path):
-        correct = False
-        imageExtList = ['.jpeg', '.jpg', '.png']
+    def correctDirStructure(self, path: str) -> bool:
+        correct: bool = False
+        imageExtList = consts.IMG_EXT_LIST
 
         for x in os.listdir(path):
             xPath = os.path.join(path, x)
@@ -913,119 +904,129 @@ class Library(QStackedWidget):
                     break
         return correct
 
-    def addToMetaData(self, path):
-        imageExtList = ['.jpeg', '.jpg', '.png']
-        manhuaMetaDict = dict()
-        manhuaChapterList = list()
+    def addToMetaData(self, path: str) -> dict:
+        try:
+            imageExtList = consts.IMG_EXT_LIST
+            manhuaMetaDict = dict()
+            manhuaChapterList = list()
 
-        manhuaMetaDict["ManhuaTitle"] = Path(path).stem
-        manhuaMetaDict["ManhuaPath"] = str(path)
-        emptyCover = True
+            manhuaMetaDict["ManhuaTitle"] = Path(path).stem
+            manhuaMetaDict["ManhuaPath"] = str(path)
+            emptyCover = True
 
-        for x in os.listdir(path):
-            xPath = os.path.join(path, x)
-            if os.path.isdir(xPath) and any(Path(os.path.join(xPath, z)).suffix in imageExtList for z in os.listdir(xPath)):
-                # sChapterName = str(Path(xPath).name)
-                sChapterName = Path(xPath).name
-                manhuaChapterList.append(sChapterName)
-            elif Path(xPath).suffix in ['.jpeg', '.jpg', '.png'] and emptyCover == True:
-                manhuaMetaDict["ManhuaCover"] = xPath
-                emptyCover = False
-        if emptyCover == True:
-            manhuaMetaDict["ManhuaCover"] = self.parent.themeObj.defaultCoverImage
-            
-        sortedManhuaChapterDict = self.sortChapters(manhuaChapterList)
-        manhuaMetaDict["Chapters"] = sortedManhuaChapterDict
-        manhuaMetaDict["Status"] = "Local Manhua Bundle"
-        manhuaMetaDict["Description"] = "No Description... This file is a locally imported file, metadata consist of no description..."
-        return manhuaMetaDict
+            for x in os.listdir(path):
+                xPath = os.path.join(path, x)
+                if os.path.isdir(xPath) and any(Path(os.path.join(xPath, z)).suffix in imageExtList for z in os.listdir(xPath)):
+                    # sChapterName = str(Path(xPath).name)
+                    sChapterName = Path(xPath).name
+                    manhuaChapterList.append(sChapterName)
+                elif Path(xPath).suffix in ['.jpeg', '.jpg', '.png'] and emptyCover == True:
+                    manhuaMetaDict["ManhuaCover"] = xPath
+                    emptyCover = False
+            if emptyCover == True:
+                manhuaMetaDict["ManhuaCover"] = resources.default_cover_image
+                
+            sortedManhuaChapterDict = self.sortChapters(manhuaChapterList)
+            manhuaMetaDict["Chapters"] = sortedManhuaChapterDict
+            manhuaMetaDict["Status"] = "Local Manhua Bundle"
+            manhuaMetaDict["Description"] = consts.E_MW_TEXT_DUMMY_DESCRIPTION
+            return manhuaMetaDict
+        except IndexError:
+            raise IndexError
 
-    def addToLibrary(self, path):
-        manhuaMetaDict = self.addToMetaData(path)
-        manhuaMetaDict["IsFav"] = False
+    def addToLibrary(self, path: str) -> None:
+        try:
+            manhuaMetaDict = self.addToMetaData(path)
+            manhuaMetaDict["IsFav"] = False
 
-        if not((manhuaMetaDict["ManhuaTitle"]) in self.libraryMetadata):
-            self.libraryMetadata.update({manhuaMetaDict["ManhuaTitle"] : manhuaMetaDict})
-            self.manhuaObj = Manhua(self.libraryMetadata[manhuaMetaDict["ManhuaTitle"]], self)
-            self.libraryListdata.append(self.manhuaObj)
-            self.addToLibraryAction(self.manhuaObj)
-        else:
-            self.parent.popDialog('duplicate')
-
-    def sortChapters(self, someList):
-        newSortedDict = dict()
-        initIndexHolderList = list()
-        indexHolderList = list()
-        chapterNameList = list()
-        for item in someList:
-            dTxt = re.findall(r"((ch+(ap)?(ter)?)+(\W|_)*(\d+(?:\.\d+)?))", str(item).casefold())
-            desiredTxt = dTxt[0]
-            initIndexHolderList.append(desiredTxt[-1])
-            if '.' in desiredTxt[-1]:
-                indexHolderList.append(float(desiredTxt[-1]))
+            if not((manhuaMetaDict["ManhuaTitle"]) in self.libraryMetadata):
+                self.libraryMetadata.update({manhuaMetaDict["ManhuaTitle"] : manhuaMetaDict})
+                self.manhuaObj = Manhua(self.libraryMetadata[manhuaMetaDict["ManhuaTitle"]])
+                self.libraryListdata.append(self.manhuaObj)
+                self.addToLibraryAction(self.manhuaObj)
             else:
-                indexHolderList.append(int(desiredTxt[-1]))
-            chapterName = 'Chapter ' + str(desiredTxt[-1])
-            chapterNameList.append(chapterName)
-        indexHolderList.sort()
-        for i in indexHolderList:
-            for j in initIndexHolderList:
-                if str(i) == j:
-                    ind = initIndexHolderList.index(j)
-                    newSortedDict.update({chapterNameList[ind] : someList[ind]})
-        return newSortedDict
+                Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DUPLICATE)
+        except IndexError:
+            return
 
-    def recreateManhuas(self):
+    def sortChapters(self, someList: list[str]) -> dict:
+        try:
+            newSortedDict = dict()
+            initIndexHolderList = list()
+            indexHolderList = list()
+            chapterNameList = list()
+            for item in someList:
+                dTxt = re.findall(r"((ch+(ap)?(ter)?)+(\W|_)*(\d+(?:\.\d+)?))", str(item).casefold())
+                desiredTxt = dTxt[0]
+                initIndexHolderList.append(desiredTxt[-1])
+                if '.' in desiredTxt[-1]:
+                    indexHolderList.append(float(desiredTxt[-1]))
+                else:
+                    indexHolderList.append(int(desiredTxt[-1]))
+                chapterName = 'Chapter ' + str(desiredTxt[-1])
+                chapterNameList.append(chapterName)
+            indexHolderList.sort()
+            for i in indexHolderList:
+                for j in initIndexHolderList:
+                    if str(i) == j:
+                        ind = initIndexHolderList.index(j)
+                        newSortedDict.update({chapterNameList[ind] : someList[ind]})
+            return newSortedDict
+        except IndexError:
+            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_REGEX)
+            raise IndexError
+
+    def recreateManhuas(self) -> None:
         self.libraryListdata.clear()
         for k in list(self.libraryMetadata.keys()):
-            self.manhuaObj = Manhua(self.libraryMetadata[k], self)            
+            self.manhuaObj = Manhua(self.libraryMetadata[k])            
             self.libraryListdata.append(self.manhuaObj)
 
-    def switchLayout(self):
+    def switchLayout(self) -> None:
         self.libraryScrollAreaWidget.deleteLater()
         self.loadLibraryItems()
 
-    def openDescription(self, dataDict):
+    def openDescription(self, dataDict: dict) -> None:
         if os.path.exists(dataDict["ManhuaPath"]):
             #if dataDict["ManhuaTitle"] != self.previousOpen:
             self.reloadManhuaData(dataDict["ManhuaTitle"])
             #self.descriptionPage.setData(dataDict)
             #self.descriptionPage.resetChapters()
             #self.win_dow.objReader.setData(dataDict["ManhuaTitle"])
-            self.win_dow.objReader.manhuaChanged = True
-            self.win_dow.objReader.previousManhuaName = self.previousOpen
+            Link.modifyAttribute(parent=consts.OBJ_READER_NAME, attr="manhuaChanged", value=True)
+            Link.modifyAttribute(parent=consts.OBJ_READER_NAME, attr="previousManhuaName", value=self.previousOpen)
             self.previousOpen = dataDict["ManhuaTitle"]
             self.setCurrentIndex(2)
         else:
-            self.parent.popDialog("deletedM")
+            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_MANHUA)
             self.deleteManhua(dataDict["ManhuaTitle"])
 
-    def calculateLibraryDimension(self):
+    def calculateLibraryDimension(self) -> int:
         dimensionV = self.geometry().width()
 
         dimension = int(dimensionV / Manhua.manhuaSize.width()) - 2
         self.gridYLimit = dimension
         return dimension
 
-    def calculateLibrarySpacing(self):
+    def calculateLibrarySpacing(self) -> int:
         spacingV = self.geometry().width()
         dimension = int(spacingV / Manhua.manhuaSize.width()) - 1
         spacing = spacingV - (Manhua.manhuaSize.width() * dimension)
         spacing = int(spacing / dimension)
         return spacing
 
-    def launchReader(self, index, path):
-        if os.path.exists(path) and len(os.listdir(path)) != 0 and any(Path(os.path.join(str(path), filename)).suffix in ['.jpg', '.jpeg', '.png'] for filename in os.listdir(path)):
-            if(self.win_dow.objReader.fsState == True and self.appW.windowState() != Qt.WindowState.WindowMaximized):
-                self.appW.customTitleBar.toggleRestore()
-            self.win_dow.objReader.loadChapterPages(index)
-            self.win_dow.objReader.setFocus()
-            self.win_dow.setCurrentIndex(1)
+    def launchReader(self, index: int, path: str) -> None:
+        if os.path.exists(path) and len(os.listdir(path)) != consts.EMPTY and any(Path(os.path.join(str(path), filename)).suffix in consts.IMG_EXT_LIST for filename in os.listdir(path)):
+            if(Link.fetchAttribute(consts.OBJ_READER_NAME, "fsState") == True and Link.fetchAttribute(consts.OBJ_APP, "windowState", True) != Qt.WindowState.WindowMaximized):
+                Link.callBackDeep(consts.OBJ_APP, "customTitleBar", "toggleRestore")
+            Link.callBack(consts.OBJ_READER_NAME, "loadChapterPages", index)
+            Link.callBack(consts.OBJ_READER_NAME, "setFocus")
+            Link.callBack(consts.OBJ_WINDOW, "setCurrentIndex", 1)
         else:
-            self.parent.popDialog("deletedC")
+            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_CHAPTER)
             self.reloadManhuaData(self.descriptionPage.currentManhua, index)
 
-    def setCover(self, path, manhuaName):
+    def setCover(self, path: str, manhuaName: str) -> None:
         if os.path.exists(path):
             self.libraryMetadata[manhuaName]["ManhuaCover"] = str(path)
             manhuasData = list(self.libraryMetadata.keys())
@@ -1033,30 +1034,29 @@ class Library(QStackedWidget):
             self.libraryListdata[index].manhuaCoverPixmap = QPixmap(str(path)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
             self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
         else:
-            self.parent.popDialog("deletedI")
-            self.libraryMetadata[manhuaName]["ManhuaCover"] = str(self.parent.themeObj.defaultCoverImage)
+            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_IMAGE)
+            self.libraryMetadata[manhuaName]["ManhuaCover"] = str(resources.default_cover_image)
             manhuasData = list(self.libraryMetadata.keys())
             index = manhuasData.index(manhuaName)
-            self.libraryListdata[index].manhuaCoverPixmap = QPixmap(self.parent.themeObj.defaultCoverImage).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+            self.libraryListdata[index].manhuaCoverPixmap = QPixmap(resources.default_cover_image).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
             self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
-            ...
             
-    def deleteManhua(self, manhuaKey):
+    def deleteManhua(self, manhuaKey: str) -> None:
         temp = list(self.libraryMetadata.keys())
         index =  temp.index(manhuaKey)
         self.deleteManhuaData(manhuaKey, index)
         self.libraryScrollAreaWidget.layout().itemAt(index).widget().deleteLater()
-        if self.libraryItemLength == 0:
-            self.setCurrentIndex(0)
+        if self.libraryItemLength == consts.EMPTY:
+            self.setCurrentIndex(consts.E_TAB_LIBRARY_NO_ITEM)
         else:
-            self.setCurrentIndex(1)
+            self.setCurrentIndex(consts.E_TAB_LIBRARY_SHELF)
 
-    def deleteManhuaData(self, manhuaKey, index):
+    def deleteManhuaData(self, manhuaKey: str, index: int) -> None:
         del self.libraryMetadata[manhuaKey]
         self.libraryListdata.pop(index)
         self.libraryItemLength = len(self.libraryListdata)
 
-    def reloadManhuaData(self, manhuaKey, index=0):
+    def reloadManhuaData(self, manhuaKey: str, index: int = 0) -> None:
         if os.path.exists(self.libraryMetadata[manhuaKey]["ManhuaPath"]):
             dic = self.addToMetaData(self.libraryMetadata[manhuaKey]["ManhuaPath"])
             self.libraryMetadata[manhuaKey]["ManhuaTitle"] = dic["ManhuaTitle"]
@@ -1068,82 +1068,26 @@ class Library(QStackedWidget):
             self.resetSomeDescData(self.libraryMetadata[manhuaKey], index)
             
         else:
-            self.parent.popDialog("deletedM")
+            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_MANHUA)
             self.deleteManhua(manhuaKey)
-            self.setCurrentIndex(1)
+            self.setCurrentIndex(consts.E_TAB_LIBRARY_SHELF)
 
-    def resetSomeDescData(self, manhuaKey: dict, index=0):
+    def resetSomeDescData(self, manhuaKey: dict, index: int = 0) -> None:
         self.descriptionPage.setData(manhuaKey)
         self.descriptionPage.redisplayChapters()
-        self.win_dow.objReader.setData(manhuaKey["ManhuaTitle"], index)
+        Link.callBack(consts.OBJ_READER_NAME, "setData", manhuaKey["ManhuaTitle"], index)
 
     @staticmethod
     def launchArchiveReader(info):
         
         ...
 
-# class History(QPushButton):
-#     def __init__(self, manhuaName, chapter, index, path, parent, time):
-#         super().__init__()
-#         self.manhuaName = manhuaName
-#         # self.dataDict = self.parent.win_dow.objMainWindow.library.libraryMetadata[self.manhuaName]
-#         self.chapter = chapter
-#         self.chapterIndex = index
-#         self.path = path
-#         self.time = time
-#         self.parent = parent
-#         self.labelString = f"{self.manhuaName} - {self.chapter}\n{self.time}"
-#         self.setText(self.labelString)
-         
-#         self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }")
-#         self.setMinimumHeight(50)
-#         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-
-#         self.clicked.connect(lambda: self.launchHistory())
-#         self.dict = dict()
-#         self.dict["ManhuaName"] = self.manhuaName
-#         self.dict["Chapter"] = self.chapter
-#         self.dict["ChapterIndex"] = self.chapterIndex
-#         self.dict["ChapterPath"] = self.path
-#         self.dict["ReadTime"] = self.time
-        
-#     def launchHistory(self):
-#         self.historyIndex = self.parent.win_dow.objMainWindow.historyScrollL.layout().indexOf(self)
-#         # delete history
-#         self.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-#         self.dict["ReadTime"] = self.time
-#         if os.path.exists(self.path) and self.manhuaName in self.parent.win_dow.objMainWindow.library.libraryMetadata:
-#             if self.manhuaName != self.parent.win_dow.objReader.currentManhuaName:
-#                 self.parent.win_dow.objReader.manhuaChanged = True
-#             self.parent.setData(self.manhuaName, self.chapterIndex)
-#             self.parent.win_dow.objMainWindow.historyScrollL.layout().itemAt(self.historyIndex).widget().deleteLater()
-#             self.parent.win_dow.objMainWindow.historyData.pop(self.historyIndex)
-#             self.parent.win_dow.objMainWindow.library.launchReader(self.chapterIndex, self.path)
-
-#         else:
-#             # pop up for file not found
-#             # remove widget from layout and delete from historydata
-#             ...
-
-#     def setValues(self, chapter, index, path):
-#         self.chapter = chapter
-#         self.chapterIndex = index
-#         self.path = path
-#         self.time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-#         self.labelString = f"{self.manhuaName} - {self.chapter}\n{self.time}"
-#         self.dict["Chapter"] = self.chapter
-#         self.dict["ChapterIndex"] = self.chapterIndex
-#         self.dict["ChapterPath"] = self.path
-#         self.dict["ReadTime"] = self.time
-#         self.setText(self.labelString)
-      
 
 class Chapter(QPushButton):
-    def __init__(self, sTitle, pTitlePath, index, parent):
+    def __init__(self, sTitle: str, pTitlePath: str | Path, index: int) -> None:
         super().__init__()
         self.title = sTitle
         self.titlePath = pTitlePath
-        self.parent = parent
         self.index = index
         
         self.fm = self.fontMetrics()
@@ -1152,22 +1096,20 @@ class Chapter(QPushButton):
 
         self.labelString = f"{self.title} \n{self.elidedText}"
         self.setText(self.labelString)
-        self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }")
+        self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }") #---Theme---
         self.setMinimumHeight(50)
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        self.clicked.connect(lambda: self.parent.launchReader(self.index, self.titlePath))
+        self.clicked.connect(lambda: Link.callBack(consts.OBJ_LIB_NAME, "launchReader", self.index, self.titlePath))
 
 
 class Manhua(QPushButton):
     manhuaSize = QSize(120, 170)
     
-    def __init__(self, metadata, parent=None):
-        super(Manhua, self).__init__(parent)
+    def __init__(self, metadata: dict) -> None:
+        super(Manhua, self).__init__()
         self.metadata: dict = metadata
-        self.parent = parent
         self.setCheckable(True)
-        # self.setChecked(False)
         self.manhuaName = metadata["ManhuaTitle"]
         self.manhuaPath = Path(metadata["ManhuaPath"])
         self.manhuaCover = Path(metadata["ManhuaCover"])
@@ -1175,41 +1117,38 @@ class Manhua(QPushButton):
         self.manhuaId = metadata["ManhuaTitle"]
         self.isFavorite = metadata["IsFav"]
         self.bookmarkPosition = object()
-        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.setObjectName(self.manhuaName)
         
-        
-
-        # self.manhuaCoverLabel = QLabel()  #Holds the description page image
         self.recreateObjectWidgets()
        
-        if self.parent.parent.viewIsGrid:
+        if Link.fetchAttribute(consts.OBJ_MW_NAME, "viewIsGrid"):
             self.manhuaBgLayoutGrid = QVBoxLayout()
             self.displayGridVariant()
         else:
             self.manhuaBgLayoutList = QHBoxLayout()
             self.displayListVariant()
 
-        self.clicked.connect(lambda: self.parent.openDescription(self.metadata))
+        self.clicked.connect(lambda: Link.callBackDeep(consts.OBJ_MW_NAME, "library", "openDescription", self.metadata))
         
-    def recreateObjectWidgets(self):
+    def recreateObjectWidgets(self) -> None:
         self.manhuaCoverDisplayLabel = QLabel()
-        self.manhuaCoverDisplayLabel.setObjectName("manhuaLabel")
-        self.manhuaCoverDisplayLabel.setSizePolicy(self.sizePolicy)
+        self.manhuaCoverDisplayLabel.setObjectName(consts.OBJ_MW_MANHUA_LABEL)
+        self.manhuaCoverDisplayLabel.setSizePolicy(self.size_policy)
         self.manhuaCoverLayout = QVBoxLayout()
         self.manhuaDetailsLayout = QHBoxLayout()
         self.manhuaDetailsLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         # self.manhuaDetailsWidget = QWidget()
         self.manhuaNameLabel = QLabel()
-        self.manhuaNameLabel.setObjectName("nameLabel")
+        self.manhuaNameLabel.setObjectName(consts.OBJ_MW_MANHUA_NAME_LABEL)
         self.manhuaFavoriteButton = QPushButton()
-        self.manhuaFavoriteButton.setSizePolicy(self.sizePolicy)
+        self.manhuaFavoriteButton.setSizePolicy(self.size_policy)
         self.manhuaFavoriteButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.manhuaFavoriteButtonIcon = QIcon()
         
         if not os.path.exists(self.manhuaCover):
-            self.manhuaCoverPixmap = QPixmap(self.parent.parent.themeObj.defaultCoverImage).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+            self.manhuaCoverPixmap = QPixmap(resources.default_cover_image).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         else:
             self.manhuaCoverPixmap = QPixmap(str(self.manhuaCover)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         self.manhuaCoverDisplayLabel.setPixmap(self.manhuaCoverPixmap)
@@ -1218,7 +1157,7 @@ class Manhua(QPushButton):
         self.manhuaCoverLayout.setContentsMargins(0, 0, 0, 0)
 
         self.manhuaNameLabel.setText(self.manhuaName)
-        self.manhuaNameLabel.setSizePolicy(self.sizePolicy)
+        self.manhuaNameLabel.setSizePolicy(self.size_policy)
         self.manhuaNameLabelFont = QFont()
         self.manhuaNameLabelFont.setPointSize(7)
         self.manhuaNameLabelFont.setBold(False)
@@ -1226,7 +1165,7 @@ class Manhua(QPushButton):
         self.manhuaNameLabel.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.manhuaNameLabel.setMaximumHeight(20)
 
-        self.manhuaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"), QIcon.Mode.Normal, QIcon.State.Off)
+        self.manhuaFavoriteButtonIcon.addPixmap(QPixmap(resources.favorite_btn), QIcon.Mode.Normal, QIcon.State.Off)
         self.manhuaFavoriteButton.setIcon(self.manhuaFavoriteButtonIcon)
         self.manhuaFavoriteButton.setFixedSize(QSize(20, 20))
         self.manhuaFavoriteButton.setObjectName("fav")
@@ -1238,11 +1177,11 @@ class Manhua(QPushButton):
         self.manhuaCoverDisplayLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.checkFav(self.isFavorite)
 
-        self.setStyleSheet(" QLabel#manhuaLabel{ padding: 7px; border-radius: 5px; background-color: white; border: none;}  QLabel#nameLabel{ padding: 1px; border-radius: 5px;} QPushButton#fav { background: rgb(147,148,165);  border: none; border-radius: 5px;} QPushButton#fav:hover { background-color: rgb(72,75,106)} .Manhua { border-radius: 5px; background-color: white;} .Manhua:hover{ background: rgba(0, 0, 0, 40); }")
+        self.setStyleSheet(" QLabel#manhuaLabel{ padding: 7px; border-radius: 5px; background-color: white; border: none;}  QLabel#nameLabel{ padding: 1px; border-radius: 5px;} QPushButton#fav { background: rgb(147,148,165);  border: none; border-radius: 5px;} QPushButton#fav:hover { background-color: rgb(72,75,106)} .Manhua { border-radius: 5px; background-color: white;} .Manhua:hover{ background: rgba(0, 0, 0, 40); }") #---Theme---
 
         self.manhuaFavoriteButton.clicked.connect(lambda: self.favorite(self.isFavorite))
 
-    def displayGridVariant(self):
+    def displayGridVariant(self) -> None:
         self.manhuaDetailsLayout.setStretch(0, 7)
         self.manhuaDetailsLayout.setStretch(1, 2)
         self.manhuaDetailsLayout.setSpacing(1)
@@ -1260,7 +1199,7 @@ class Manhua(QPushButton):
         self.setMaximumSize(self.manhuaSize)
         self.setMinimumSize(self.manhuaSize)
     
-    def displayListVariant(self):
+    def displayListVariant(self) -> None:
         self.manhuaDetailsLayout.setStretch(0, 10)
         self.manhuaDetailsLayout.setStretch(1, 1)
         self.manhuaDetailsLayout.setSpacing(1)
@@ -1278,13 +1217,13 @@ class Manhua(QPushButton):
         self.setMinimumHeight(140)
         self.setMaximumHeight(140)
 
-    def checkFav(self, isFavorite):
+    def checkFav(self, isFavorite: bool) -> None:
         if isFavorite == False:
             self.removeFavorite()
         else:
             self.addToFavorite()
 
-    def favorite(self, isFavorite):
+    def favorite(self, isFavorite: bool) -> None:
         if isFavorite == False:
             self.addToFavorite()
             self.isFavorite = True
@@ -1292,38 +1231,39 @@ class Manhua(QPushButton):
             self.removeFavorite()
             self.isFavorite = False
 
-    def addToFavorite(self):
-        self.manhuaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-checked-64.png"))
+    def addToFavorite(self) -> None:
+        self.manhuaFavoriteButtonIcon.addPixmap(QPixmap(resources.favorite_btn_checked))
         self.manhuaFavoriteButton.setIcon(self.manhuaFavoriteButtonIcon)
-        self.parent.libraryMetadata[self.manhuaName]["IsFav"] = True
-        ...
+        dict_ = Link.fetchAttribute(consts.OBJ_LIB_NAME, "libraryMetadata")
+        dict_[self.manhuaName]["IsFav"] = True
     
-    def removeFavorite(self):
-        self.manhuaFavoriteButtonIcon.addPixmap(QPixmap("resources/icons/icons8-favourite-64.png"))
+    def removeFavorite(self) -> None:
+        self.manhuaFavoriteButtonIcon.addPixmap(QPixmap(resources.favorite_btn))
         self.manhuaFavoriteButton.setIcon(self.manhuaFavoriteButtonIcon)
-        self.parent.libraryMetadata[self.manhuaName]["IsFav"] = False
+        dict_ = Link.fetchAttribute(consts.OBJ_LIB_NAME, "libraryMetadata")
+        dict_[self.manhuaName]["IsFav"] = False
     
 
 class Description(QWidget):
-    def __init__(self, parent):
-        super(Description, self).__init__(parent)
-        self.sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+    def __init__(self) -> None:
+        super(Description, self).__init__()
+        self.size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.max_button_size = QSize(36, 36)
         self.min_button_size = QSize(16, 16)
         self.icon_size = QSize(20, 20)
-        self.parent = parent
         self.launchDone = False
         self.dataDict = dict()
-        self.descChapters = dict()
+        self.descChapters: dict = dict()
         self.chapterLen = int()
         self.createDescriptionWidget()
         self.launchDone = True
 
         self.exitButton.clicked.connect(lambda: self.exitPage())
-        self.deleteButton.clicked.connect(lambda: self.parent.deleteManhua(self.dataDict["ManhuaTitle"]))
-        self.setObjectName("descPage")
+        self.deleteButton.clicked.connect(lambda: Link.callBack(consts.OBJ_LIB_NAME, "deleteManhua", self.dataDict["ManhuaTitle"]))
+
+        self.setObjectName(consts.OBJ_MW_LIBRARY_DESC)
         
-    def createDescriptionWidget(self):
+    def createDescriptionWidget(self) -> None:
         self.mainLayout = QHBoxLayout()
         
         self.infoLayout = QVBoxLayout()
@@ -1332,28 +1272,28 @@ class Description(QWidget):
         self.exitButton = QPushButton()
         self.exitButton.setObjectName("backDescButton")
 
-        self.exitButton.setSizePolicy(self.sizePolicy)
+        self.exitButton.setSizePolicy(self.size_policy)
         self.exitButton.setMinimumSize(self.min_button_size)
         self.exitButton.setMaximumSize(self.max_button_size)
         self.exitButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.exitButton.setGeometry(0, 0, 36, 36)
         self.exitButton.setToolTip("Return to Home")
-        self.exitButton.setToolTipDuration(3000)
+        self.exitButton.setToolTipDuration(consts.TOOLTIP_DURATION)
         self.exitButtonIcon = QIcon()
         self.exitButton.setIconSize(self.icon_size)
         self.exitButton.setCheckable(True)
 
         self.modeTag = QLabel()
         self.deleteButton = QPushButton()
-        self.deleteButton.setObjectName("deleteManhuaButton")
+        self.deleteButton.setObjectName(consts.OBJ_MW_LIBRARY_DESC_DELETE_MANHUA_BTN)
 
-        self.deleteButton.setSizePolicy(self.sizePolicy)
+        self.deleteButton.setSizePolicy(self.size_policy)
         self.deleteButton.setMinimumSize(self.min_button_size)
         self.deleteButton.setMaximumSize(self.max_button_size)
         self.deleteButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.deleteButton.setGeometry(0, 0, 36, 36)
         self.deleteButton.setToolTip("Delete Manhua")
-        self.deleteButton.setToolTipDuration(3000)
+        self.deleteButton.setToolTipDuration(consts.TOOLTIP_DURATION)
         self.deleteButtonIcon = QIcon()
         self.deleteButton.setIconSize(self.icon_size)
         self.deleteButton.setCheckable(True)
@@ -1423,7 +1363,7 @@ class Description(QWidget):
         
         self.setLayout(self.mainLayout)
 
-    def loadDescriptionItems(self):
+    def loadDescriptionItems(self) -> None:
         self.scrollAreaWidget = QWidget()
 
         self.chapterDescListLayout = QVBoxLayout(self.scrollAreaWidget)
@@ -1435,7 +1375,7 @@ class Description(QWidget):
 
         self.selectionLayout.addWidget(self.scrollArea)
 
-    def setData(self, dataDict: dict):
+    def setData(self, dataDict: dict) -> None:
         self.dataDict = dataDict
         self.setName(dataDict["ManhuaTitle"])
         self.setCover(dataDict["ManhuaCover"])
@@ -1444,7 +1384,7 @@ class Description(QWidget):
         self.setDesc(dataDict["Description"])
         self.chapterLen = len(self.descChapters)
 
-    def setName(self, name):
+    def setName(self, name: str) -> None:
         self.nameLabel.setText(name)
         self.nameLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.nameLabelFont = QFont()
@@ -1453,50 +1393,49 @@ class Description(QWidget):
         self.nameLabel.setFont(self.nameLabelFont)
         self.currentManhua = self.dataDict["ManhuaTitle"]
 
-    def setCover(self, cover):
+    def setCover(self, cover: str | Path) -> None:
         w, h = self.coverLabel.width(), self.coverLabel.height()
         if not os.path.exists(cover):
-            self.coverPixmap = QPixmap(self.parent.parent.themeObj.defaultCoverImage).scaled(w, h, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
+            self.coverPixmap = QPixmap(resources.default_cover_image).scaled(w, h, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         else:
             self.coverPixmap = QPixmap(str(cover)).scaled(w, h, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
         self.coverLabel.setPixmap(self.coverPixmap)
         self.coverLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-    def setDesc(self, desc):
+    def setDesc(self, desc: str) -> None:
         self.synopsisLabel.setText(desc)
         self.synopsisLabel.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignLeft)
         self.synopsisLabel.setWordWrap(True)
 
-    def setChapters(self, chapters):
+    def setChapters(self, chapters: dict) -> None:
         self.descChapters = chapters
 
-    def setStatus(self, status):
+    def setStatus(self, status: str) -> None:
         self.modeTag.setText(status)
 
-    def setPath(self, pPath, path):
+    def setPath(self, pPath: str | Path, path: str | Path) -> str:
         path = str(pPath) + '\\' + str(path) + '\\'
         return path
 
-    def resetChapters(self):
+    def resetChapters(self) -> None:
         self.scrollAreaWidget.deleteLater()
         self.loadDescriptionItems()
 
-    def redisplayChapters(self):
-        if os.path.exists(self.dataDict["ManhuaPath"]) and self.chapterLen != 0:
+    def redisplayChapters(self) -> None:
+        if os.path.exists(self.dataDict["ManhuaPath"]) and self.chapterLen != consts.EMPTY:
             self.resetChapters()
         else:
-            self.parent.parent.popDialog("deletedM")
-            self.parent.deleteManhua(self.dataDict["ManhuaTitle"])
-            self.parent.setCurrentIndex(1)
-            ...
+            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_MANHUA)
+            Link.callBack(consts.OBJ_LIB_NAME, "deleteManhua", self.dataDict["ManhuaTitle"])
+            Link.callBack(consts.OBJ_LIB_NAME, "setCurrentIndex", consts.E_TAB_LIBRARY_SHELF)
 
-    def chapterDescListDisplay(self):
+    def chapterDescListDisplay(self) -> None:
         for x in range(len(self.descChapters)):
             key = list(self.descChapters.keys())[x]
             iPath = self.descChapters.get(key)
             path = self.setPath(self.dataDict["ManhuaPath"], iPath)
-            chap = Chapter(key, path, x, self.parent)
+            chap = Chapter(key, path, x)
             self.chapterDescListLayout.addWidget(chap)
 
-    def exitPage(self):
-        self.parent.setCurrentIndex(1)
+    def exitPage(self) -> None:
+        Link.callBack(consts.OBJ_LIB_NAME, "setCurrentIndex", consts.E_TAB_LIBRARY_SHELF)
