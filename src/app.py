@@ -40,7 +40,7 @@ class  App(QMainWindow):
         self.appLayout = QVBoxLayout()
         self.appWidget = QWidget()
 
-        self.stWindow = create.Window()
+        self.stWindow = create.Window(parent=self)
 
         self.stWindowLayout = QVBoxLayout()
         self.stWindowLayout.addWidget(self.stWindow)

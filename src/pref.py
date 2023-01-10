@@ -53,21 +53,12 @@ class Preference(QWidget):
         self.fontSize2 = 9
         self.fontSize3 = 8
 
-        self.compressionState = bool()
-        self.themeButtonState = bool()
-        self.updateChapter = bool()
-        self.updateOther = bool()
-        self.hideNav = bool()
-        self.fsState = bool()
-        self.readerDisplayIndex = int()
         self.readerDisplayList = []
         self.settingsToggleIndex = int()
         self.settingsToggleList = []
-        self.initReaderState = []
         self.updatedReaderState = []
 
         self.downloadDirPath = object()
-        self.initPath = object()
         self.newPath = object()
         
         self.numCurrent = 0
@@ -230,15 +221,11 @@ class Preference(QWidget):
         self.themesButton.clicked.connect(lambda: self.setActive(consts.E_ACTIVE_STACK_THEME))
 
     def backAction(self) -> None:
-        Settings.setPrefVariables()
         self.updateReaderState()
         Link.callBack(consts.OBJ_WINDOW, "changeStackIndex", consts.E_WINDOW_STACK_MW)
 
     def updateReaderState(self) -> None:
-        if self.initReaderState != Link.fetchAttribute(consts.OBJ_READER_NAME, "initReaderState"):
-            self.updatedReaderState = self.initReaderState
-            Link.callBack(consts.OBJ_READER_NAME, "setState", self.updatedReaderState)
-            Link.callBack(consts.OBJ_READER_NAME, "updateLayout")
+        Link.callBack(consts.OBJ_READER_NAME, "updateLayout")
 
     def setActive(self, activeIndex: int) -> None:
         self.active = activeIndex
@@ -487,7 +474,6 @@ class Preference(QWidget):
 
     def onRadioClicked(self, radioIndex: int) -> None:
         radioBtn = self.sender()
-        self.readerDisplayIndex = radioIndex
         if radioBtn.isChecked():
             Settings.readerDisplayIndex = radioIndex
         
@@ -627,7 +613,6 @@ class Preference(QWidget):
             Link.callBack(consts.OBJ_WINDOW, "setTheme", consts.E_THEME_DARK_MODE)
         else:
             Link.callBack(consts.OBJ_WINDOW, "setTheme", consts.E_THEME_LIGHT_MODE)
-        Settings.setPrefVariables()
             
     def themesWidgetObj(self) -> None:
         self.themesLabel = QLabel("Dark Theme")

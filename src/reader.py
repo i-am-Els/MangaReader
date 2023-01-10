@@ -22,6 +22,7 @@ import os, consts, resources
 from themes import Themes
 from linker import Link 
 from pathlib import Path
+from settings import Settings
 
 class Reader(QWidget):
     def __init__(self, parent: QWidget) -> None:
@@ -46,15 +47,10 @@ class Reader(QWidget):
         self.icon_size = QSize(20, 20)
 
         self.ifSameChapter = False
-
-        self.hideNav = bool()
-        self.fsState = bool()
-        self.readerDisplayIndex = int()
-        self.initReaderState = []
         self.majorLayout = QVBoxLayout()
 
     def setData(self, data: str, index: int = 0) -> None:
-        self.currentDict: dict = Link.fetchAttribute(consts.OBJ_LIB_NAME, "libraryMetadata")[data]
+        self.currentDict: dict = Settings.libraryMetadata[data]
         self.currentManhuaName = data
         self.currentManhuaPath = self.currentDict["ManhuaPath"] 
         self.currentChapterIndex = index
@@ -68,20 +64,19 @@ class Reader(QWidget):
         Link.callBack(consts.OBJ_WINDOW, "changeStackIndex", consts.E_WINDOW_STACK_MW)
 
     def calLabelSize(self) -> None:
-        if Link.fetchAttribute(consts.OBJ_WINDOW, "currentIndex", True) == consts.E_WINDOW_STACK_READER and self.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
+        if Link.fetchAttribute(consts.OBJ_WINDOW, "currentIndex", True) == consts.E_WINDOW_STACK_READER and Settings.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
             self.reScaleMLabel()
 
     def setState(self, state: list) -> None:
-        self.readerDisplayIndex = state[0]
+        Settings.readerDisplayIndex = state[0]
         self.hideNav = state[1]
         self.fsState = state[2]
-        self.initReaderState = state
 
     def selfInit(self) -> None:
         self.majorWidget = QWidget()
         self.setLayout(self.majorLayout)
         self.mainLayout = QHBoxLayout()
-        if self.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
+        if Settings.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
             self.scrollingLayoutInit()
         else:
             self.pagingLayoutInit()
@@ -278,14 +273,14 @@ class Reader(QWidget):
         self.mainLayout.setStretch(2, 1)
 
         self.backButton.clicked.connect(lambda: self.backAction())
-        self.previousButton.clicked.connect(lambda: self.previousAction(self.readerDisplayIndex))
-        self.nextButton.clicked.connect(lambda: self.nextAction(self.readerDisplayIndex))
+        self.previousButton.clicked.connect(lambda: self.previousAction(Settings.readerDisplayIndex))
+        self.nextButton.clicked.connect(lambda: self.nextAction(Settings.readerDisplayIndex))
         self.setToCoverButton.clicked.connect(lambda: self.setToCoverAction())
 
     def updateLayout(self) -> None:
         self.majorWidget.deleteLater()
         self.selfInit()
-        Themes.readerStyle(self.readerDisplayIndex)
+        Themes.readerStyle(Settings.readerDisplayIndex)
 
     def previousAction(self, typeIndex: int) -> None:
         if typeIndex == consts.E_RADIO_SELECTED_LTR:
@@ -330,7 +325,7 @@ class Reader(QWidget):
                 self.nextChapter()
 
     def setToCoverAction(self) -> None:
-        if self.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
+        if Settings.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
             n = len(self.imageList)
             v = self.screenScrollArea.verticalScrollBar().value()
             max = self.screenScrollArea.verticalScrollBar().maximum()
@@ -371,7 +366,7 @@ class Reader(QWidget):
             self.imageList = []
             self.loadImageList()       
             self.imageCurrent = 0
-            if self.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
+            if Settings.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
                 self.setImageToLabel(self.imageCurrent)
             else:
                 if self.currentIndexPath != self.prevPath:
@@ -424,19 +419,19 @@ class Reader(QWidget):
     def clearLabels(self) -> None:
         self.screenScrollArea.deleteLater()
         self.setChapterLabels()
-        Themes.readerStyle(self.readerDisplayIndex)
+        Themes.readerStyle(Settings.readerDisplayIndex)
 
     def keyPressEvent(self, event) -> None:
-        if self.hideNav:
+        if Settings.hideNav:
             if Link.fetchAttribute(consts.OBJ_WINDOW, "currentIndex", True) == consts.E_WINDOW_STACK_READER: 
-                if event.key() == Qt.Key.Key_A and self.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
-                    if self.readerDisplayIndex == consts.E_RADIO_SELECTED_LTR:
+                if event.key() == Qt.Key.Key_A and Settings.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
+                    if Settings.readerDisplayIndex == consts.E_RADIO_SELECTED_LTR:
                         self.previousAction(consts.E_RADIO_SELECTED_LTR)
                     else:
                         self.previousAction(consts.E_RADIO_SELECTED_RTL)
 
-                elif event.key() == Qt.Key.Key_D and self.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
-                    if self.readerDisplayIndex == consts.E_RADIO_SELECTED_LTR:
+                elif event.key() == Qt.Key.Key_D and Settings.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
+                    if Settings.readerDisplayIndex == consts.E_RADIO_SELECTED_LTR:
                         self.nextAction(consts.E_RADIO_SELECTED_LTR)
                     else:
                         self.nextAction(consts.E_RADIO_SELECTED_RTL)

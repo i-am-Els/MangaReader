@@ -17,7 +17,7 @@
 
 
 from pathlib import Path
-import os, consts
+import os, consts, json, ctypes
 
 class Settings(object):
     obj = object()
@@ -26,35 +26,16 @@ class Settings(object):
     objR = object()
 
     picklePath = str(os.path.join(Path.home(), "Manhua Reader"))
-            
-    libraryInitPath = "C:\\"
-    libraryNewPath = libraryInitPath
-    localManhuaTitleDict = dict()
-
-    updateChapter = True
-    updateOther = True
-    hideNav = True
-    fsState = False
-    readerDisplayIndex = 1
-
-    compressionState = True
-
-    themeIndex = consts.E_THEME_LIGHT_MODE
-    themeButtonState = False
-
-    downloadInitPath = str(os.path.join(Path.home(), "Documents\\Manhua Reader\\downloads\\"))
-
-    downloadNewPath = downloadInitPath
-
-    extractionInitPath = str(os.path.join(Path.home(), "Documents\\Manhua Reader\\archives\\"))
-
-    extractionNewPath = extractionInitPath
-    apiName = ['Asura Scan', 'Mangabat', 'HolyManga']
-    apiIndex = 1
+    pickleFile = os.path.join(picklePath, "metadata.mhr")
+    pickleDict = dict()
 
     def init() -> None: 
-        if not os.path.exists(Settings.picklePath):
-            os.makedirs(Settings.picklePath)
+        if not os.path.exists(Settings.pickleFile):
+            os.makedirs(Settings.picklePath, exist_ok=True)
+            
+            Settings.saveData(Settings.defaults())
+            # print("System call", os.system(f"attrib +h {Settings.pickleFile}"))
+        Settings.pickleDict = Settings.loadSettings()
         
         if not os.path.exists(Settings.downloadInitPath):
             os.makedirs(Settings.downloadInitPath)
@@ -68,77 +49,127 @@ class Settings(object):
         Settings.objR = obj.objReader
         Settings.objP = obj.objPref
 
+    def defaults() -> dict:
+        return  {
+            "libraryMetadata" : {},
+            "libraryInitPath" : "",
+            "libraryNewPath" : "C:\\",
+            "viewIsGrid" : False,
+            "viewOptionIndex" : consts.E_MW_LIST_VIEW,
+            "previousViewOptionIndex" : consts.E_MW_GRID_VIEW,
+            "downloadInitPath" : str(os.path.join(Path.home(), "Documents\\Manhua Reader\\downloads\\")),
+            "downloadNewPath" : str(os.path.join(Path.home(), "Documents\\Manhua Reader\\downloads\\")),
+            "extractionInitPath" : str(os.path.join(Path.home(), "Documents\\Manhua Reader\\archives\\")),
+            "extractionNewPath" : str(os.path.join(Path.home(), "Documents\\Manhua Reader\\archives\\")),
+            "updateChapter" : True,
+            "updateOther" : True,
+            "hideNav" : True,
+            "fsState" : False,
+            "readerDisplayIndex" : consts.E_RADIO_SELECTED_WEBTOON,
+            "compressionState" : True,
+            "apiName" : ['Asura Scan', 'Mangabat', 'HolyManga'],
+            "apiIndex" : 1,
+
+            "themeIndex" : consts.E_THEME_LIGHT_MODE,
+            "themeButtonState" : False
+        }
+
+    def saveData(data) -> None:
+        data = json.dumps(data)
+
+        data = data.encode()
+
+        with open(os.path.expanduser(Settings.pickleFile), "wb") as filehandle:
+            filehandle.write(data)
+
+    def loadSettings() -> dict:
+        try:
+            data = b''
+            with open(Settings.pickleFile, 'rb') as filehandle:
+                data = filehandle.read()
+            data = data.decode()
+            data = json.loads(data)
+
+            for key, value in data.items():
+                setattr(Settings, key, value)
+            return data
+        except PermissionError:
+            ...
+        except FileNotFoundError:
+            data = Settings.saveDefaults()
+            return Settings.loadSettings()
+
+    def updateSettings():
+        data = {key: Settings.__dict__[key] for key in Settings.defaults()}
+
+        Settings.saveData(data)
+
+
 
     def setMainWindowVariables() -> None:
-        Settings.objM.initPath = Settings.libraryInitPath
+        # Settings.objM.initPath = Settings.libraryInitPath
 
-        Settings.objM.newPath = Settings.libraryNewPath
+        # Settings.objM.newPath = Settings.libraryNewPath
 
         Settings.objM.apiName = Settings.apiName
-        Settings.objM.apiIndex = Settings.apiIndex
-        Settings.objM.localManhuaTitleDict = Settings.localManhuaTitleDict
+        # Settings.objM.libraryMetadata = Settings.libraryMetadata
 
-    def setPrefVariables() -> None:
-        Settings.objP.compressionState = Settings.compressionState
+    # def setPrefVariables() -> None:
+    #     Settings.objP.compressionState = Settings.compressionState
 
-        Settings.objP.updateChapter = Settings.updateChapter
+    #     Settings.objP.updateChapter = Settings.updateChapter
 
-        Settings.objP.updateOther = Settings.updateOther
+    #     Settings.objP.updateOther = Settings.updateOther
 
-        Settings.objP.themeButtonState = Settings.themeButtonState
+    #     Settings.objP.themeButtonState = Settings.themeButtonState
 
-        Settings.objP.hideNav = Settings.hideNav
+    #     Settings.objP.hideNav = Settings.hideNav
 
-        Settings.objP.fsState = Settings.fsState
+    #     Settings.objP.fsState = Settings.fsState
 
-        Settings.objP.readerDisplayIndex = Settings.readerDisplayIndex
+    #     Settings.objP.readerDisplayIndex = Settings.readerDisplayIndex
 
-        Settings.objP.initPath = Settings.downloadInitPath
+    #     Settings.objP.initPath = Settings.downloadInitPath
 
-        Settings.objP.newPath = Settings.downloadNewPath
+    #     Settings.objP.newPath = Settings.downloadNewPath
 
-        Settings.objP.initReaderState = [Settings.readerDisplayIndex, Settings.hideNav, Settings.fsState]
+    # def setReaderInits() -> None:
+    #     Settings.objR.hideNav = Settings.hideNav
 
-    def setReaderInits() -> None:
-        Settings.objR.hideNav = Settings.hideNav
+    #     Settings.objR.fsState = Settings.fsState
 
-        Settings.objR.fsState = Settings.fsState
-
-        Settings.objR.readerDisplayIndex = Settings.readerDisplayIndex
-        Settings.objR.initReaderState = [Settings.readerDisplayIndex, Settings.hideNav, Settings.fsState]
+    #     Settings.objR.readerDisplayIndex = Settings.readerDisplayIndex
 
     def setObjMState() -> None:
-        Settings.apiIndex = Settings.objM.apiIndex
         Settings.objM.apiButton.setText(Settings.apiName[Settings.apiIndex])
 
     def setStates() -> None:
         Settings.setMainWindowVariables()
-        Settings.setPrefVariables()
-        Settings.setReaderInits()
+        # Settings.setPrefVariables()
+        # Settings.setReaderInits()
         Settings.objR.selfInit()
 
         Settings.objM.apiCombo.addItems(Settings.apiName)
 
-        Settings.objM.apiIndex = Settings.apiIndex
         Settings.setObjMState()
 
-        Settings.objM.apiCombo.setCurrentIndex(Settings.objM.apiIndex)
+        Settings.objM.apiCombo.setCurrentIndex(Settings.apiIndex)
         if Settings.apiIndex == 0:
             Settings.objM.setApiIndex(Settings.apiIndex)
         
         Settings.objP.downloadDirPathDisplay.setText(str(Settings.downloadNewPath))
 
-        Settings.objP.compressArchiveToggleBtn.setChecked(Settings.objP.compressionState)
+        Settings.objP.compressArchiveToggleBtn.setChecked(Settings.compressionState)
 
-        Settings.objP.toggleOne.setChecked(Settings.objP.updateChapter)
+        Settings.objP.toggleOne.setChecked(Settings.updateChapter)
 
-        Settings.objP.toggleTwo.setChecked(Settings.objP.updateOther)
+        Settings.objP.toggleTwo.setChecked(Settings.updateOther)
 
-        Settings.objP.readerNavtoggle.setChecked(Settings.objP.hideNav)
+        Settings.objP.readerNavtoggle.setChecked(Settings.hideNav)
 
-        Settings.objP.readerFStoggle.setChecked(Settings.objP.fsState)
+        Settings.objP.readerFStoggle.setChecked(Settings.fsState)
 
-        Settings.objP.readerDisplayList[Settings.objP.readerDisplayIndex].setChecked(True)
+        Settings.objP.readerDisplayList[Settings.readerDisplayIndex].setChecked(True)
 
-        Settings.objP.themesBtn.setChecked(Settings.objP.themeButtonState)
+        Settings.objP.themesBtn.setChecked(Settings.themeButtonState)
         

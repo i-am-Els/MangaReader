@@ -32,13 +32,9 @@ from linker import Link
 
 class Window(QStackedWidget):
 
-    def __new__(cls):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(Window, cls).__new__(cls)
-        return cls.instance
-
-    def __init__(self) -> None:
+    def __init__(self, parent=None) -> None:
         super().__init__()
+        self.parent = parent
         self.window_icon = QIcon()
         self.window_icon.addPixmap(QPixmap(resources.app_logo), QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.window_icon)
