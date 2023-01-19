@@ -229,6 +229,7 @@ class Preference(QWidget):
 
     def setActive(self, activeIndex: int) -> None:
         self.active = activeIndex
+        Themes.prefSelectedButtonIndex = self.active
         
         Themes.prefButtonActive(self.active, Settings.themeIndex)
 

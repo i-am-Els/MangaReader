@@ -446,9 +446,10 @@ class Reader(QWidget):
         def __init__(self, path: str | Path, width: int):
             super().__init__()
             self.path = path
+            # self.width = self.width()
             self.width = width
             self.setScaledContents(True)
             if os.path.exists(self.path):
                 self.setPixmap(QPixmap(self.path).scaledToWidth(self.width, Qt.TransformationMode.SmoothTransformation))
-            self.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+            self.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.setStyleSheet("padding: 0px;")

@@ -23,7 +23,7 @@ from PyQt6.QtGui import QIcon, QPainter, QColor, QPen, QPixmap, QBrush, QCursor,
 
 from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QLabel, QWidget, QSizePolicy, QVBoxLayout
 
-import consts, resources
+import consts, resources, color
 from linker import Link
 from settings import Settings
 
@@ -37,7 +37,9 @@ class Themes:
     style = str()
 
     # self.Themes.objP.spaceE.setPixmap(self.Themes.objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
-    scrollbarStyleLight = "QScrollArea { background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QScrollBar:vertical { width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;} QScrollBar::handle:vertical { background: rgb(128, 128, 128); min-height:0px; border-radius: 3px;} QScrollBar::add-line:vertical { background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; } QScrollBar::sub-line:vertical {  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(32, 47, 130), stop: 1 rgb(32, 47, 130)); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }"
+    scrollbarStyleLight = f"QScrollArea {{ background-color: {color.LIGHT_COLOR_3}; border: 1px solid {color.LIGHT_COLOR_3}; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QScrollBar:vertical {{ width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;}} QScrollBar::handle:vertical {{ background: {color.LIGHT_COLOR_7}; min-height:0px; border-radius: 3px;}} QScrollBar::add-line:vertical {{ background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; }} QScrollBar::sub-line:vertical {{  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }}"
+
+    # scrollbarStyleDark = f"QScrollArea {{ background-color: {color.DARK_COLOR_3}; border: 1px solid {color.DARK_COLOR_3}; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QScrollBar:vertical {{ width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;}} QScrollBar::handle:vertical {{ background: {color.DARK_COLOR_7}; min-height:0px; border-radius: 3px;}} QScrollBar::add-line:vertical {{ background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.DARK_COLOR_8}, stop: 0.5 {color.DARK_COLOR_8}, stop: 1 {color.DARK_COLOR_8}); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; }} QScrollBar::sub-line:vertical {{  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.DARK_COLOR_8}, stop: 0.5 {color.DARK_COLOR_8}, stop: 1 {color.DARK_COLOR_8}); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }}"
 
     def themeInit() -> None:
         Themes.objM = Link.typeTest(consts.OBJ_MW_NAME)
@@ -47,92 +49,114 @@ class Themes:
 
     def prefButtonActiveLight(obj, indexB: int) -> None:
         if type(Themes.prevObjButton) == QPushButton:
-            Themes.prevObjButton.setStyleSheet(
-                "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250, 250, 250);} QPushButton:hover { color:white; background-color:rgb(210, 211, 219);} #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}")
+            Themes.prevObjButton.setStyleSheet(f"QPushButton {{ color: Black; border-radius: 15px;background-color: {color.LIGHT_COLOR_1};}} QPushButton:hover {{ color:white; background-color: {color.LIGHT_COLOR_3};}} #backButton:hover{{ background-color:{color.LIGHT_COLOR_4}; border-radius: 18px}}")
         else:
             pass
 
-        obj.setStyleSheet(
-            "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210, 211, 219);}#backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
-        )
-        Themes.prefButtonList[indexB].setStyleSheet(
-            "QPushButton { color:white;background-color:rgb(147, 148, 165); } #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
-        )
+        obj.setStyleSheet(f"QPushButton {{ color: Black; border-radius: 15px;}} .QPushButton:hover{{ color:white;background-color:{color.LIGHT_COLOR_3};}}#backButton:hover{{ background-color:{color.LIGHT_COLOR_4}; border-radius: 18px}}")
+
+        Themes.prefButtonList[indexB].setStyleSheet(f"QPushButton {{ color:white;background-color:{color.LIGHT_COLOR_4}; }} #backButton:hover{{ background-color:{color.LIGHT_COLOR_4}; border-radius: 18px}}")
+
+        for x in Themes.prefButtonList:
+            if x != Themes.prefButtonList[indexB]:
+                x.setStyleSheet(f"QPushButton {{ color: black; border-radius: 15px;}} .QPushButton:hover{{ color:white;background-color:{color.LIGHT_COLOR_3};}} #backButton:hover{{ background-color:{color.LIGHT_COLOR_4}; border-radius: 18px}}")
+
+        Themes.objP.downloadDirPathBtn.setStyleSheet(f"QPushButton {{ color:white;background-color:{color.LIGHT_COLOR_4}; }} #backButton:hover{{ background-color:{color.LIGHT_COLOR_4}; border-radius: 18px}}")
+
+        Themes.prevObjButton = Themes.prefButtonList[indexB]
+
+    def prefButtonActiveDark(obj, indexB: int) -> None:
+        if type(Themes.prevObjButton) == QPushButton:
+            Themes.prevObjButton.setStyleSheet(f"QPushButton {{ color: white; border-radius: 15px;background-color: {color.DARK_COLOR_9};}} QPushButton:hover {{ color:gray; background-color: {color.DARK_COLOR_3};}} #backButton:hover{{ background-color:{color.DARK_COLOR_4}; border-radius: 18px}}")
+        else:
+            pass
+
+        obj.setStyleSheet(f"QPushButton {{ color: gray; border-radius: 15px;}} .QPushButton:hover{{ color:gray;background-color:{color.DARK_COLOR_3};}} #backButton:hover{{ background-color:{color.DARK_COLOR_4}; border-radius: 18px}}")
+
+        Themes.prefButtonList[indexB].setStyleSheet(f"QPushButton {{ color:white;background-color:{color.DARK_COLOR_4}; }} #backButton:hover{{ background-color:{color.DARK_COLOR_4}; border-radius: 18px}}")
+
+        for x in Themes.prefButtonList:
+            if x != Themes.prefButtonList[indexB]:
+                x.setStyleSheet(f"QPushButton {{ color: gray; border-radius: 15px;}} .QPushButton:hover{{ color:gray;background-color:{color.DARK_COLOR_3};}} #backButton:hover{{ background-color:{color.DARK_COLOR_4}; border-radius: 18px}}")
+
+        Themes.objP.downloadDirPathBtn.setStyleSheet(f"QPushButton {{ color:white;background-color:{color.DARK_COLOR_4}; }} #backButton:hover{{ background-color:{color.DARK_COLOR_4}; border-radius: 18px}}")
 
         Themes.prevObjButton = Themes.prefButtonList[indexB]
 
     def lightMode(obj) -> None:
-        Themes.style ="""
-        *{
+        Themes.style = f"""
+        *{{
             color: Black;
-            background-color: rgb(250, 250, 250);
-        }
-        QPushButton{
+            background-color: {color.LIGHT_COLOR_1};
+        }}
+        QPushButton{{
+            background-color: {color.LIGHT_COLOR_1};
             border-radius: 18px;
-        }
-        QPushButton:hover {
-            background-color: rgb(147, 148, 165);
-        }
-        QLineEdit{
-            border: 1px solid rgba(0, 0, 0, 40);
+        }}
+        QPushButton:hover {{
+            background-color: {color.LIGHT_COLOR_4};
+        }}
+        QLineEdit{{
+            border: 1px solid {color.LIGHT_COLOR_6};
             border-radius: 18px;
             padding-left: 15px;
             font: 13px;
-        }
-        QStatusBar{
-            background-color: rgba(0, 0, 0, 40);
-        }
-        QLabel{
+        }}
+        QLabel{{
             padding: 10px;
             border-radius: 10px;
-        }
-
-        #toggleGridView:hover, #toggleListView:hover{
-            background-color: rgb(147, 148, 165);
+        }}
+        
+        #toggleGridView:hover, #toggleListView:hover{{
+            background-color: {color.LIGHT_COLOR_4};
             border-radius: 5px;
-        }
-
-        QTabWidget::pane{
-            border: 0px;
-        }
-        #historyLabel{
+        }}
+        
+        #historyLabel{{
             color: white;
-            background-color: rgb(72, 75, 106); 
+            background-color: {color.LIGHT_COLOR_5}; 
             font: 15px;
-        }
-        #historyListView{
-            background-color: rgb(210, 211, 219);
-            border: none;
-        }
-        #historyScroll, scroll{
-            background-color: rgb(210, 211, 219);
+        }}
+        #historyListView{{
+            background-color: {color.LIGHT_COLOR_3};
+        }}
+        #historyScroll, scroll{{
+            background-color: {color.LIGHT_COLOR_3};
             padding: 0px;
             margin: 0px;
-            border: none;
-        }
+        }}
         """
 
         obj.setStyleSheet(Themes.style)
         
-        Themes.objM.tabWidget.tabBar().setStyleSheet("QTabBar::tab { background-color: rgb(250, 250, 250); width: 200px; padding: 1px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }  QTabBar::tab:bottom{ background: rgb(235, 235, 235);}  QTabBar::tab:bottom:selected { background-color: rgb(72, 75, 106); color: rgb(250, 250, 250);}")
+        Themes.objM.tabWidget.tabBar().setStyleSheet(f"QTabBar::tab {{ background-color: {color.LIGHT_COLOR_1}; width: 200px; padding: 0px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }}  QTabBar::tab:bottom{{ background: {color.LIGHT_COLOR_9};}}  QTabBar::tab:bottom:selected {{ background-color: {color.LIGHT_COLOR_5}; color: {color.LIGHT_COLOR_1};}}")
 
-        Themes.objM.tabWidget.setStyleSheet("QTabWidget::pane { background: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
+        Themes.objM.tabWidget.setStyleSheet(f"QTabWidget::pane {{ background: {color.LIGHT_COLOR_3}; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} ")
 
-        Themes.objM.homeTabStack.setStyleSheet("background-color: rgb(210, 211, 219); border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
+        Themes.objM.homeTabStack.setStyleSheet(f"background-color: {color.LIGHT_COLOR_3}; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
-        Themes.objM.library.setStyleSheet("#libraryOrigin { background:transparent; border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} ")
+        Themes.objM.library.setStyleSheet(f" background: {color.LIGHT_COLOR_3}; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
         
-        Themes.objM.library.noItems.setStyleSheet(" QWidget{ background: rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;} QLabel { border: none; }")
+        Themes.objM.library.noItems.setStyleSheet(f" QWidget{{ background: transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QLabel {{ border: none; }}")
         
-        Themes.objM.library.descriptionPage.setStyleSheet("QWidget#descPage { background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } QPushButton:hover { background-color: rgb(147, 148, 165);}")
+        Themes.objM.library.descriptionPage.setStyleSheet(f"QWidget#descPage {{ background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; }} QPushButton:hover {{ background-color: {color.LIGHT_COLOR_4};}}")
 
         Themes.objM.library.libraryShelf.setStyleSheet(" background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
-        Themes.objM.library.libraryScrollArea.setStyleSheet(Themes.scrollbarStyleLight)
-        Themes.objM.library.descriptionPage.scrollArea.setStyleSheet(Themes.scrollbarStyleLight)
-        Themes.objM.scroll.setStyleSheet(Themes.scrollbarStyleLight)
+        Themes.objM.library.libraryScrollArea.setStyleSheet(f"QScrollArea {{ background-color: transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QScrollBar:vertical {{ width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;}} QScrollBar::handle:vertical {{ background: {color.LIGHT_COLOR_7}; min-height:0px; border-radius: 3px;}} QScrollBar::add-line:vertical {{ background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; }} QScrollBar::sub-line:vertical {{  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }}")
 
-        # self.Themes.objM.library.libraryScrollAreaWidget.setStyleSheet("QSCrollArea{ border: 1px solid rgb(210, 211, 219); border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; } ")
+        Themes.objM.library.descriptionPage.scrollArea.setStyleSheet(f"QScrollArea {{ background-color: transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QScrollBar:vertical {{ width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;}} QScrollBar::handle:vertical {{ background: {color.LIGHT_COLOR_7}; min-height:0px; border-radius: 3px;}} QScrollBar::add-line:vertical {{ background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; }} QScrollBar::sub-line:vertical {{  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }}  QPushButton:hover{{ background-color: {color.LIGHT_COLOR_4};}}")
+
+        Themes.objM.scroll.setStyleSheet(f"QScrollArea {{ background-color: {color.LIGHT_COLOR_4}; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QScrollBar:vertical {{ width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;}} QScrollBar::handle:vertical {{ background: {color.LIGHT_COLOR_7}; min-height:0px; border-radius: 3px;}} QScrollBar::add-line:vertical {{ background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; }} QScrollBar::sub-line:vertical {{  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }} QPushButton:hover{{ background-color: {color.DARK_COLOR_3};}}")
+
+        Themes.objM.library.libraryScrollAreaWidget.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+
+        Themes.objM.scrollW.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+
+        Themes.objM.historyListView.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+
+
+        Themes.objM.library.descriptionPage.selectionWidget.setStyleSheet(f"background-color: transparent;")
 
         Themes.objM.apiButton.setStyleSheet("QPushButton{ border-radius: 18px;}")
         
@@ -151,12 +175,12 @@ class Themes:
         Themes.objM.library.descriptionPage.exitButtonIcon.addPixmap(QPixmap(resources.exit_button), QIcon.Mode.Normal, QIcon.State.Off)
         Themes.objM.library.descriptionPage.exitButton.setIcon(Themes.objM.library.descriptionPage.exitButtonIcon)
         
-        Themes.objM.library.descriptionPage.exitButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+        Themes.objM.library.descriptionPage.exitButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_3}; border-radius: 18px;}}")
 
         Themes.objM.library.descriptionPage.deleteButtonIcon.addPixmap(QPixmap(resources.delete_manhua), QIcon.Mode.Normal, QIcon.State.Off)
         Themes.objM.library.descriptionPage.deleteButton.setIcon(Themes.objM.library.descriptionPage.deleteButtonIcon)
         
-        Themes.objM.library.descriptionPage.deleteButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+        Themes.objM.library.descriptionPage.deleteButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_3}; border-radius: 18px;}}")
         
         Themes.objM.refreshIcon.addPixmap(QPixmap(resources.refresh_icon), QIcon.Mode.Normal, QIcon.State.Off)
         Themes.objM.refreshButton.setIcon(Themes.objM.refreshIcon)
@@ -164,33 +188,33 @@ class Themes:
         Themes.objM.clearHistoryIcon.addPixmap(QPixmap(resources.clear_history_icon), QIcon.Mode.Normal, QIcon.State.Off)
         Themes.objM.clearHistoryButton.setIcon(Themes.objM.clearHistoryIcon)
 
-        Themes.objM.apiButtonWidget.setStyleSheet("#apiWidget { background-color: rgb(210, 211, 219); border: 2px solid rgb(72, 75, 106); border-radius: 18px;} QPushButton{ background-color: rgb(210, 211, 219); margin: 5px;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
+        Themes.objM.apiButtonWidget.setStyleSheet(f"#apiWidget {{ background-color: {color.LIGHT_COLOR_3}; border: 2px solid {color.LIGHT_COLOR_5}; border-radius: 18px;}} QPushButton{{ background-color: {color.LIGHT_COLOR_3}; margin: 5px;}} QPushButton:hover{{ background-color: {color.LIGHT_COLOR_3};}}")
 
-        Themes.objM.apiCombo.setStyleSheet(" QComboBox{  border: 0px; background-color: rgb(210, 211, 219);} QComboBox::drop-down{ border: 0px; width: 70px;} QComboBox:selected{ background-color: white;}")
+        Themes.objM.apiCombo.setStyleSheet(f" QComboBox{{  border: 0px; background-color: {color.LIGHT_COLOR_3};}} QComboBox::drop-down{{ border: 0px; width: 70px;}} QComboBox:selected{{ background-color: white;}}")
 
-        Themes.objP.style = """   
-            #settingsButton, #downloadButton, #themesButton{
+        Themes.objP.style = f"""   
+            #settingsButton, #downloadButton, #themesButton{{
                 border-radius: 15px;
-            }
-            #settingsButton:hover, #downloadButton:hover, #themesButton:hover{
+                background-color: {color.LIGHT_COLOR_1};
+            }}
+            #settingsButton:hover, #downloadButton:hover, #themesButton:hover {{
                 color:white;
-                background-color:rgb(210, 211, 219);
-            }
-            
+                background-color: {color.LIGHT_COLOR_3};
+            }}
         """
         Themes.objP.setStyleSheet(Themes.objP.style)
 
         Themes.objP.headerLabel.setMaximumHeight(48)
         
-        Themes.objP.stackedWidget.setStyleSheet("background-color: rgb(210, 211, 219); border-radius: 10px;")
+        Themes.objP.stackedWidget.setStyleSheet(f"background-color: {color.LIGHT_COLOR_3}; border-radius: 10px;")
         
         Themes.objP.headerBackgroundWidget.setMaximumHeight(60)
-        Themes.objP.headerBackgroundWidget.setStyleSheet("background-color: rgb(147, 148, 165); border-radius: 25px; color: white; padding-top: 0px;")
+        Themes.objP.headerBackgroundWidget.setStyleSheet(f"background-color: {color.LIGHT_COLOR_4}; border-radius: 25px; color: white; padding-top: 0px;")
         
         Themes.objP.backIcon.addPixmap(QPixmap(resources.back_icon), QIcon.Mode.Normal, QIcon.State.Off)
         Themes.objP.backButton.setIcon(Themes.objP.backIcon)
         
-        Themes.objP.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+        Themes.objP.backButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_3}; border-radius: 18px;}}")
 
         Themes.objP.radioButtonOne.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px;}")
 
@@ -202,7 +226,7 @@ class Themes:
 
         # self.Themes.objP.spaceE.setPixmap(QPixmap("resources/icons/lightModeTheme.png"))
 
-        Themes.objP.downloadDirPathBtn.setStyleSheet("background: rgb(147, 148, 165); margin-top: 5px; margin-right: 5px; color: white;")
+        Themes.objP.downloadDirPathBtn.setStyleSheet(f"background: {color.LIGHT_COLOR_4}; margin-top: 5px; margin-right: 5px; color: white;")
         Themes.objP.downloadDirPathBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         Themes.objP.pixPixmap = QPixmap(resources.light_mode)
@@ -212,11 +236,163 @@ class Themes:
 
         Themes.readerStyle(Settings.readerDisplayIndex)
 
-    def resetHistoryStyle() -> None:
-        # if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:    
-        #     self.obj.Themes.objMainWindow.scrollW.setStyleSheet("QWidget { background-color: rgb(210, 211, 219); padding: 0px; margin: 0px; border: none;} QPushButton:hover { color: white; }")
-        ...
+    def darkMode(obj) -> None:
+        Themes.style = f"""
+        *{{
+            color: gray;
+            background-color: {color.DARK_COLOR_9};
+        }}
+        QPushButton{{
+            background-color: {color.DARK_COLOR_9};
+            border-radius: 18px;
+        }}
+        QPushButton:hover {{
+            background-color: {color.DARK_COLOR_4};
+        }}
+        QLineEdit{{
+            border: 1px solid {color.DARK_COLOR_6};
+            border-radius: 18px;
+            padding-left: 15px;
+            font: 13px;
+        }}
+        QLabel{{
+            padding: 10px;
+            border-radius: 10px;
+        }}
+
+        #toggleGridView:hover, #toggleListView:hover{{
+            background-color: {color.DARK_COLOR_4};
+            border-radius: 5px;
+        }}
+
+        #historyLabel{{
+            color: gray;
+            background-color: {color.DARK_COLOR_5}; 
+            font: 15px;
+        }}
+        #historyListView{{
+            background-color: {color.DARK_COLOR_3};
+            border: none;
+        }}
+        #historyScroll, scroll{{
+            background-color: {color.DARK_COLOR_3};
+            padding: 0px;
+            margin: 0px;
+            border: none;
+        }}
+        """
+
+        obj.setStyleSheet(Themes.style)
         
+        Themes.objM.tabWidget.tabBar().setStyleSheet(f"QTabBar::tab {{ background-color: {color.DARK_COLOR_2}; width: 200px; padding: 0px; border-bottom-left-radius : 10px; border-bottom-right-radius : 10px; }}  QTabBar::tab:bottom{{ background: {color.DARK_COLOR_2}; color: {color.DARK_COLOR_6};}}  QTabBar::tab:bottom:selected {{ background-color: {color.DARK_COLOR_5}; color: white;}}")
+
+        Themes.objM.tabWidget.setStyleSheet(f"QTabWidget::pane {{ background: {color.DARK_COLOR_3}; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} ")
+
+        Themes.objM.homeTabStack.setStyleSheet(f"background-color: {color.DARK_COLOR_3}; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
+
+        Themes.objM.library.setStyleSheet(f" background-color: {color.DARK_COLOR_3}; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
+
+        Themes.objM.library.noItems.setStyleSheet(f" QWidget{{ background: transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QLabel {{ border: none; }}")
+        
+        Themes.objM.library.descriptionPage.setStyleSheet(f"QWidget#descPage {{ background:transparent;  border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; }} QPushButton:hover {{ background-color: {color.DARK_COLOR_4};}}")
+
+        Themes.objM.library.libraryShelf.setStyleSheet(f"background:transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+
+        Themes.objM.library.libraryScrollArea.setStyleSheet(f"QScrollArea {{ background-color: transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QScrollBar:vertical {{ width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;}} QScrollBar::handle:vertical {{ background: {color.LIGHT_COLOR_7}; min-height:0px; border-radius: 3px;}} QScrollBar::add-line:vertical {{ background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; }} QScrollBar::sub-line:vertical {{  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }}")
+
+        Themes.objM.library.descriptionPage.scrollArea.setStyleSheet(f"QScrollArea {{ background-color: transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QScrollBar:vertical {{ width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;}} QScrollBar::handle:vertical {{ background: {color.LIGHT_COLOR_7}; min-height:0px; border-radius: 3px;}} QScrollBar::add-line:vertical {{ background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; }} QScrollBar::sub-line:vertical {{  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }} QPushButton:hover{{ background-color: {color.DARK_COLOR_4};}}")
+
+        Themes.objM.scroll.setStyleSheet(f"QScrollArea {{ background-color: {color.DARK_COLOR_3}; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QScrollBar:vertical {{ width: 7px; background: white; border: none; margin: 0px 0px 0px 0px; border-radius: 3px;}} QScrollBar::handle:vertical {{ background: {color.LIGHT_COLOR_7}; min-height:0px; border-radius: 3px;}} QScrollBar::add-line:vertical {{ background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: bottom; subcontrol-origin: margin; }} QScrollBar::sub-line:vertical {{  background: qlineargradient(x1:0; y1:0, x2:1, y2:0, stop: 0 {color.LIGHT_COLOR_8}, stop: 0.5 {color.LIGHT_COLOR_8}, stop: 1 {color.LIGHT_COLOR_8}); height: 0px; subcontrol-position: top; subcontrol-origin: margin; }} QPushButton:hover{{ background-color: {color.DARK_COLOR_4};}}")
+
+        Themes.objM.library.libraryScrollAreaWidget.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+
+        Themes.objM.scrollW.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+
+        Themes.objM.historyListView.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+
+        Themes.objM.library.descriptionPage.selectionWidget.setStyleSheet(f"background-color: transparent;")
+
+
+        Themes.objM.apiButton.setStyleSheet("QPushButton{ border-radius: 18px;}")
+        
+        Themes.objM.menuIcon.addPixmap(QPixmap(resources.d_menu_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.menuButton.setIcon(Themes.objM.menuIcon)
+
+        Themes.objM.searchIcon.addPixmap(QPixmap(resources.d_search_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.searchButton.setIcon(Themes.objM.searchIcon)
+
+        Themes.objM.localSearchIcon.addPixmap(QPixmap(resources.d_local_search_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.localSearchButton.setIcon(Themes.objM.localSearchIcon)
+
+        Themes.objM.localSearchIconSingleFormat.addPixmap(QPixmap(resources.d_local_search_single_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.localSearchButtonSingleFormat.setIcon(Themes.objM.localSearchIconSingleFormat)
+
+        Themes.objM.library.descriptionPage.exitButtonIcon.addPixmap(QPixmap(resources.d_exit_button), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.library.descriptionPage.exitButton.setIcon(Themes.objM.library.descriptionPage.exitButtonIcon)
+        
+        Themes.objM.library.descriptionPage.exitButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.DARK_COLOR_4}; border-radius: 18px;}}")
+
+        Themes.objM.library.descriptionPage.deleteButtonIcon.addPixmap(QPixmap(resources.d_delete_manhua), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.library.descriptionPage.deleteButton.setIcon(Themes.objM.library.descriptionPage.deleteButtonIcon)
+        
+        Themes.objM.library.descriptionPage.deleteButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.DARK_COLOR_4}; border-radius: 18px;}}")
+        
+        Themes.objM.refreshIcon.addPixmap(QPixmap(resources.d_refresh_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.refreshButton.setIcon(Themes.objM.refreshIcon)
+
+        Themes.objM.clearHistoryIcon.addPixmap(QPixmap(resources.d_clear_history_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.clearHistoryButton.setIcon(Themes.objM.clearHistoryIcon)
+
+        Themes.objM.apiButtonWidget.setStyleSheet(f"#apiWidget {{ background-color: {color.DARK_COLOR_3}; border: 2px solid {color.DARK_COLOR_5}; border-radius: 18px;}} QPushButton{{ background-color: {color.DARK_COLOR_3}; margin: 5px;}} QPushButton:hover{{ background-color: {color.DARK_COLOR_3};}}")
+
+        Themes.objM.apiCombo.setStyleSheet(f" QComboBox{{  border: 0px; background-color: {color.DARK_COLOR_3};}} QComboBox::drop-down{{ border: 0px; width: 70px;}} QComboBox:selected{{ background-color: white;}}")
+
+        Themes.objP.style = f"""   
+            #settingsButton, #downloadButton, #themesButton{{
+                border-radius: 15px;
+                color: white;
+                background-color: {color.DARK_COLOR_3};
+            }}
+            #settingsButton:hover, #downloadButton:hover, #themesButton:hover {{
+                color:white;
+                background-color: {color.DARK_COLOR_3};
+            }}
+        """
+        Themes.objP.setStyleSheet(Themes.objP.style)
+
+        Themes.objP.headerLabel.setMaximumHeight(48)
+        
+        Themes.objP.stackedWidget.setStyleSheet(f"background-color: {color.DARK_COLOR_3}; border-radius: 10px;")
+        
+        Themes.objP.headerBackgroundWidget.setMaximumHeight(60)
+        Themes.objP.headerBackgroundWidget.setStyleSheet(f"background-color: {color.DARK_COLOR_4}; border-radius: 25px; color: white; padding-top: 0px;")
+        
+        Themes.objP.backIcon.addPixmap(QPixmap(resources.back_icon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objP.backButton.setIcon(Themes.objP.backIcon)
+        
+        Themes.objP.backButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.DARK_COLOR_3}; border-radius: 18px;}}")
+
+        Themes.objP.radioButtonOne.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px;}")
+
+        Themes.objP.radioButtonTwo.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px; }")
+
+        Themes.objP.radioButtonThree.setStyleSheet("QRadioButton::indicator { width: 20px; height: 20px;}")
+
+        Themes.objP.downloadQueue.setStyleSheet(f"background-color: {color.DARK_COLOR_9};")
+
+        # self.Themes.objP.spaceE.setPixmap(QPixmap("resources/icons/lightModeTheme.png"))
+
+        Themes.objP.downloadDirPathBtn.setStyleSheet(f"background: {color.LIGHT_COLOR_4}; margin-top: 5px; margin-right: 5px; color: white;")
+        Themes.objP.downloadDirPathBtn.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+
+        Themes.objP.pixPixmap = QPixmap(resources.dark_mode)
+        Themes.objP.spaceE.setPixmap(Themes.objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
+
+        Themes.prefButtonActiveDark(Themes.objP, Themes.prefSelectedButtonIndex)
+
+        Themes.readerStyle(Settings.readerDisplayIndex)
+
+
     def readerStyle(index: int) -> None:
         if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:
             Themes.objR.style = """ 
@@ -230,12 +406,12 @@ class Themes:
             Themes.objR.backIcon.addPixmap(QPixmap(resources.exit_button), QIcon.Mode.Normal, QIcon.State.Off)
             Themes.objR.backButton.setIcon(Themes.objR.backIcon)
             
-            Themes.objR.backButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+            Themes.objR.backButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_3}; border-radius: 18px;}}")
 
             Themes.objR.setToCoverIcon.addPixmap(QPixmap(resources.download_icon), QIcon.Mode.Normal, QIcon.State.Off)
             Themes.objR.setToCoverButton.setIcon(Themes.objR.setToCoverIcon)
             
-            Themes.objR.setToCoverButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+            Themes.objR.setToCoverButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_3}; border-radius: 18px;}}")
 
             Themes.objR.manhuaLabel.setStyleSheet(" padding: 0px;")
             
@@ -246,16 +422,48 @@ class Themes:
                 Themes.objR.nextIcon.addPixmap(QPixmap(resources.next_icon), QIcon.Mode.Normal, QIcon.State.Off)
                 Themes.objR.nextButton.setIcon(Themes.objR.nextIcon)
             
-                Themes.objR.nextButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+                Themes.objR.nextButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_3}; border-radius: 18px;}}")
 
                 Themes.objR.previousIcon.addPixmap(QPixmap(resources.previous_icon), QIcon.Mode.Normal, QIcon.State.Off)
                 Themes.objR.previousButton.setIcon(Themes.objR.previousIcon)
             
-                Themes.objR.previousButton.setStyleSheet("QPushButton:hover{ background-color: rgb(210, 211, 219); border-radius: 18px;}")
+                Themes.objR.previousButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_3}; border-radius: 18px;}}")
 
         else:
-            ...
-    
+            Themes.objR.style = """ 
+                QPushButton{
+                    border-radius: 18px;
+                    color: red;
+                }
+            """
+            Themes.objR.setStyleSheet(Themes.objR.style)
+
+            Themes.objR.backIcon.addPixmap(QPixmap(resources.d_exit_button), QIcon.Mode.Normal, QIcon.State.Off)
+            Themes.objR.backButton.setIcon(Themes.objR.backIcon)
+            
+            Themes.objR.backButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.DARK_COLOR_3}; border-radius: 18px;}}")
+
+            Themes.objR.setToCoverIcon.addPixmap(QPixmap(resources.d_download_icon), QIcon.Mode.Normal, QIcon.State.Off)
+            Themes.objR.setToCoverButton.setIcon(Themes.objR.setToCoverIcon)
+            
+            Themes.objR.setToCoverButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.DARK_COLOR_3}; border-radius: 18px;}}")
+
+            Themes.objR.manhuaLabel.setStyleSheet(" padding: 0px;")
+            
+            if Settings.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
+                Themes.objR.screenScrollArea.setStyleSheet("border: 0px")
+
+            if index != consts.E_RADIO_SELECTED_WEBTOON:
+                Themes.objR.nextIcon.addPixmap(QPixmap(resources.d_next_icon), QIcon.Mode.Normal, QIcon.State.Off)
+                Themes.objR.nextButton.setIcon(Themes.objR.nextIcon)
+            
+                Themes.objR.nextButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.DARK_COLOR_3}; border-radius: 18px;}}")
+
+                Themes.objR.previousIcon.addPixmap(QPixmap(resources.d_previous_icon), QIcon.Mode.Normal, QIcon.State.Off)
+                Themes.objR.previousButton.setIcon(Themes.objR.previousIcon)
+            
+                Themes.objR.previousButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.DARK_COLOR_3}; border-radius: 18px;}}")
+  
     def changeTabBarIconLight(obj) -> None:
         obj.tabIndex = obj.tabWidget.currentIndex()
         if obj.tabIndex == consts.E_TAB_HOME_INDEX:
@@ -271,45 +479,78 @@ class Themes:
             obj.libraryIcon.addPixmap(QPixmap(resources.library_icon_dark), QIcon.Mode.Normal, QIcon.State.Off)
             obj.tabWidget.setTabIcon(obj.tabIndex, obj.libraryIcon)
 
-    def prefButtonActiveDark(obj, indexB) -> None:
-        # if type(self.prevObjButton) == PyQt6.QtWidgets.QPushButton:
-        #     self.prevObjButton.setStyleSheet(
-        #         "QPushButton { color: Black; border-radius: 15px;background-color: rgb(250, 250, 250);} QPushButton:hover { color:white; background-color:rgb(210, 211, 219);} #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
-        #     )
-        # else:
-        #     pass
-
-        # obj.setStyleSheet(
-        #     "QPushButton { color: Black; border-radius: 15px;} QPushButton:hover{ color:white;background-color:rgb(210, 211, 219);}#backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
-        # )
-        # self.prefButtonList[indexB].setStyleSheet(
-        #     "QPushButton { color:white;background-color:rgb(147, 148, 165); } #backButton:hover{ background-color:rgb(147, 148, 165); border-radius: 18px}"
-        # )
-
-        # self.prevObjButton = self.prefButtonList[indexB]
-        pass
-
-    def darkMode(obj) -> None:
-        Themes.objP.pixPixmap = QPixmap(resources.dark_mode)
-        Themes.objP.spaceE.setPixmap(Themes.objP.pixPixmap.scaled(150, 150, Qt.AspectRatioMode.KeepAspectRatio))
-
     def changeTabBarIconDark(obj) -> None:
-        pass
+        obj.tabIndex = obj.tabWidget.currentIndex()
+        if obj.tabIndex == consts.E_TAB_HOME_INDEX:
+            obj.homeIcon.addPixmap(QPixmap(resources.home_icon_dark), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.tabWidget.setTabIcon(obj.tabIndex, obj.homeIcon)
+
+            obj.libraryIcon.addPixmap(QPixmap(resources.library_icon), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.tabWidget.setTabIcon(1, obj.libraryIcon)
+        else:
+            obj.homeIcon.addPixmap(QPixmap(resources.home_icon), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.tabWidget.setTabIcon(0, obj.homeIcon)
+
+            obj.libraryIcon.addPixmap(QPixmap(resources.library_icon_dark), QIcon.Mode.Normal, QIcon.State.Off)
+            obj.tabWidget.setTabIcon(obj.tabIndex, obj.libraryIcon)
 
     def prefButtonActive(indexB, themeIndex: int) -> None:
-        Themes.prefSelectedButtonIndex = indexB
         if themeIndex == consts.E_THEME_LIGHT_MODE:
             Themes.prefButtonActiveLight(Themes.objP, indexB)
         else:
             Themes.prefButtonActiveDark(Themes.objP, indexB)
 
-    def declareTheme(themeIndex: int) -> None:
-        Settings.themeIndex = themeIndex
-        if themeIndex == consts.E_THEME_LIGHT_MODE:
+    def resetHistoryStyle() -> None:
+        # if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:    
+        #     self.obj.Themes.objMainWindow.scrollW.setStyleSheet("QWidget { background-color: {color.LIGHT_COLOR_3}; padding: 0px; margin: 0px; border: none;} QPushButton:hover { color: white; }")
+        ...
+   
+    def declareTheme() -> None:
+        if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:
             Settings.themeButtonState = False
         else:
             Settings.themeButtonState = True
+        Themes.prefButtonActive(Themes.prefSelectedButtonIndex, Settings.themeIndex)
+        Themes.resetManhuaTheme()
+        Themes.setViewOptionStyle()
+
+    def setViewOptionStyle():
+        listIcon = ""
+        gridIcon = ""
+        if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:
+            listIcon = resources.list_icon
+            gridIcon = resources.grid_icon
+        else:
+            listIcon = resources.list_icon_disabled
+            gridIcon = resources.grid_icon_disabled
+
+        Themes.toggleGridIcon = QIcon()
+        Themes.toggleListIcon = QIcon()
+
+        Themes.toggleGridIcon.addPixmap(QPixmap(gridIcon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.toggleGridView.setIcon(Themes.toggleGridIcon)
         
+        Themes.toggleListIcon.addPixmap(QPixmap(listIcon), QIcon.Mode.Normal, QIcon.State.Off)
+        Themes.objM.toggleListView.setIcon(Themes.toggleListIcon)
+
+        if Settings.viewIsGrid:
+            Themes.objM.view.setText(consts.E_MW_GRID_TEXT)
+            Themes.objM.toggleGridView.setStyleSheet(f"border-radius: 25px; border: 1px solid {color.DARK_COLOR_5}; background-color: {color.DARK_COLOR_5}")
+            Themes.objM.toggleListView.setStyleSheet(f"border: none; background-color: transparent")
+        else:
+            Themes.objM.view.setText(consts.E_MW_LIST_TEXT)
+            Themes.objM.toggleGridView.setStyleSheet(f"border: none; background-color: transparent")
+            Themes.objM.toggleListView.setStyleSheet(f"border-radius: 25px; border: 1px solid {color.DARK_COLOR_5}; background-color: {color.DARK_COLOR_5}")
+
+    def resetManhuaTheme():
+        for all in Themes.objM.library.libraryListdata:
+            Themes.setManhuaObjStyle(all)
+
+    def setManhuaObjStyle(obj):
+        if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:
+            obj.setStyleSheet(f" QLabel#manhuaLabel{{ padding: 7px; border-radius: 5px; background-color: white; border: none;}}  QLabel#nameLabel{{ padding: 1px; border-radius: 5px;}} QPushButton#fav {{ background: {color.LIGHT_COLOR_4};  border: none; border-radius: 5px;}} QPushButton#fav:hover {{ background-color: {color.LIGHT_COLOR_5}}} .Manhua {{ border-radius: 5px; background-color: {color.LIGHT_COLOR_1};}} .Manhua:hover{{ background: {color.LIGHT_COLOR_6}; }}") 
+        else:
+            obj.setStyleSheet(f" QLabel#manhuaLabel{{ padding: 7px; border-radius: 5px; background-color: white; border: none;}}  QLabel#nameLabel{{ padding: 5px; border: none; color: {color.DARK_COLOR_4}; background-color: transparent;}} QPushButton#fav {{ background: {color.DARK_COLOR_4};  border: none; border-radius: 5px;}} QPushButton#fav:hover {{ background-color: {color.DARK_COLOR_5}}} .Manhua {{ border-radius: 5px; background-color: {color.DARK_COLOR_6};}} .Manhua:hover{{ background: {color.DARK_COLOR_1}}}") 
 
 class ToggleSwitch(QPushButton):
     def __init__(self) -> None:
@@ -401,7 +642,7 @@ class WindowTitleBar(QHBoxLayout):
         self.minimizeIconIcon.addPixmap(QPixmap("resources/icons/icons8-minimize-dark-90.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.minimizeIcon.setIcon(self.minimizeIconIcon)
 
-        self.minimizeIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgb(210, 211, 219); }")
+        self.minimizeIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: {color.LIGHT_COLOR_3}; }")
 
 
         self.restoreIcon.setMaximumSize(iconsizew, iconsize)
@@ -410,7 +651,7 @@ class WindowTitleBar(QHBoxLayout):
         self.restoreIconIcon.addPixmap(QPixmap("resources/icons/icons8-restore-dark-96.png"), QIcon.Mode.Normal, QIcon.State.Off)
         self.restoreIcon.setIcon(self.restoreIconIcon)
 
-        self.restoreIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: rgb(210, 211, 219);}")
+        self.restoreIcon.setStyleSheet("QPushButton{background-color: rgba(72, 75, 106, 0.8); border: none;} QPushButton:hover{ background-color: {color.LIGHT_COLOR_3};}")
 
         self.closeIcon.setMaximumSize(iconsizew, iconsize)
 

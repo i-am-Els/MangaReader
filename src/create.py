@@ -69,12 +69,14 @@ class Window(QStackedWidget):
         self.setCurrentIndex(w_index)
 
     def setTheme(self, s_index: int) -> None:
-        Themes.declareTheme(s_index)
+        Settings.themeIndex = s_index
         if s_index == consts.E_THEME_LIGHT_MODE:
             Themes.lightMode(obj=self)
+            Themes.declareTheme()
             self.objPref.setThemesBtnChecked(False)
         else:
             Themes.darkMode(obj=self)
+            Themes.declareTheme()
             self.objPref.setThemesBtnChecked(True)
 
     def setSetting(self) -> None:

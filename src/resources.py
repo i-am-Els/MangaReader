@@ -4,10 +4,10 @@ page_not_found = "resources/icons/page-not-found.png"
 
 # Light mode icons
 grid_icon = "resources/icons/icons8-grid-96.png"
-grid_icon_disabled = "resources/icons/icons8-list-disabled-96.png"
+grid_icon_disabled = "resources/icons/icons8-grid-disabled-96.png"
 
 list_icon = "resources/icons/icons8-list-96.png"
-list_icon_disabled = "resources/icons/icons8-grid-disabled-96.png"
+list_icon_disabled = "resources/icons/icons8-list-disabled-96.png"
 
 lib_no_item = "resources/icons/digital-library.png"
 default_cover_image = "resources/logo/thumbnailCoverless.png"
@@ -35,3 +35,19 @@ library_icon_dark = "resources/icons/icons8-library-dark-96.png"
 
 # Dark mode icons
 dark_mode = "resources/icons/darkModeTheme.png"
+d_menu_icon = "resources/icons/icons8-menu-dark-96.png"
+d_search_icon = "resources/icons/icons8-search-dark-90.png"
+d_local_search_icon = "resources/icons/icons8-add-folder-dark-96.png"
+d_local_search_single_icon = "resources/icons/icons8-cbr-dark-96.png"
+d_exit_button = "resources/icons/icons8-go-back-dark-96.png"
+d_delete_manhua = "resources/icons/icons8-delete-dark-96.png"
+d_refresh_icon = "resources/icons/icons8-refresh-dark-90.png"
+d_clear_history_icon = "resources/icons/icons8-unpin-dark-96.png"
+d_back_icon = "resources/icons/icons8-go-back-96.png"
+d_download_icon = "resources/icons/icons8-download-dark-96.png"
+d_next_icon = "resources/icons/icons8-next-dark-96.png"
+d_previous_icon = "resources/icons/icons8-previous-dark-96.png"
+d_home_icon = "resources/icons/icons8-home-dark-96.png"
+d_home_icon_dark = "resources/icons/icons8-home-96.png"
+d_library_icon = "resources/icons/icons8-library-dark-96.png"
+d_library_icon_dark = "resources/icons/icons8-library-96.png"

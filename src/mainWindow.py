@@ -19,7 +19,7 @@
 
 from linker import Link
 from pathlib import Path
-import os, re, consts, resources
+import os, re, consts, resources, color
 from themes import Themes
 from settings import Settings
 from PyQt6.QtWidgets import (
@@ -267,10 +267,12 @@ class MainWindow(QWidget):
         self.toggleLayout = QHBoxLayout()
 
         self.toggleGridView = QPushButton()
+#        self.toggleGridIcon = QIcon()
         self.toggleGridView.setCheckable(True)
         self.toggleGridView.setObjectName(consts.OBJ_MW_TOGGLE_GRID_BTN)
 
         self.toggleListView = QPushButton()
+#        self.toggleListIcon = QIcon()
         self.toggleListView.setCheckable(True)
         self.toggleListView.setObjectName(consts.OBJ_MW_TOGGLE_LIST_BTN)
         
@@ -285,9 +287,9 @@ class MainWindow(QWidget):
         self.toggleListView.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
 
-        self.view = QLabel(consts.E_MW_GRID_TEXT if Settings.viewOptionIndex == consts.E_MW_GRID_VIEW else consts.E_MW_LIST_TEXT)
+        self.view = QLabel(consts.E_MW_GRID_TEXT if Settings.viewIsGrid == True else consts.E_MW_LIST_TEXT)
 
-        self.selectViewTypeByObj(Settings.viewOptionIndex)
+        self.selectViewTypeByObj(Settings.viewIsGrid)
 
         self.toggleLayout.addWidget(self.view)
         self.toggleLayout.addWidget(self.toggleGridView)
@@ -343,8 +345,8 @@ class MainWindow(QWidget):
         self.localSearchButton.clicked.connect(self.localSearchAction)
         self.localSearchButtonSingleFormat.clicked.connect(self.localSearchSingleFormatAction)
         self.tabWidget.currentChanged.connect(lambda:self.changeTabBarIcon())
-        self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj(consts.E_MW_GRID_VIEW))
-        self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj(consts.E_MW_LIST_VIEW))
+        self.toggleGridView.clicked.connect( lambda: self.selectViewTypeByObj(True))
+        self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj(False))
 
     def clearAllHistoryData(self) -> None:
         self.historyData.clear()
@@ -575,59 +577,21 @@ class MainWindow(QWidget):
     def loadSearchResultPage(self) -> None:
         self.resultLayout = QGridLayout()
 
-    def viewTypeAction(self, gridView: bool) -> None:
-        if gridView == True:
-            self.toggleGridIcon = QIcon()
-            self.toggleGridIcon.addPixmap(QPixmap(resources.grid_icon), QIcon.Mode.Normal, QIcon.State.Off)
-            self.toggleGridView.setIcon(self.toggleGridIcon)
-            self.toggleGridView.setIconSize(self.icon_size * 1.1)
-            
-            self.toggleListDisabledIcon = QIcon()
-            self.toggleListDisabledIcon.addPixmap(QPixmap(resources.grid_icon_disabled), QIcon.Mode.Normal, QIcon.State.Off)
-            self.toggleListView.setIcon(self.toggleListDisabledIcon)
-            self.toggleListView.setIconSize(self.icon_size * 1.1)
-
-            self.view.setText(consts.E_MW_GRID_TEXT)
-            Settings.previousViewOptionIndex = consts.E_MW_GRID_VIEW
-
-            if self.launchDone:
-                self.library.switchLayout()
-
-        else:
-            self.toggleListIcon = QIcon()
-            self.toggleListIcon.addPixmap(QPixmap(resources.list_icon), QIcon.Mode.Normal, QIcon.State.Off)
-            self.toggleListView.setIcon(self.toggleListIcon)
-            self.toggleListView.setIconSize(self.icon_size * 1.1)
-            
-            self.toggleGridDisabledIcon = QIcon()
-            self.toggleGridDisabledIcon.addPixmap(QPixmap(resources.list_icon_disabled), QIcon.Mode.Normal, QIcon.State.Off)
-            self.toggleGridView.setIcon(self.toggleGridDisabledIcon)
-            self.toggleGridView.setIconSize(self.icon_size * 1.1)
-
-            self.view.setText(consts.E_MW_LIST_TEXT)
-            Settings.previousViewOptionIndex = consts.E_MW_LIST_VIEW
-
-            if self.launchDone:
-                self.library.switchLayout()
+    def viewTypeAction(self) -> None:
+        self.toggleGridView.setIconSize(self.icon_size * 1.1)
+        self.toggleListView.setIconSize(self.icon_size * 1.1)
+        
+        if self.launchDone:
+            Themes.setViewOptionStyle()
+            self.library.switchLayout()
     
-    def selectViewTypeByObj(self, objName)  -> None:
-        if objName == consts.E_MW_GRID_VIEW:
-            Settings.viewOptionIndex = consts.E_MW_GRID_VIEW
-            Settings.previousViewOptionIndex = consts.E_MW_LIST_VIEW
-            self.selectView(Settings.viewOptionIndex)
-        else:
-            Settings.viewOptionIndex = consts.E_MW_LIST_VIEW
-            Settings.previousViewOptionIndex = consts.E_MW_GRID_VIEW
-            self.selectView(Settings.viewOptionIndex)
-
-    def selectView(self, view_index) -> None:
-        if view_index == consts.E_MW_GRID_VIEW and view_index != Settings.previousViewOptionIndex:
+    def selectViewTypeByObj(self, isGrid)  -> None:
+        if isGrid == True:
             Settings.viewIsGrid = True
-            self.viewTypeAction(Settings.viewIsGrid)
+            self.viewTypeAction()
         else:
-            if view_index == consts.E_MW_LIST_VIEW and view_index != Settings.previousViewOptionIndex:
-                Settings.viewIsGrid = False
-                self.viewTypeAction(Settings.viewIsGrid)
+            Settings.viewIsGrid = False
+            self.viewTypeAction()               
    
     def popDialog(self, type: str) -> None:
         if type == consts.E_DIALOG_EMPTY:
@@ -788,8 +752,12 @@ class Library(QStackedWidget):
                 v = self.addToMetaData(x["ManhuaPath"])
                 v["IsFav"] = x["IsFav"]
                 alt.update({x["ManhuaTitle"] : v})
+        temp = alt
         if not Settings.libraryMetadata == alt:
-            Settings.libraryMetadata = alt
+            for x in list(Settings.libraryMetadata.values()):
+                if os.path.exists(x["ManhuaCover"]):
+                    temp[x["ManhuaTitle"]]["ManhuaCover"] = x["ManhuaCover"]
+        Settings.libraryMetadata = temp
             
     def setNoItemsWidget(self) -> None:
         self.noItemsLabel = QLabel()
@@ -1068,7 +1036,8 @@ class Library(QStackedWidget):
         if os.path.exists(Settings.libraryMetadata[manhuaKey]["ManhuaPath"]):
             dic = self.addToMetaData(Settings.libraryMetadata[manhuaKey]["ManhuaPath"])
             Settings.libraryMetadata[manhuaKey]["ManhuaTitle"] = dic["ManhuaTitle"]
-            Settings.libraryMetadata[manhuaKey]["ManhuaCover"] = dic["ManhuaCover"]
+            if not os.path.exists(Settings.libraryMetadata[manhuaKey]["ManhuaCover"]):
+                Settings.libraryMetadata[manhuaKey]["ManhuaCover"] = dic["ManhuaCover"]
             Settings.libraryMetadata[manhuaKey]["Chapters"] = dic["Chapters"]
             Settings.libraryMetadata[manhuaKey]["Status"] = dic["Status"]
             Settings.libraryMetadata[manhuaKey]["Description"] = dic["Description"]
@@ -1169,7 +1138,7 @@ class Manhua(QPushButton):
         self.manhuaNameLabel.setSizePolicy(self.size_policy)
         self.manhuaNameLabelFont = QFont()
         self.manhuaNameLabelFont.setPointSize(7)
-        self.manhuaNameLabelFont.setBold(False)
+        self.manhuaNameLabelFont.setBold(True)
         self.manhuaNameLabel.setFont(self.manhuaNameLabelFont)
         self.manhuaNameLabel.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         self.manhuaNameLabel.setMaximumHeight(20)
@@ -1186,7 +1155,9 @@ class Manhua(QPushButton):
         self.manhuaCoverDisplayLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.checkFav(self.isFavorite)
 
-        self.setStyleSheet(" QLabel#manhuaLabel{ padding: 7px; border-radius: 5px; background-color: white; border: none;}  QLabel#nameLabel{ padding: 1px; border-radius: 5px;} QPushButton#fav { background: rgb(147,148,165);  border: none; border-radius: 5px;} QPushButton#fav:hover { background-color: rgb(72,75,106)} .Manhua { border-radius: 5px; background-color: white;} .Manhua:hover{ background: rgba(0, 0, 0, 40); }") #---Theme---
+        Themes.setManhuaObjStyle(self)
+
+        # self.setStyleSheet(f" QLabel#manhuaLabel{{ padding: 7px; border-radius: 5px; background-color: white; border: none;}}  QLabel#nameLabel{{ padding: 1px; border-radius: 5px;}} QPushButton#fav {{ background: {color.LIGHT_COLOR_4};  border: none; border-radius: 5px;}} QPushButton#fav:hover {{ background-color: {color.LIGHT_COLOR_5}}} .Manhua {{ border-radius: 5px; background-color: white;}} .Manhua:hover{{ background: {color.LIGHT_COLOR_6}; }}") #---Theme---
 
         self.manhuaFavoriteButton.clicked.connect(lambda: self.favorite(self.isFavorite))
 

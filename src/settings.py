@@ -55,8 +55,6 @@ class Settings(object):
             "libraryInitPath" : "",
             "libraryNewPath" : "C:\\",
             "viewIsGrid" : False,
-            "viewOptionIndex" : consts.E_MW_LIST_VIEW,
-            "previousViewOptionIndex" : consts.E_MW_GRID_VIEW,
             "downloadInitPath" : str(os.path.join(Path.home(), "Documents\\Manhua Reader\\downloads\\")),
             "downloadNewPath" : str(os.path.join(Path.home(), "Documents\\Manhua Reader\\downloads\\")),
             "extractionInitPath" : str(os.path.join(Path.home(), "Documents\\Manhua Reader\\archives\\")),
@@ -104,49 +102,14 @@ class Settings(object):
 
         Settings.saveData(data)
 
-
-
     def setMainWindowVariables() -> None:
-        # Settings.objM.initPath = Settings.libraryInitPath
-
-        # Settings.objM.newPath = Settings.libraryNewPath
-
         Settings.objM.apiName = Settings.apiName
-        # Settings.objM.libraryMetadata = Settings.libraryMetadata
-
-    # def setPrefVariables() -> None:
-    #     Settings.objP.compressionState = Settings.compressionState
-
-    #     Settings.objP.updateChapter = Settings.updateChapter
-
-    #     Settings.objP.updateOther = Settings.updateOther
-
-    #     Settings.objP.themeButtonState = Settings.themeButtonState
-
-    #     Settings.objP.hideNav = Settings.hideNav
-
-    #     Settings.objP.fsState = Settings.fsState
-
-    #     Settings.objP.readerDisplayIndex = Settings.readerDisplayIndex
-
-    #     Settings.objP.initPath = Settings.downloadInitPath
-
-    #     Settings.objP.newPath = Settings.downloadNewPath
-
-    # def setReaderInits() -> None:
-    #     Settings.objR.hideNav = Settings.hideNav
-
-    #     Settings.objR.fsState = Settings.fsState
-
-    #     Settings.objR.readerDisplayIndex = Settings.readerDisplayIndex
 
     def setObjMState() -> None:
         Settings.objM.apiButton.setText(Settings.apiName[Settings.apiIndex])
 
     def setStates() -> None:
         Settings.setMainWindowVariables()
-        # Settings.setPrefVariables()
-        # Settings.setReaderInits()
         Settings.objR.selfInit()
 
         Settings.objM.apiCombo.addItems(Settings.apiName)

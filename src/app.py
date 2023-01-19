@@ -19,7 +19,7 @@
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QMainWindow, QSizePolicy
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QIcon
-import sys, create, ctypes, consts
+import sys, create, ctypes, consts, color
 from themes import WindowTitleBar, MoveableWindow
 from linker import Link
 
@@ -55,7 +55,7 @@ class  App(QMainWindow):
         
         self.cWidget.setLayout(self.customTitleBar)
         self.cWidget.setMaximumHeight(consts.C_W_HEIGHT)
-        self.cWidget.setStyleSheet("QWidget{background-color: rgba(72, 75, 106, 0.65); color: white;}")
+        self.cWidget.setStyleSheet(f"QWidget{{background-color: {color.LIGHT_COLOR_11} ; color: white;}}")
         self.cLayout.addWidget(self.cWidget)
         self.cLayout.setSpacing(0)
         self.cLayout.setContentsMargins(0,0,0,0)
