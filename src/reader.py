@@ -59,6 +59,12 @@ class Reader(QWidget):
         self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
 
     def backAction(self) -> None:
+        Settings.historyData[0]["page"] = self.exitpage() + 1
+        Settings.historyData[0]["chapter"] = self.currentChapterKey
+        Settings.historyData[0]["path"] = self.currentIndexPath
+        Settings.historyData[0]["index"] = self.currentChapterIndex
+        Link.fetchAttribute(consts.OBJ_MW_NAME, "historyScrollL").layout().itemAt(0).widget().updateData()
+        Link.fetchAttribute(consts.OBJ_MW_NAME, "historyScrollL").layout().itemAt(0).widget().bindData()
         Link.callBack(consts.OBJ_MW_NAME, "setFocus")
         self.previousManhuaName = self.currentManhuaName
         Link.callBack(consts.OBJ_WINDOW, "changeStackIndex", consts.E_WINDOW_STACK_MW)
@@ -324,6 +330,28 @@ class Reader(QWidget):
                 Link.callBack(consts.OBJ_LIB_NAME, "reloadManhuaData", self.manhuaKey, self.currentChapterIndex)
                 self.nextChapter()
 
+    def exitpage(self) -> None:
+        if Settings.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
+            return self.imageCurrent
+        else:
+            n = len(self.imageList)
+            v = self.screenScrollArea.verticalScrollBar().value()
+            max = self.screenScrollArea.verticalScrollBar().maximum()
+            p = (v / max) * 100
+            x = int((p/100) * n)
+            return x
+
+    def calculateCurrentScrollValue(self) -> None:
+        self.screenScrollArea.verticalScrollBar().setMaximum(100)
+        n = len(self.imageList)
+        if n != 0:
+            x = self.imageCurrent + 1
+            max = self.screenScrollArea.verticalScrollBar().maximum()
+            value = int((x/n)*max)
+            self.screenScrollArea.verticalScrollBar().setSliderPosition(value)
+            # self.screenScrollArea.verticalScrollBar().setValue(value)
+
+
     def setToCoverAction(self) -> None:
         if Settings.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
             n = len(self.imageList)
@@ -345,6 +373,7 @@ class Reader(QWidget):
         self.screenScrollArea.setWidgetResizable(True)
         self.screenScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.screenScrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.screenScrollArea.verticalScrollBar().setMaximum(100)
         self.manhuaLabel = QWidget()
 
         self.manhuaLayout = QVBoxLayout(self.manhuaLabel)
@@ -356,7 +385,7 @@ class Reader(QWidget):
         self.manhuaLayout.setSpacing(0)
         self.screenScrollAreaLayout.addWidget(self.screenScrollArea)
 
-    def loadChapterPages(self, index: int) -> None:
+    def loadChapterPages(self, index: int, pageIndex: int = 1) -> None:
         self.setFocus()
         self.currentIndexPath = str(self.currentManhuaPath) + "\\" + self.currentDict["Chapters"].get(str(list(self.currentDict["Chapters"].keys())[index])) 
         if os.path.exists(self.currentIndexPath):
@@ -364,8 +393,8 @@ class Reader(QWidget):
             self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[index])
             self.manhuaKey = self.currentDict["ManhuaTitle"]
             self.imageList = []
-            self.loadImageList()       
-            self.imageCurrent = 0
+            self.loadImageList()
+            self.imageCurrent = pageIndex - 1
             if Settings.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
                 self.setImageToLabel(self.imageCurrent)
             else:
@@ -391,19 +420,22 @@ class Reader(QWidget):
                 item.setPixmap(pix.scaledToWidth(self.screenScrollAreaW.width(), Qt.TransformationMode.SmoothTransformation))
 
     def setImageToLabel(self, index: int) -> None:
-        path = str(self.currentIndexPath) + "\\" + str(self.imageList[index])
-        if os.path.exists(path):
-            self.manhuaLabel.setPixmap(QPixmap(path))
-        else:
-            self.imageList.clear()
-            self.loadImageList()
-            if len(self.imageList) != consts.EMPTY:
-                self.imageCurrent = 0
-                self.setImageToLabel(self.imageCurrent)
+        try:
+            path = str(self.currentIndexPath) + "\\" + str(self.imageList[index])
+            if os.path.exists(path):
+                self.manhuaLabel.setPixmap(QPixmap(path))
             else:
-                Link.callBackDeep(consts.OBJ_LIB_NAME, "descriptionPage", "redisplayChapters")
-                Link.callBack(consts.OBJ_WINDOW, "setCurrentIndex", consts.E_WINDOW_STACK_MW)
-                Link.callBack(consts.OBJ_LIB_NAME, "setCurrentIndex", consts.E_TAB_LIBRARY_DESCRIPTION_PAGE)
+                self.imageList.clear()
+                self.loadImageList()
+                if len(self.imageList) != consts.EMPTY:
+                    self.setImageToLabel(self.imageCurrent)
+                else:
+                    Link.callBackDeep(consts.OBJ_LIB_NAME, "descriptionPage", "redisplayChapters")
+                    Link.callBack(consts.OBJ_WINDOW, "setCurrentIndex", consts.E_WINDOW_STACK_MW)
+                    Link.callBack(consts.OBJ_LIB_NAME, "setCurrentIndex", consts.E_TAB_LIBRARY_DESCRIPTION_PAGE)
+        except IndexError:
+            self.imageCurrent = 0
+            self.setImageToLabel(self.imageCurrent)
 
     def setScrollLabelImages(self) -> None:
         self.setFocus()
@@ -415,6 +447,7 @@ class Reader(QWidget):
             else:
                 self.imageList.remove(x)
         self.screenScrollArea.verticalScrollBar().setMaximum(100)
+        self.calculateCurrentScrollValue()
 
     def clearLabels(self) -> None:
         self.screenScrollArea.deleteLater()

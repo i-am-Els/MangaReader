@@ -20,6 +20,7 @@
 from linker import Link
 from pathlib import Path
 import os, re, consts, resources, color
+from history import History
 from themes import Themes
 from settings import Settings
 from PyQt6.QtWidgets import (
@@ -59,7 +60,6 @@ class MainWindow(QWidget):
         self.localDirImport = []
         self.localSingleImport = []
         # self.history = []
-        self.historyData = list()
 
         self.apiName = []
         self.firstRun = True
@@ -349,7 +349,7 @@ class MainWindow(QWidget):
         self.toggleListView.clicked.connect(lambda: self.selectViewTypeByObj(False))
 
     def clearAllHistoryData(self) -> None:
-        self.historyData.clear()
+        Settings.historyData.clear()
         for x in range(self.historyScrollL.layout().count()):
             self.historyScrollL.layout().itemAt(x).widget().deleteLater()
 
@@ -360,16 +360,17 @@ class MainWindow(QWidget):
         self.historyScrollL.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.scroll.setWidget(self.scrollW)
         self.historyScrollL.setContentsMargins(5, 10, 5, 10)
-        # if self.launchDone:
-        #     self.themeObj.resetHistoryStyle()
-        # if len(self.historyData) != 0:
-        #     self.reloadHistory()
+        if self.launchDone:
+            self.themeObj.resetHistoryStyle()
+        if len(Settings.historyData) != 0:
+            self.reloadHistory()
         self.historyListViewL.addWidget(self.scroll)
         
-    # def reloadHistory(self):
-    #     for x in self.historyData:
-    #         hist = History(x["ManhuaName"], x["Chapter"], x["ChapterIndex"], x["ChapterPath"], self.win_dow.objReader, x["ReadTime"])
-    #         self.historyScrollL.addWidget(hist)
+    def reloadHistory(self):
+        for x in Settings.historyData:
+            hist = History()
+            hist.initData(x["manhuaTitle"], x["chapter"], x["path"], x["index"], x["page"])
+            self.historyScrollL.addWidget(hist)
 
     def resetHistory(self) -> None:
         self.scrollW.deleteLater()
@@ -958,20 +959,20 @@ class Library(QStackedWidget):
         self.libraryScrollAreaWidget.deleteLater()
         self.loadLibraryItems()
 
-    def openDescription(self, dataDict: dict) -> None:
-        if os.path.exists(dataDict["ManhuaPath"]):
+    def openDescription(self, dataDictInfo: str, dataDictInfoPath: str, index: int = 0) -> None:
+        if os.path.exists(dataDictInfoPath):
             #if dataDict["ManhuaTitle"] != self.previousOpen:
-            self.reloadManhuaData(dataDict["ManhuaTitle"])
+            self.reloadManhuaData(dataDictInfo, index)
             #self.descriptionPage.setData(dataDict)
             #self.descriptionPage.resetChapters()
             #self.win_dow.objReader.setData(dataDict["ManhuaTitle"])
             Link.modifyAttribute(parent=consts.OBJ_READER_NAME, attr="manhuaChanged", value=True)
             Link.modifyAttribute(parent=consts.OBJ_READER_NAME, attr="previousManhuaName", value=self.previousOpen)
-            self.previousOpen = dataDict["ManhuaTitle"]
+            self.previousOpen = dataDictInfo
             self.setCurrentIndex(2)
         else:
             Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_MANHUA)
-            self.deleteManhua(dataDict["ManhuaTitle"])
+            self.deleteManhua(dataDictInfo)
 
     def calculateLibraryDimension(self) -> int:
         dimensionV = self.geometry().width()
@@ -991,16 +992,38 @@ class Library(QStackedWidget):
         spacing = int(spacing / dimension)
         return spacing
 
-    def launchReader(self, index: int, path: str) -> None:
+    def launchReader(self, mtitle: str, ctitle: str, index: int, path: str, page:int = 0) -> None:
         if os.path.exists(path) and len(os.listdir(path)) != consts.EMPTY and any(Path(os.path.join(str(path), filename)).suffix in consts.IMG_EXT_LIST for filename in os.listdir(path)):
             if(Settings.fsState) == True and Link.fetchAttribute(consts.OBJ_APP, "windowState", True) != Qt.WindowState.WindowMaximized:
                 Link.callBackDeep(consts.OBJ_APP, "customTitleBar", "toggleRestore")
-            Link.callBack(consts.OBJ_READER_NAME, "loadChapterPages", index)
+            self.setHistory(mtitle, ctitle, path, index, page)
+            Link.callBack(consts.OBJ_READER_NAME, "loadChapterPages", index, page)
             Link.callBack(consts.OBJ_READER_NAME, "setFocus")
             Link.callBack(consts.OBJ_WINDOW, "setCurrentIndex", 1)
         else:
             Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_CHAPTER)
             self.reloadManhuaData(self.descriptionPage.currentManhua, index)
+
+    def setHistory(self, mtitle: str, ctitle: str, path: str, index: int, page: int = 0) -> None:
+        dict_ = {"mName": mtitle}
+        try:
+            dictSetting = {"mName": Settings.historyData[0]["manhuaTitle"]}
+            if dictSetting != dict_:
+                historyWidget = History()
+                historyWidget.initData(mtitle, ctitle, path, index, page)
+                Link.callBackDeep(consts.OBJ_MW_NAME, "historyScrollL", "insertWidget", 0, historyWidget)
+                dictD = historyWidget.getData()
+                Settings.historyData.insert(0, dictD)
+            else:
+                l = Link.fetchAttribute(consts.OBJ_MW_NAME, "historyScrollL").layout().itemAt(0).widget()
+                l.updateTime()
+                l.bindData()
+        except IndexError:
+            historyWidget = History()
+            historyWidget.initData(mtitle, ctitle, path, index, page)
+            Link.callBackDeep(consts.OBJ_MW_NAME, "historyScrollL", "insertWidget", 0, historyWidget)
+            dictD = historyWidget.getData()
+            Settings.historyData.insert(0, dictD)
 
     def setCover(self, path: str, manhuaName: str) -> None:
         if os.path.exists(path):
@@ -1061,8 +1084,9 @@ class Library(QStackedWidget):
 
 
 class Chapter(QPushButton):
-    def __init__(self, sTitle: str, pTitlePath: str | Path, index: int) -> None:
+    def __init__(self, mtitle: str, sTitle: str, pTitlePath: str | Path, index: int) -> None:
         super().__init__()
+        self.mtitle = mtitle
         self.title = sTitle
         self.titlePath = pTitlePath
         self.index = index
@@ -1077,7 +1101,7 @@ class Chapter(QPushButton):
         self.setMinimumHeight(50)
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
-        self.clicked.connect(lambda: Link.callBack(consts.OBJ_LIB_NAME, "launchReader", self.index, self.titlePath))
+        self.clicked.connect(lambda: Link.callBack(consts.OBJ_LIB_NAME, "launchReader", self.mtitle, self.title, self.index, self.titlePath))
 
 
 class Manhua(QPushButton):
@@ -1107,7 +1131,7 @@ class Manhua(QPushButton):
             self.manhuaBgLayoutList = QHBoxLayout()
             self.displayListVariant()
 
-        self.clicked.connect(lambda: Link.callBackDeep(consts.OBJ_MW_NAME, "library", "openDescription", self.metadata))
+        self.clicked.connect(lambda: Link.callBackDeep(consts.OBJ_MW_NAME, "library", "openDescription", self.metadata["ManhuaTitle"], self.metadata["ManhuaPath"]))
         
     def recreateObjectWidgets(self) -> None:
         self.manhuaCoverDisplayLabel = QLabel()
@@ -1414,7 +1438,7 @@ class Description(QWidget):
             key = list(self.descChapters.keys())[x]
             iPath = self.descChapters.get(key)
             path = self.setPath(self.dataDict["ManhuaPath"], iPath)
-            chap = Chapter(key, path, x)
+            chap = Chapter(self.dataDict["ManhuaTitle"], key, path, x)
             self.chapterDescListLayout.addWidget(chap)
 
     def exitPage(self) -> None:

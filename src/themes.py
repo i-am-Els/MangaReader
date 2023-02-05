@@ -152,7 +152,7 @@ class Themes:
 
         Themes.objM.scrollW.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
-        Themes.objM.historyListView.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+        Themes.objM.historyListView.setStyleSheet(f"QObject{{background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QPushButton{{color: off-white; background-color: {color.LIGHT_COLOR_1};}} QPushButton:hover{{background-color: {color.LIGHT_COLOR_7};}}")
 
 
         Themes.objM.library.descriptionPage.selectionWidget.setStyleSheet(f"background-color: transparent;")
@@ -278,6 +278,13 @@ class Themes:
             padding: 0px;
             margin: 0px;
             border: none;
+        }}
+        .History QPushButton{{
+            color: gray;
+            background-color: {color.DARK_COLOR_9};
+        }}
+        .History QPushButton:hover{{
+            background-color: {color.DARK_COLOR_5};
         }}
         """
 

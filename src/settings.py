@@ -69,7 +69,8 @@ class Settings(object):
             "apiIndex" : 1,
 
             "themeIndex" : consts.E_THEME_LIGHT_MODE,
-            "themeButtonState" : False
+            "themeButtonState" : False,
+            "historyData" : []
         }
 
     def saveData(data) -> None:
