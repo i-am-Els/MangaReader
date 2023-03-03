@@ -19,7 +19,7 @@
 from PyQt6.QtWidgets import QApplication, QVBoxLayout, QWidget, QMainWindow, QSizePolicy
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QIcon
-import sys, create, ctypes, consts, color
+import sys, create, ctypes, consts, color, splashScreen
 from themes import WindowTitleBar, MoveableWindow
 from linker import Link
 
@@ -97,6 +97,12 @@ if __name__ == "__main__":
     Link.setAppWindow(appWindow)
 
     app.setWindowIcon(appWindow.getWindowIcon())
-    appWindow.showMaximized()
+    
+    splashScreen = splashScreen.SplashScreen(appWindow)
+    splashScreen.show()
+
+
+
+
 
     sys.exit(app.exec())

@@ -1,5 +1,0 @@
-Hello, Pythonista!
-
-Welcome to Real Python!
-
-Ready to try Python's zipfile module?
