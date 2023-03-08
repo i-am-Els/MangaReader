@@ -13,7 +13,7 @@ class SplashScreen(QWidget):
     def __init__(self, appWindow) -> None:
         super().__init__()
         self.appWindow = appWindow
-        self.setFixedSize(480, 320)
+        self.setFixedSize(480, 300)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setWindowTitle("Splash Screen")
@@ -33,7 +33,7 @@ class SplashScreen(QWidget):
         self.labelTitle = QLabel(self.frame)
         self.labelTitle.setObjectName("labelTitle")
         self.labelTitle.resize(self.width() - 10, 150)
-        self.labelTitle.move(0, 40)
+        self.labelTitle.move(0, 20)
         self.labelTitle.setText("Manhua Reader")
         self.labelTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
@@ -46,7 +46,7 @@ class SplashScreen(QWidget):
 
         self.progressBar = QProgressBar(self.frame)
         self.progressBar.resize(440, 30)
-        self.progressBar.move(5, self.labelDescription.y() + 40)
+        self.progressBar.move(10, self.labelDescription.y() + 40)
         self.progressBar.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.progressBar.setFormat('%p%')
         self.progressBar.setTextVisible(True)
@@ -72,7 +72,7 @@ class SplashScreen(QWidget):
             }
 
             QFrame {
-                background-color: rgb(34, 24, 24);
+                background-color: rgb(72, 75, 105);
                 color: rgb(220, 220, 220);
             }
 

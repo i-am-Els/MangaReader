@@ -1,5 +1,5 @@
 VERSION = "v.1.0.2"
-APP_NAME = f"Manhua Reader - [{VERSION}]"
+APP_NAME = f"Manhua Reader"
 APP_DOMAIN = "els.ng"
 ORG_NAME = "El's"
 
