@@ -2,5 +2,6 @@
 .vscode
 *.iss
 resources/design_files/
+src/_pycache_/*.pyc
 src/_pycache_/
 LICENSE.txt
