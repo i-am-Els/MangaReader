@@ -150,9 +150,9 @@ class Themes:
 
         Themes.objM.library.libraryScrollAreaWidget.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
-        Themes.objM.scrollW.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+        Themes.objM.scrollW.setStyleSheet(f" QObject{{ background-color: transparent; color: white; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QPushButton{{background-color: {color.LIGHT_COLOR_6}; color: white; border-radius: 15px;}} QPushButton:hover{{background-color: {color.LIGHT_COLOR_5}; color: white; border-radius: 15px;}}")
 
-        Themes.objM.historyListView.setStyleSheet(f"QObject{{background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QPushButton{{color: off-white; background-color: {color.LIGHT_COLOR_1};}} QPushButton:hover{{background-color: {color.LIGHT_COLOR_7};}}")
+        Themes.objM.historyListView.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;")
 
 
         Themes.objM.library.descriptionPage.selectionWidget.setStyleSheet(f"background-color: transparent;")
@@ -174,12 +174,12 @@ class Themes:
         Themes.objM.library.descriptionPage.exitButtonIcon.addPixmap(QPixmap(resources.exit_button), QIcon.Mode.Normal, QIcon.State.Off)
         Themes.objM.library.descriptionPage.exitButton.setIcon(Themes.objM.library.descriptionPage.exitButtonIcon)
         
-        Themes.objM.library.descriptionPage.exitButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_3}; border-radius: 18px;}}")
+        Themes.objM.library.descriptionPage.exitButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_4}; border-radius: 18px;}}")
 
         Themes.objM.library.descriptionPage.deleteButtonIcon.addPixmap(QPixmap(resources.delete_manhua), QIcon.Mode.Normal, QIcon.State.Off)
         Themes.objM.library.descriptionPage.deleteButton.setIcon(Themes.objM.library.descriptionPage.deleteButtonIcon)
         
-        Themes.objM.library.descriptionPage.deleteButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_3}; border-radius: 18px;}}")
+        Themes.objM.library.descriptionPage.deleteButton.setStyleSheet(f"QPushButton:hover{{ background-color: {color.LIGHT_COLOR_4}; border-radius: 18px;}}")
         
         Themes.objM.refreshIcon.addPixmap(QPixmap(resources.refresh_icon), QIcon.Mode.Normal, QIcon.State.Off)
         Themes.objM.refreshButton.setIcon(Themes.objM.refreshIcon)
@@ -312,7 +312,7 @@ class Themes:
 
         Themes.objM.library.libraryScrollAreaWidget.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
-        Themes.objM.scrollW.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
+        Themes.objM.scrollW.setStyleSheet(f" QObject{{ background-color: transparent; color: white; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px;}} QPushButton{{background-color: {color.DARK_COLOR_6}; color: {color.DARK_COLOR_4}; border-radius: 15px;}} QPushButton:hover{{background-color: {color.DARK_COLOR_1}; color: {color.DARK_COLOR_4}; border-radius: 15px;}}")
 
         Themes.objM.historyListView.setStyleSheet(f"background-color: transparent; border: 1px solid transparent; border-top-left-radius :10px; border-top-right-radius : 10px; border-bottom-left-radius : 0px; border-bottom-right-radius : 10px; ")
 
@@ -554,7 +554,7 @@ class Themes:
 
     def setManhuaObjStyle(obj):
         if Settings.themeIndex == consts.E_THEME_LIGHT_MODE:
-            obj.setStyleSheet(f" QLabel#manhuaLabel{{ padding: 7px; border-radius: 5px; background-color: white; border: none;}}  QLabel#nameLabel{{ padding: 1px; border-radius: 5px;}} QPushButton#fav {{ background: {color.LIGHT_COLOR_4};  border: none; border-radius: 5px;}} QPushButton#fav:hover {{ background-color: {color.LIGHT_COLOR_5}}} .Manhua {{ border-radius: 5px; background-color: {color.LIGHT_COLOR_1};}} .Manhua:hover{{ background: {color.LIGHT_COLOR_6}; }}") 
+            obj.setStyleSheet(f" QLabel#manhuaLabel{{ padding: 7px; border-radius: 5px; background-color: white; border: none;}}  QLabel#nameLabel{{ padding: 1px; border-radius: 5px;}} QPushButton#fav {{ background: {color.LIGHT_COLOR_4};  border: none; border-radius: 5px;}} QPushButton#fav:hover {{ background-color: {color.LIGHT_COLOR_5}}} .Manhua {{ border-radius: 5px; background-color: {color.LIGHT_COLOR_6};}} .Manhua:hover{{ background: {color.LIGHT_COLOR_5}; }}") 
         else:
             obj.setStyleSheet(f" QLabel#manhuaLabel{{ padding: 7px; border-radius: 5px; background-color: white; border: none;}}  QLabel#nameLabel{{ padding: 5px; border: none; color: {color.DARK_COLOR_4}; background-color: transparent;}} QPushButton#fav {{ background: {color.DARK_COLOR_4};  border: none; border-radius: 5px;}} QPushButton#fav:hover {{ background-color: {color.DARK_COLOR_5}}} .Manhua {{ border-radius: 5px; background-color: {color.DARK_COLOR_6};}} .Manhua:hover{{ background: {color.DARK_COLOR_1}}}") 
 

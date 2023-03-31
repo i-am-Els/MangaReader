@@ -19,7 +19,7 @@
 
 from linker import Link
 from pathlib import Path
-import os, re, consts, resources, color
+import os, re, consts, resources, color, utilities
 from history import History
 from themes import Themes
 from settings import Settings
@@ -33,7 +33,6 @@ from PyQt6.QtWidgets import (
     QLineEdit,
     QLabel,
     QSizePolicy,
-    QMessageBox,
     QPushButton,
     QFileDialog,
     QComboBox, 
@@ -51,7 +50,6 @@ class MainWindow(QWidget):
         self.max_button_size: QSize = QSize(consts.MAX_BTN_SIZE, consts.MAX_BTN_SIZE)
         self.min_button_size: QSize = QSize(consts.MIN_BTN_SIZE, consts.MIN_BTN_SIZE)
 
-        self.curZipFileList = list()
 
         self.newPath = Settings.libraryNewPath
         self.tabIndex: int = consts.E_TAB_HOME_INDEX
@@ -594,80 +592,45 @@ class MainWindow(QWidget):
             Settings.viewIsGrid = False
             self.viewTypeAction()               
    
-    def popDialog(self, type: str) -> None:
-        if type == consts.E_DIALOG_EMPTY:
-            txt, t_txt = "Bundle is empty, Please select a filled directory.", "Empty Bundle Error!"
-        elif type == consts.E_DIALOG_STRUCTURE:
-            txt, t_txt = "There are 2 scenarios that raise this error: Bundle Structure Error or No Image Found\nTip 1: Select a Parent folder that has chapters arranged in sub-folders.\nTip 2: The chapter sub-folders MUST contain images.", "Structure or File Error!"
-        elif type == consts.E_DIALOG_BADFILE:
-            txt, t_txt = "The supposed archive file might contain a bad or corrupted file...\nUnable to completely read archive.", "Bad/Corrupted Archive File!"
-        elif type == consts.E_DIALOG_NONE:
-            txt, t_txt = "Selected file is not a valid archive file. Select A readable archive file such as '.cbz', '.zip' files.", "Not an Archive File!"
-
-        elif type == consts.E_DIALOG_DUPLICATE:
-            txt, t_txt = "The manhua title already exists in your library, select another title.", "Duplicate Action!"
-
-        elif type == consts.E_DIALOG_PERMISSION:
-            txt, t_txt = "The system has denied permission to the selected folder.", "Permission Denied!"
-
-        elif type == consts.E_DIALOG_DELETED_MANHUA:
-            txt, t_txt = "The manhua bundle is no longer on drive. The path might be incorrect or the manhua has been deleted. The directory might also be folder-less or has no image in it's structure.", "Manhua not found on Drive!"
-
-        elif type == consts.E_DIALOG_DELETED_CHAPTER:
-            txt, t_txt = "The selected Chapter is no longer on drive or Does not contain any image file. It might also be empty. Check the above conditions...", "Unable to read Chapter!"
-
-        elif type == consts.E_DIALOG_DELETED_IMAGE:
-            txt, t_txt = "Image not Found, it must have been deleted just now.", "Missing Image!"
-
-        elif type == consts.E_DIALOG_REGEX:
-            txt, t_txt = "Directories failed the chapter regex test... \n[FIX] Rename at least one sub-directory of the bundle something like 'chapter 1', 'chap 1" or 'ch 1', "ReGex Failed!"
-
-        
-        messageBox = QMessageBox()
-        messageBox.setIcon(QMessageBox.Icon.Information)
-        messageBox.setText(txt)
-        messageBox.setWindowTitle(t_txt)
-        messageBox.setStandardButtons(QMessageBox.StandardButton.Ok)
-        messageBox.setWindowIcon(self.getWindowIcon())
-        messageBox.exec()
+    
 
     def localSearchAction(self) -> None:
         try:
             self.localDirDialog = QFileDialog.getExistingDirectory(self,"Select Manhua Title",self.newPath)
 
-            self.localDirPath = self.convertToPath(self.localDirDialog)
+            self.localDirPath = utilities.convertToPath(self.localDirDialog)
             dir = list(os.listdir(self.localDirPath))
             
 
             if len(dir) == consts.EMPTY:
-                self.popDialog(consts.E_DIALOG_EMPTY)
+                utilities.popDialog(consts.E_DIALOG_EMPTY)
                 self.localSearchAction()
 
             elif self.localDirDialog == '':
                 pass
 
             elif self.localDirDialog != '' and len(dir) != consts.EMPTY:
-                rightStructure = self.library.correctDirStructure(self.localDirPath)
+                rightStructure = utilities.correctDirStructure(self.localDirPath)
                 if rightStructure == True:
-                    self.newPath = self.extractParentFolderPath(self.localDirPath)
+                    self.newPath = utilities.extractParentFolderPath(self.localDirPath)
                     Settings.libraryNewPath = self.newPath
 
                     self.library.addToLibrary(self.localDirPath)
                 else:
-                    self.popDialog(consts.E_DIALOG_STRUCTURE)
+                    utilities.popDialog(consts.E_DIALOG_STRUCTURE)
                     self.localSearchAction()
         except PermissionError:
-            self.popDialog(consts.E_DIALOG_PERMISSION)
+            utilities.popDialog(consts.E_DIALOG_PERMISSION)
             self.localSearchAction()
 
     def localSearchSingleFormatAction(self) -> None:
         self.localSingleDialog = QFileDialog().getOpenFileName(self, 'Open Archived Manhua File', self.newPath, 'Archived Files (*.cbz *zip)')
-        self.localSinglePath = self.convertToPath(self.localSingleDialog[0])
+        self.localSinglePath = utilities.convertToPath(self.localSingleDialog[0])
 
         if os.path.isfile(self.localSinglePath) and Path(self.localSinglePath).suffix in ['.cbz', '.zip']:  
-            self.localFileName = self.extractFileName(self.localSinglePath)
+            self.localFileName = utilities.extractFileName(self.localSinglePath)
 
-            self.parentLocalSinglePath = self.extractParentFolderPath(self.localSinglePath)
+            self.parentLocalSinglePath = utilities.extractParentFolderPath(self.localSinglePath)
 
             self.localSingleImport = [self.localSinglePath, self.localFileName, self.parentLocalSinglePath]
             self.newPath = self.parentLocalSinglePath
@@ -676,31 +639,30 @@ class MainWindow(QWidget):
 
             ziper = Archiver()
             outPath = Path(Settings.extractionNewPath + str(Path(self.localFileName).stem) + "\\")
-            # print(outPath)
+            print(outPath)
             if not os.path.exists(outPath):
                 os.makedirs(outPath)
-            # self.curZipFileList = ziper.extractCbz(self.localSinglePath, outPath, self)
-            # self.library.libraryArchiveMetaDataList = self.curZipFileList
-            # Library.launchArchiveReader(self.curZipFileList)
+                
+            curZipFile = ziper.extractCbz(self.localSinglePath, outPath, self)
+            dir = list(os.listdir(curZipFile))
+
+            if curZipFile != '' and len(dir) != consts.EMPTY:
+                rightStructure = utilities.correctDirStructure(curZipFile)
+                if rightStructure == True:
+                    self.newPath = utilities.extractParentFolderPath(curZipFile)
+                    Settings.libraryNewPath = self.newPath
+
+                    self.library.addToLibrary(curZipFile)
+                else:
+                    utilities.popDialog(consts.E_DIALOG_STRUCTURE)
 
         elif self.localSingleDialog == ('', ''):
             pass
 
         elif not(os.path.isfile(self.localSinglePath)):
-            self.popDialog(consts.E_DIALOG_NONE)
+            utilities.popDialog(consts.E_DIALOG_NONE)
             self.localSearchSingleFormatAction()
-        
-    def convertToPath(self, path: str) -> Path:
-        path_n = Path(path)
-        return path_n
 
-    def extractParentFolderPath(self, path: str) -> str:
-        path_n = os.path.dirname(path)
-        return path_n
-
-    def extractFileName(self, path: str) -> str:
-        file_n = os.path.basename(path)
-        return file_n
 
     def setTabIndex(self, tabIndex: int) -> None:
         self.tabWidget.setCurrentIndex(tabIndex)
@@ -716,7 +678,6 @@ class Library(QStackedWidget):
         self.previousOpen = ""
 
         self.libraryListdata = list()
-        self.libraryArchiveMetaDataList = dict()
 
         self.noItems = QWidget()
         self.libraryShelf = QWidget()
@@ -750,7 +711,7 @@ class Library(QStackedWidget):
 
         for x in list(Settings.libraryMetadata.values()):
             if os.path.exists(x["ManhuaPath"]):
-                v = self.addToMetaData(x["ManhuaPath"])
+                v = utilities.addToMetaData(x["ManhuaPath"])
                 v["IsFav"] = x["IsFav"]
                 alt.update({x["ManhuaTitle"] : v})
         temp = alt
@@ -865,50 +826,10 @@ class Library(QStackedWidget):
                 # self.libraryListdata[x].switchVariant("grid")
                 self.libraryShelfListLayout.addWidget(self.libraryListdata[x])
 
-    def correctDirStructure(self, path: str) -> bool:
-        correct: bool = False
-        imageExtList = consts.IMG_EXT_LIST
-
-        for x in os.listdir(path):
-            xPath = os.path.join(path, x)
-            if os.path.isdir(xPath):
-                correct = not(any(os.path.isdir(os.path.join(xPath, y)) == True for y in os.listdir(xPath))) and any((Path(os.path.join(xPath, y)).suffix in imageExtList) for y in os.listdir(xPath))
-                if correct == True:
-                    break
-        return correct
-
-    def addToMetaData(self, path: str) -> dict:
-        
-        imageExtList = consts.IMG_EXT_LIST
-        manhuaMetaDict = dict()
-        manhuaChapterList = list()
-
-        manhuaMetaDict["ManhuaTitle"] = Path(path).stem
-        manhuaMetaDict["ManhuaPath"] = str(path)
-        emptyCover = True
-
-        for x in os.listdir(path):
-            xPath = os.path.join(path, x)
-            if os.path.isdir(xPath) and any(Path(os.path.join(xPath, z)).suffix in imageExtList for z in os.listdir(xPath)):
-                    # sChapterName = str(Path(xPath).name)
-                sChapterName = Path(xPath).name
-                manhuaChapterList.append(sChapterName)
-            elif Path(xPath).suffix in ['.jpeg', '.jpg', '.png'] and emptyCover == True:
-                manhuaMetaDict["ManhuaCover"] = xPath
-                emptyCover = False
-        if emptyCover == True:
-            manhuaMetaDict["ManhuaCover"] = resources.default_cover_image
-                
-        sortedManhuaChapterDict = self.sortChapters(manhuaChapterList)
-        if sortedManhuaChapterDict != {}:
-            manhuaMetaDict["Chapters"] = sortedManhuaChapterDict
-            manhuaMetaDict["Status"] = "Local Manhua Bundle"
-            manhuaMetaDict["Description"] = consts.E_MW_TEXT_DUMMY_DESCRIPTION
-            return manhuaMetaDict
 
     def addToLibrary(self, path: str) -> None:
         try:
-            manhuaMetaDict = self.addToMetaData(path)
+            manhuaMetaDict = utilities.addToMetaData(path)
             if manhuaMetaDict != {} and manhuaMetaDict != None:
                 manhuaMetaDict["IsFav"] = False
 
@@ -918,36 +839,10 @@ class Library(QStackedWidget):
                     self.libraryListdata.append(self.manhuaObj)
                     self.addToLibraryAction(self.manhuaObj)
                 else:
-                    Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DUPLICATE)
+                    utilities.popDialog(consts.E_DIALOG_DUPLICATE)
         except IndexError:
-            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_STRUCTURE)
+            utilities.popDialog(consts.E_DIALOG_STRUCTURE)
 
-    def sortChapters(self, someList: list[str]) -> dict:
-        try:
-            newSortedDict = dict()
-            initIndexHolderList = list()
-            indexHolderList = list()
-            chapterNameList = list()
-            for item in someList:
-                dTxt = re.findall(r"((ch+(ap)?(ter)?)+(\W|_)*(\d+(?:\.\d+)?))", str(item).casefold())
-                desiredTxt = dTxt[0]
-                initIndexHolderList.append(desiredTxt[-1])
-                if '.' in desiredTxt[-1]:
-                    indexHolderList.append(float(desiredTxt[-1]))
-                else:
-                    indexHolderList.append(int(desiredTxt[-1]))
-                chapterName = 'Chapter ' + str(desiredTxt[-1])
-                chapterNameList.append(chapterName)
-            indexHolderList.sort()
-            for i in indexHolderList:
-                for j in initIndexHolderList:
-                    if str(i) == j:
-                        ind = initIndexHolderList.index(j)
-                        newSortedDict.update({chapterNameList[ind] : someList[ind]})
-            return newSortedDict
-        except IndexError:
-            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_REGEX)
-            return {}
 
     def recreateManhuas(self) -> None:
         self.libraryListdata.clear()
@@ -971,7 +866,7 @@ class Library(QStackedWidget):
             self.previousOpen = dataDictInfo
             self.setCurrentIndex(2)
         else:
-            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_MANHUA)
+            utilities.popDialog(consts.E_DIALOG_DELETED_MANHUA)
             self.deleteManhua(dataDictInfo)
 
     def calculateLibraryDimension(self) -> int:
@@ -992,7 +887,7 @@ class Library(QStackedWidget):
         spacing = int(spacing / dimension)
         return spacing
 
-    def launchReader(self, mtitle: str, ctitle: str, index: int, path: str, page:int = 0) -> None:
+    def launchReader(self, mtitle: str, ctitle: str, index: int, path: str, page:int = 1) -> None:
         if os.path.exists(path) and len(os.listdir(path)) != consts.EMPTY and any(Path(os.path.join(str(path), filename)).suffix in consts.IMG_EXT_LIST for filename in os.listdir(path)):
             if(Settings.fsState) == True and Link.fetchAttribute(consts.OBJ_APP, "windowState", True) != Qt.WindowState.WindowMaximized:
                 Link.callBackDeep(consts.OBJ_APP, "customTitleBar", "toggleRestore")
@@ -1001,10 +896,10 @@ class Library(QStackedWidget):
             Link.callBack(consts.OBJ_READER_NAME, "setFocus")
             Link.callBack(consts.OBJ_WINDOW, "setCurrentIndex", 1)
         else:
-            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_CHAPTER)
+            utilities.popDialog(consts.E_DIALOG_DELETED_CHAPTER)
             self.reloadManhuaData(self.descriptionPage.currentManhua, index)
 
-    def setHistory(self, mtitle: str, ctitle: str, path: str, index: int, page: int = 0) -> None:
+    def setHistory(self, mtitle: str, ctitle: str, path: str, index: int, page: int = 1) -> None:
         dict_ = {"mName": mtitle}
         try:
             dictSetting = {"mName": Settings.historyData[0]["manhuaTitle"]}
@@ -1033,7 +928,7 @@ class Library(QStackedWidget):
             self.libraryListdata[index].manhuaCoverPixmap = QPixmap(str(path)).scaled(90, 120, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
             self.libraryListdata[index].manhuaCoverDisplayLabel.setPixmap(self.libraryListdata[index].manhuaCoverPixmap)
         else:
-            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_IMAGE)
+            utilities.popDialog(consts.E_DIALOG_DELETED_IMAGE)
             Settings.libraryMetadata[manhuaName]["ManhuaCover"] = str(resources.default_cover_image)
             manhuasData = list(Settings.libraryMetadata.keys())
             index = manhuasData.index(manhuaName)
@@ -1057,7 +952,7 @@ class Library(QStackedWidget):
 
     def reloadManhuaData(self, manhuaKey: str, index: int = 0) -> None:
         if os.path.exists(Settings.libraryMetadata[manhuaKey]["ManhuaPath"]):
-            dic = self.addToMetaData(Settings.libraryMetadata[manhuaKey]["ManhuaPath"])
+            dic = utilities.addToMetaData(Settings.libraryMetadata[manhuaKey]["ManhuaPath"])
             Settings.libraryMetadata[manhuaKey]["ManhuaTitle"] = dic["ManhuaTitle"]
             if not os.path.exists(Settings.libraryMetadata[manhuaKey]["ManhuaCover"]):
                 Settings.libraryMetadata[manhuaKey]["ManhuaCover"] = dic["ManhuaCover"]
@@ -1068,7 +963,7 @@ class Library(QStackedWidget):
             self.resetSomeDescData(Settings.libraryMetadata[manhuaKey], index)
             
         else:
-            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_MANHUA)
+            utilities.popDialog(consts.E_DIALOG_DELETED_MANHUA)
             self.deleteManhua(manhuaKey)
             self.setCurrentIndex(consts.E_TAB_LIBRARY_SHELF)
 
@@ -1429,7 +1324,7 @@ class Description(QWidget):
         if os.path.exists(self.dataDict["ManhuaPath"]) and self.chapterLen != consts.EMPTY:
             self.resetChapters()
         else:
-            Link.callBack(consts.OBJ_MW_NAME, "popDialog", consts.E_DIALOG_DELETED_MANHUA)
+            utilities.popDialog(consts.E_DIALOG_DELETED_MANHUA)
             Link.callBack(consts.OBJ_LIB_NAME, "deleteManhua", self.dataDict["ManhuaTitle"])
             Link.callBack(consts.OBJ_LIB_NAME, "setCurrentIndex", consts.E_TAB_LIBRARY_SHELF)
 

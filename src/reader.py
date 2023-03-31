@@ -337,8 +337,11 @@ class Reader(QWidget):
             n = len(self.imageList)
             v = self.screenScrollArea.verticalScrollBar().value()
             max = self.screenScrollArea.verticalScrollBar().maximum()
-            p = (v / max) * 100
-            x = int((p/100) * n)
+            if max != 0:
+                p = (v / max) * 100
+                x = int((p/100) * n)
+            else:
+                x = 0
             return x
 
     def calculateCurrentScrollValue(self) -> None:

@@ -17,28 +17,20 @@
 
 
 
-from PyQt6.QtWidgets import (
-    QStackedWidget,
-    QHBoxLayout,
-    QVBoxLayout,
-    QGridLayout,
-    QWidget,
-    QLabel,
-    QSizePolicy,
-    QPushButton,
-    QRadioButton,
-    QListWidget,
-    QFileDialog
-)
+from pathlib import Path
 
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtGui import QCursor, QIcon, QFont
+from PyQt6.QtGui import QCursor, QFont, QIcon
+from PyQt6.QtWidgets import (QFileDialog, QGridLayout, QHBoxLayout, QLabel,
+                             QListWidget, QPushButton, QRadioButton,
+                             QSizePolicy, QStackedWidget, QVBoxLayout, QWidget)
+
+import consts, utilities
 from linker import Link
-import consts
-from pathlib import Path
 # import os
 from settings import Settings
-from themes import ToggleSwitch, Themes
+from themes import Themes, ToggleSwitch
+
 
 class Preference(QWidget):
     def __init__(self) -> None:
@@ -493,7 +485,7 @@ class Preference(QWidget):
     def selectDownloadDir(self) -> None:
         self.downloadDirDialog = QFileDialog.getExistingDirectory(self,"Select Download Location", self.newPath)
 
-        self.downloadDirPath = self.convertToPath(self.downloadDirDialog)
+        self.downloadDirPath = utilities.convertToPath(self.downloadDirDialog)
         if self.downloadDirDialog != "":
             Settings.downloadNewPath = str(self.downloadDirPath)
 
@@ -641,10 +633,6 @@ class Preference(QWidget):
 
     def percentDone(self) -> int:
         return ((self.numDownloaded/self.totalDownloads) * 100 )
-
-    def convertToPath(self, path: str) -> Path:
-        path_n = Path(path)
-        return path_n
     
     def setThemesBtnChecked(self, bool_value: bool) -> None:
         self.themesBtn.setChecked(bool_value)
