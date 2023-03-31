@@ -1,3 +1,20 @@
+# Manhua Reader,  An application for reading manhuas and manhuas online and offline
+# Copyright (C) 2022  Eniola Emmanuel Olawale
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
 LIGHT_COLOR_1: str = "rgb(250, 250, 250)"
 LIGHT_COLOR_3: str = "rgb(210, 211, 219)"
 LIGHT_COLOR_4: str = "rgb(147, 148, 165)"

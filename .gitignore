@@ -1,0 +1,4 @@
+[Rr]elease/
+.vscode/
+*.iss
+_pycache_
