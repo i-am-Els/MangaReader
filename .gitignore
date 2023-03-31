@@ -1,5 +1,5 @@
 [Rr]elease/
-.vscode/
+.vscode
 *.iss
 _pycache_
 LICENSE.txt
