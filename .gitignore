@@ -1,5 +1,6 @@
 [Rr]elease/
 .vscode
 *.iss
-_pycache_
+resources/design_files/
+src/_pycache_/
 LICENSE.txt
