@@ -70,6 +70,14 @@ E_TOGGLE_AUTO_UPDATE_OTHER = 1
 E_TOGGLE_HIDE_NAV = 2
 E_TOGGLE_FULLSCREEN = 3
 
+E_STATUS_OFFLINE = "Offline"
+E_STATUS_ONLINE = "Online"
+E_STATUS_ARCHIVE = "Archive"
+
+E_STATUS_OFFLINE_TEXT = "Local Manhua Bundle"
+E_STATUS_ONLINE_TEXT = "Online Manhua Bundle"
+E_STATUS_ARCHIVE_TEXT = "Archive Manhua Bundle"
+
 E_MW_TEXT_DUMMY_DESCRIPTION = "No Description... This file is a locally imported file, metadata consist of no description..."
 
 
@@ -84,6 +92,7 @@ E_DIALOG_DELETED_MANHUA = "deletedM"
 E_DIALOG_DELETED_CHAPTER = "deletedC"
 E_DIALOG_DELETED_IMAGE = "deletedI"
 E_DIALOG_REGEX = "regex"
+E_DIALOG_FILE_NOT_FOUND = "file_not_found"
 
 
 # object names

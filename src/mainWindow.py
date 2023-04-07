@@ -366,8 +366,9 @@ class MainWindow(QWidget):
         
     def reloadHistory(self):
         for x in Settings.historyData:
-            hist = History()
-            hist.initData(x["manhuaTitle"], x["chapter"], x["path"], x["index"], x["page"])
+            hist = History(False)
+            hist.initData(x["manhuaTitle"], x["chapter"], x["path"], x["index"], x["page"], x["time"])
+            hist.setTimeUpdatable(True)
             self.historyScrollL.addWidget(hist)
 
     def resetHistory(self) -> None:
@@ -491,8 +492,9 @@ class MainWindow(QWidget):
   
     def loadHomeDisplay(self) -> None:# More Work
         self.homeDisplayLayout = QGridLayout()
-        
-
+        ...
+        ...
+        ...
         self.homeDisplay.setLayout(self.homeDisplayLayout)
 
     def loadNoInternetDisplay(self) -> None:
@@ -615,7 +617,7 @@ class MainWindow(QWidget):
                     self.newPath = utilities.extractParentFolderPath(self.localDirPath)
                     Settings.libraryNewPath = self.newPath
 
-                    self.library.addToLibrary(self.localDirPath)
+                    self.library.addToLibrary(self.localDirPath, consts.E_STATUS_OFFLINE)
                 else:
                     utilities.popDialog(consts.E_DIALOG_STRUCTURE)
                     self.localSearchAction()
@@ -639,7 +641,7 @@ class MainWindow(QWidget):
 
             ziper = Archiver()
             outPath = Path(Settings.extractionNewPath + str(Path(self.localFileName).stem) + "\\")
-            print(outPath)
+
             if not os.path.exists(outPath):
                 os.makedirs(outPath)
                 
@@ -652,7 +654,7 @@ class MainWindow(QWidget):
                     self.newPath = utilities.extractParentFolderPath(curZipFile)
                     Settings.libraryNewPath = self.newPath
 
-                    self.library.addToLibrary(curZipFile)
+                    self.library.addToLibrary(curZipFile, consts.E_STATUS_ARCHIVE)
                 else:
                     utilities.popDialog(consts.E_DIALOG_STRUCTURE)
 
@@ -679,8 +681,8 @@ class Library(QStackedWidget):
 
         self.libraryListdata = list()
 
-        self.noItems = QWidget()
-        self.libraryShelf = QWidget()
+        self.noItems = QWidget(self)
+        self.libraryShelf = QWidget(self)
         self.descriptionPage = Description()
         
         self.addWidget(self.noItems)
@@ -692,6 +694,7 @@ class Library(QStackedWidget):
         self.setNoItemsWidget()
 
         self.loadLibraryLayout()
+
         self.parent.launchDone = True
         self.testDataForTamper()
         if len(Settings.libraryMetadata) != 0:
@@ -706,12 +709,20 @@ class Library(QStackedWidget):
                 self.reloadManhuaData(self.descriptionPage.currentManhua)
                 # print(self.descriptionPage.dataDict)
 
+    def fetchStatus(self, key: str):
+        if key == consts.E_STATUS_OFFLINE_TEXT:
+            return consts.E_STATUS_OFFLINE
+        elif key == consts.E_STATUS_ONLINE_TEXT:
+            return consts.E_STATUS_ONLINE
+        elif key == consts.E_STATUS_ARCHIVE_TEXT:
+            return consts.E_STATUS_ARCHIVE 
+
     def testDataForTamper(self) -> None:
         alt = dict()
 
         for x in list(Settings.libraryMetadata.values()):
             if os.path.exists(x["ManhuaPath"]):
-                v = utilities.addToMetaData(x["ManhuaPath"])
+                v = utilities.addToMetaData(x["ManhuaPath"], self.fetchStatus(x["Status"]))
                 v["IsFav"] = x["IsFav"]
                 alt.update({x["ManhuaTitle"] : v})
         temp = alt
@@ -759,6 +770,7 @@ class Library(QStackedWidget):
             self.libraryListReDisplay()
 
         self.libraryShelfLayout.addWidget(self.libraryScrollArea)
+
         
     def loadLibraryLayout(self) -> None:
         self.libraryShelfLayout = QVBoxLayout(self.libraryShelf)
@@ -768,6 +780,7 @@ class Library(QStackedWidget):
         self.libraryScrollArea.setWidgetResizable(True)
         self.libraryScrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.loadLibraryItems()
+        self.libraryShelfLayout.setStretch(0, 1)
         self.libraryShelf.setLayout(self.libraryShelfLayout)
 
     def addToLibraryAction(self, manhuaObj: QWidget) -> None:
@@ -827,9 +840,9 @@ class Library(QStackedWidget):
                 self.libraryShelfListLayout.addWidget(self.libraryListdata[x])
 
 
-    def addToLibrary(self, path: str) -> None:
+    def addToLibrary(self, path: str, status: str) -> None:
         try:
-            manhuaMetaDict = utilities.addToMetaData(path)
+            manhuaMetaDict = utilities.addToMetaData(path, status)
             if manhuaMetaDict != {} and manhuaMetaDict != None:
                 manhuaMetaDict["IsFav"] = False
 
@@ -952,7 +965,8 @@ class Library(QStackedWidget):
 
     def reloadManhuaData(self, manhuaKey: str, index: int = 0) -> None:
         if os.path.exists(Settings.libraryMetadata[manhuaKey]["ManhuaPath"]):
-            dic = utilities.addToMetaData(Settings.libraryMetadata[manhuaKey]["ManhuaPath"])
+            st = self.fetchStatus(Settings.libraryMetadata[manhuaKey]["Status"])
+            dic = utilities.addToMetaData(Settings.libraryMetadata[manhuaKey]["ManhuaPath"], st)
             Settings.libraryMetadata[manhuaKey]["ManhuaTitle"] = dic["ManhuaTitle"]
             if not os.path.exists(Settings.libraryMetadata[manhuaKey]["ManhuaCover"]):
                 Settings.libraryMetadata[manhuaKey]["ManhuaCover"] = dic["ManhuaCover"]
@@ -985,16 +999,20 @@ class Chapter(QPushButton):
         self.title = sTitle
         self.titlePath = pTitlePath
         self.index = index
-        
+
         self.fm = self.fontMetrics()
+        self.elided = self.fm.elidedText(self.title, Qt.TextElideMode.ElideRight, 200)
+        
         self.pathText = self.titlePath
         self.elidedText = self.fm.elidedText(self.pathText, Qt.TextElideMode.ElideMiddle, 250)
 
-        self.labelString = f"{self.title} \n{self.elidedText}"
+        self.labelString = f"{self.elided} \n{self.elidedText}"
         self.setText(self.labelString)
         self.setStyleSheet("QPushButton{ text-align:  left; border-radius: 5px; padding-left: 10px;} QPushButton:hover { color: white; }") #---Theme---
         self.setMinimumHeight(50)
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.setToolTip(self.pathText)
+        self.setToolTipDuration(consts.TOOLTIP_DURATION)
 
         self.clicked.connect(lambda: Link.callBack(consts.OBJ_LIB_NAME, "launchReader", self.mtitle, self.title, self.index, self.titlePath))
 
@@ -1011,14 +1029,15 @@ class Manhua(QPushButton):
         self.manhuaPath = Path(metadata["ManhuaPath"])
         self.manhuaCover = Path(metadata["ManhuaCover"])
         self.manhuaChapters = metadata["Chapters"]
-        self.manhuaId = metadata["ManhuaTitle"]
         self.isFavorite = metadata["IsFav"]
-        self.bookmarkPosition = object()
         self.size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.setObjectName(self.manhuaName)
-        
+
+        self.setToolTip(self.manhuaName)
+        self.setToolTipDuration(consts.TOOLTIP_DURATION)
+
         self.recreateObjectWidgets()
-       
+
         if Settings.viewIsGrid:
             self.manhuaBgLayoutGrid = QVBoxLayout()
             self.displayGridVariant()
@@ -1053,7 +1072,9 @@ class Manhua(QPushButton):
         self.manhuaCoverLayout.setSpacing(0)
         self.manhuaCoverLayout.setContentsMargins(0, 0, 0, 0)
 
-        self.manhuaNameLabel.setText(self.manhuaName)
+        self.fm = self.fontMetrics()
+        self.elided = self.fm.elidedText(self.manhuaName, Qt.TextElideMode.ElideRight, 110)
+        self.manhuaNameLabel.setText(self.elided)
         self.manhuaNameLabel.setSizePolicy(self.size_policy)
         self.manhuaNameLabelFont = QFont()
         self.manhuaNameLabelFont.setPointSize(7)
@@ -1075,8 +1096,6 @@ class Manhua(QPushButton):
         self.checkFav(self.isFavorite)
 
         Themes.setManhuaObjStyle(self)
-
-        # self.setStyleSheet(f" QLabel#manhuaLabel{{ padding: 7px; border-radius: 5px; background-color: white; border: none;}}  QLabel#nameLabel{{ padding: 1px; border-radius: 5px;}} QPushButton#fav {{ background: {color.LIGHT_COLOR_4};  border: none; border-radius: 5px;}} QPushButton#fav:hover {{ background-color: {color.LIGHT_COLOR_5}}} .Manhua {{ border-radius: 5px; background-color: white;}} .Manhua:hover{{ background: {color.LIGHT_COLOR_6}; }}") #---Theme---
 
         self.manhuaFavoriteButton.clicked.connect(lambda: self.favorite(self.isFavorite))
 
@@ -1163,7 +1182,7 @@ class Description(QWidget):
         self.setObjectName(consts.OBJ_MW_LIBRARY_DESC)
         
     def createDescriptionWidget(self) -> None:
-        self.mainLayout = QHBoxLayout()
+        self.mainLayout = QHBoxLayout(self)
         
         self.infoLayout = QVBoxLayout()
         
@@ -1284,7 +1303,9 @@ class Description(QWidget):
         self.chapterLen = len(self.descChapters)
 
     def setName(self, name: str) -> None:
-        self.nameLabel.setText(name)
+        self.fm = self.fontMetrics()
+        self.elided = self.fm.elidedText(name, Qt.TextElideMode.ElideMiddle, 140)
+        self.nameLabel.setText(self.elided)
         self.nameLabel.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.nameLabelFont = QFont()
         self.nameLabelFont.setBold(True)

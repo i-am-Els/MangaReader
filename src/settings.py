@@ -65,7 +65,7 @@ class Settings(object):
             "fsState" : False,
             "readerDisplayIndex" : consts.E_RADIO_SELECTED_WEBTOON,
             "compressionState" : True,
-            "apiName" : ['Asura Scan', 'Mangabat', 'HolyManga'],
+            "apiName" : ["Non-Functional", "Coming Soon"],
             "apiIndex" : 1,
 
             "themeIndex" : consts.E_THEME_LIGHT_MODE,

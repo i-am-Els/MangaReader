@@ -60,7 +60,7 @@ class Window(QStackedWidget):
         
 
         self.setSetting()
-        # self.objMainWindow.library.loadLibraryItems()
+        
         self.setTheme(Settings.themeIndex)
 
         self.objMainWindow.loadHomeTab()

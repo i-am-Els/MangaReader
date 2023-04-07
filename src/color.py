@@ -16,6 +16,7 @@
 
 
 LIGHT_COLOR_1: str = "rgb(250, 250, 250)"
+LIGHT_COLOR_2: str = "rgb(30, 30, 30)"
 LIGHT_COLOR_3: str = "rgb(210, 211, 219)"
 LIGHT_COLOR_4: str = "rgb(147, 148, 165)"
 LIGHT_COLOR_5: str = "rgb(72, 75, 106)"
@@ -37,8 +38,9 @@ DARK_COLOR_2: str = "rgb(10, 10, 10)"
 DARK_COLOR_3: str = "rgb(35, 34, 33)"
 DARK_COLOR_4: str = "rgb(147, 148, 165)"
 DARK_COLOR_5: str = "rgb(72, 75, 106)"
-# DARK_COLOR_5: str = "rgb(183, 180, 149)"
+# DARK_COLOR_5: str = "rgb(255, 255, 255)"
 DARK_COLOR_6: str = "rgba(255, 255, 255, 60)"
 DARK_COLOR_7: str = "rgb(127, 127, 127)"
 DARK_COLOR_8: str = "rgb(223, 208, 125)"
 DARK_COLOR_9: str = "rgb(20, 20, 20)"
+DARK_COLOR_10: str = "rgb(255, 255, 255)"

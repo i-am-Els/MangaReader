@@ -38,6 +38,9 @@ def popDialog(type: str) -> None:
     elif type == consts.E_DIALOG_REGEX:
         txt, t_txt = "Directories failed the chapter regex test... \n[FIX] Rename at least one sub-directory of the bundle something like 'chapter 1', 'chap 1' or 'ch 1'", "ReGex Failed!"
 
+    elif type == consts.E_DIALOG_FILE_NOT_FOUND:
+        txt, t_txt = "File not Found. Make sure the Selected Path is still present on the drive.", "File Not Found"
+
     window_icon = QIcon()
     window_icon.addPixmap(QPixmap(resources.app_logo), QIcon.Mode.Normal, QIcon.State.Off)
 
@@ -62,7 +65,7 @@ def correctDirStructure(path: str) -> bool:
                 break
     return correct
 
-def addToMetaData(path: str) -> dict:
+def addToMetaData(path: str, status: str) -> dict:
         
     imageExtList = consts.IMG_EXT_LIST
     manhuaMetaDict = dict()
@@ -83,11 +86,15 @@ def addToMetaData(path: str) -> dict:
             emptyCover = False
     if emptyCover == True:
         manhuaMetaDict["ManhuaCover"] = resources.default_cover_image
-                
+
+    if status == consts.E_STATUS_OFFLINE:
+        manhuaMetaDict["Status"] = consts.E_STATUS_OFFLINE_TEXT
+    elif status == consts.E_STATUS_ARCHIVE:
+        manhuaMetaDict["Status"] = consts.E_STATUS_ARCHIVE_TEXT
+        
     sortedManhuaChapterDict = sortChapters(manhuaChapterList)
     if sortedManhuaChapterDict != {}:
         manhuaMetaDict["Chapters"] = sortedManhuaChapterDict
-        manhuaMetaDict["Status"] = "Local Manhua Bundle"
         manhuaMetaDict["Description"] = consts.E_MW_TEXT_DUMMY_DESCRIPTION
         return manhuaMetaDict
 
@@ -129,3 +136,4 @@ def extractParentFolderPath(path: str) -> str:
 def extractFileName(path: str) -> str:
     file_n = os.path.basename(path)
     return file_n
+        

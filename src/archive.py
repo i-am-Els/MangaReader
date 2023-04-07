@@ -15,14 +15,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-import zipfile, os, utilities
+import zipfile, os, utilities, consts
 from pathlib import Path
 from datetime import datetime
 from PyQt6.QtWidgets import QWidget
-
-path = Path(r"C:\Users\Eniola Olawale\Documents\Els\Study Room\Literatti\Graphics Novel\avatar\cbz\Avatar - The Last Airbender - The Promise Part 1 (2012) (digital) (Son of Ultron II-Empire).cbz")
-
-path_2 = Path(r"C:\Users\Eniola Olawale\Documents\Els\Study Room\Literatti\Graphics Novel\avatar\cbz\Avatar - The Last Airbender - The Rift Part 1 (2014) (digital) (Son of Ultron II-Empire).cbz")
 
 
 class Archiver:
@@ -37,27 +33,31 @@ class Archiver:
             with zipfile.ZipFile(path, mode='r') as archive:
                 try:
                     archive.extractall(outPath)
-                    
-                    for x in os.listdir(outPath):
-                        ...
-                        # if Path(x).suffix in ['.jpeg', '.jpg', '.png']:
-                        #     print(x)
-                    print(archive.printdir())
+                    if utilities.correctDirStructure(outPath):
+                        pass
+                    else:
+                        newFolder = os.path.join(outPath, "chapter 0")
+                        os.makedirs(newFolder, exist_ok=True)
+                        for x in os.listdir(outPath):
+                            xPath = os.path.join(outPath, x)
+                            if Path(xPath).suffix in ['.jpeg', '.jpg', '.png']:
+                                os.rename(xPath, os.path.join(newFolder, x))
+
                 except zipfile.BadZipFile:
-                    #utilities.popDialog('badFile')
-                    ...
+                    utilities.popDialog(consts.E_DIALOG_BADFILE)
+
                 except FileNotFoundError:
-                    print("Something unexpected happened...")
+                    utilities.popDialog(consts.E_DIALOG_FILE_NOT_FOUND)
+
             return outPath
 
         else:
-            #utilities.popDialog('none')
+            utilities.popDialog(consts.E_DIALOG_NONE)
             return 0
 
     def writeNewCbz(self):
         with zipfile.ZipFile("hello.zip", mode="w") as archive:
             archive.write("hello.txt")
-        print("Pop dialog Success!")
 
     def writeToCbz(self):
         with zipfile.ZipFile("hello.zip", mode="a") as archive:
@@ -66,7 +66,3 @@ class Archiver:
 
     def readAllContent(self):
         ...
-
-# a = Archiver()
-# a.extractCbz(path, r"C:\Users\Eniola Olawale\Documents\Manhua Reader\archives", None)
-# a.extractCbz(path_2, r"C:\Users\Eniola Olawale\Documents\Manhua Reader\archives", None)

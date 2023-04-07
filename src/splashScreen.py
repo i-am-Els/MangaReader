@@ -23,6 +23,7 @@ from PyQt6.QtWidgets import (
     QProgressBar, 
     QLabel 
 )
+from settings import Settings
 
 from PyQt6.QtCore import Qt, QTimer
 
@@ -110,14 +111,16 @@ class SplashScreen(QWidget):
 
     def loading(self):
         self.progressBar.setValue(self.counter)
-        if self.counter == int(self._n * 0.3):
+        if self.counter == int(self._n * 0.33):
             self.labelDescription.setText("<strong>we are working on loading your lovely app</strong>")
-        elif self.counter == int(self._n * 0.6):
+        elif self.counter == int(self._n * 0.67):
             self.labelDescription.setText("<strong>wait a little while as we get everything ready...</strong>")
         elif self.counter >= self._n:
             self.timer.stop()
             self.close()
             time.sleep(.5)
             self.appWindow.showMaximized()
+            if Settings.viewIsGrid:
+                self.appWindow.stWindow.objMainWindow.selectViewTypeByObj(True)
         self.counter += 1
         

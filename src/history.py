@@ -26,8 +26,9 @@ from pathlib import Path
 
 class History(QPushButton):
     imageExit = 0
-    def __init__(self) -> None:
+    def __init__(self, updateTime: bool = True) -> None:
         super().__init__()
+        self.v_updateTime = updateTime
         self.data = {
             "manhuaTitle" : "",
             "chapter" : "",
@@ -37,6 +38,7 @@ class History(QPushButton):
             "page" : 0,
             "time" : ""
         }
+
         self.updateTime()
         self.createPolicy()
         self.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
@@ -44,19 +46,24 @@ class History(QPushButton):
         self.clicked.connect(lambda: self.launchReader())
 
     def bindData(self) -> None:
-        self.setText(f"{self.data['manhuaTitle']} \n{self.data['chapter']} - pg {self.data['page']}\n{self.data['time']}")
+        self.fm = self.fontMetrics()
+        self.elided = self.fm.elidedText(self.data['manhuaTitle'], Qt.TextElideMode.ElideMiddle, 200)
+        txt = f"{self.elided} \n{self.data['chapter']} - pg {self.data['page']}\n{self.data['time']}"
+        self.setText(txt)
         
     def createPolicy(self) -> None:
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.setMaximumHeight(50)
 
-    def initData(self, mTitle: str, cTitle: str, path: str, index: int, page: int) -> None:
+    def initData(self, mTitle: str, cTitle: str, path: str, index: int, page: int, time: str = "") -> None:
         self.data["manhuaTitle"] = mTitle
         self.data["chapter"] = cTitle
         self.data["path"] = path
         self.data["mPath"] = str(Path(path).parent)
         self.data["index"] = index
         self.data["page"] = page
+        if not self.v_updateTime:
+            self.data["time"] = time
         self.bindData()
 
     def updateData(self) -> None:
@@ -68,9 +75,13 @@ class History(QPushButton):
 
     def getData(self):
         return self.data
+    
+    def setTimeUpdatable(self, updatable: bool) -> None:
+        self.v_updateTime = updatable
 
     def updateTime(self):
-        self.data["time"] = datetime.now().strftime("%d/%m/%Y - %H:%M")
+        if self.v_updateTime:
+            self.data["time"] = datetime.now().strftime("%d/%m/%Y - %H:%M")
 
     def launchReader(self):
         metadata = self.data["manhuaTitle"]
