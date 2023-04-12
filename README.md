@@ -1,6 +1,6 @@
 # MangaReader
 
-### First Major Personal Python Project.
+## First Major Personal Python Project.
 
 Birthed through my curiosity about how GUI applications are made and a longing for a free desktop application to read manhua files offline, I researched, planned, designed and developed a manga/**manhua**/manhwa reading desktop application.
 
@@ -10,7 +10,7 @@ It was implemented purely in `Python` and `PyQt6`.
 
 This manhua reader supports reading manga `offline from directory` and in archived format `*.cbz`, `*.zip`.
 
-# Features
+## Features
 
 ### Implemented the following features:
 - Themes(Light & Dark modes) 
