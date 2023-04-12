@@ -48,7 +48,7 @@ This manhua reader supports reading manga `offline from directory` and in archiv
                     .
                     .
                     .
-                    |=== cover.jpg
+                    |--- cover.jpg
 
 
 Keep your images sorted in chapter folders and then nest them in a Manhua folder. That Manhua Folder is what you should select when importing folder bundle. You should archive your zip or cbz files in the same manner.
