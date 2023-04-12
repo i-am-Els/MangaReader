@@ -101,7 +101,7 @@ class MainWindow(QWidget):
 
         # TextBox
         self.lineEdit = QLineEdit()
-        self.lineEdit.setPlaceholderText("Enter Search keyword here... e.g 'Shinkeji no Kyojin', 'Bleach', 'Kimetsu no yaiba' etc...")
+        self.lineEdit.setPlaceholderText("[Non-Functional]Enter Search keyword here... e.g 'Shinkeji no Kyojin', 'Bleach', 'Kimetsu no yaiba' etc...")
         
         self.lineEdit.setSizePolicy(self.size_policy)
         self.lineEdit.setMinimumSize(QSize(0, 36))
@@ -118,7 +118,7 @@ class MainWindow(QWidget):
         self.searchButton.setMinimumSize(self.min_button_size)
         self.searchButton.setMaximumSize(self.max_button_size)
         self.searchButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.searchButton.setToolTip("Search Manhua")
+        self.searchButton.setToolTip("[Non-Functional]Search Manhua")
         self.searchButton.setToolTipDuration(consts.TOOLTIP_DURATION)
 
         self.searchIcon = QIcon()
@@ -159,7 +159,7 @@ class MainWindow(QWidget):
         self.refreshButton.setMinimumSize(self.max_button_size)
         self.refreshButton.setMaximumSize(self.max_button_size)
         self.refreshButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.refreshButton.setToolTip("Refresh Home tab")
+        self.refreshButton.setToolTip("[Non-Functional]Refresh Home tab")
         self.refreshButton.setToolTipDuration(consts.TOOLTIP_DURATION)
         
         self.refreshIcon = QIcon()
@@ -169,7 +169,7 @@ class MainWindow(QWidget):
         self.apiButton = QPushButton()
         # self.apiButton.addItems(self.apiName)
         self.apiButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
-        self.apiButton.setToolTip("Manhua plugin dropdown here...")
+        self.apiButton.setToolTip("[Non-Functional]Manhua plugin dropdown here...")
 
         self.apiButton.setCheckable(True)
         self.apiButton.setSizePolicy(self.size_policy)
