@@ -4,7 +4,7 @@
 
 Birthed through my curiosity about how GUI applications are made and a longing for a free desktop application to read manhua files offline, I researched, planned, designed and developed a manga/**manhua**/manhwa reading desktop application.
 
-![ManhuaReaderLogo](https://github.com/i-am-Els/MangaReader/blob/main/resources/logo/mrlogoRound.png?raw=true)
+![ManhuaReaderLogo](https://github.com/i-am-Els/MangaReader/blob/main/screenshots_md/mrlogoRound.png)
 
 It was implemented purely in `Python` and `PyQt6`.
 
@@ -54,6 +54,24 @@ This manhua reader supports reading manga `offline from directory` and in archiv
 Keep your images sorted in chapter folders and then nest them in a Manhua folder. That Manhua Folder is what you should select when importing folder bundle. You should archive your zip or cbz files in the same manner.
 - The name of the bundle folder is recognized as the Manhua Name.
 - The first image file found in the bundle folder is set as the manhua cover. A default cover is provided if no image file is found in the bundle folder.
+
+## What it looks like
+### Light Mode
+Home View
+![HomeView](screenshots_md/Screenshot_20221217_110636.png)
+
+Library View
+![LibraryView](screenshots_md/Screenshot%202023-04-12%20231554.png)
+
+### Dark Mode
+Library in Dark Mode
+![DarkMode](screenshots_md/Screenshot%202023-04-12%20231651.png)
+
+Description Page
+![DescriptionPage](screenshots_md/Screenshot%202023-04-12%20231852.png)
+
+Reader View
+![ReaderView](screenshots_md/Screenshot%202023-04-12%20231945.png)
 
 # Future Plans
 Further release updates will include online scraping, viewing and downloading features...(Not coming soon :disappointed_relieved:)... 
