@@ -2,7 +2,9 @@
 
 ### First Major Personal Python Project.
 
-Birth through my curiosity about how GUI applications are made and a longing for a free desktop application to read manhua files offline, I researched, planned, designed and developed a manga/**manhua**/manhwa reading desktop application.
+Birthed through my curiosity about how GUI applications are made and a longing for a free desktop application to read manhua files offline, I researched, planned, designed and developed a manga/**manhua**/manhwa reading desktop application.
+
+![ManhuaReaderLogo][resources/logo/mrlogoRound.png]
 
 It was implemented purely in `Python` and `PyQt6`.
 
@@ -35,15 +37,14 @@ This manhua reader supports reading manga `offline from directory` and in archiv
     Bundle Folder/  |
                     |
                     |--- Chapter 1/|
-                    |              | === image1.png
-                    |              | === image2.png
-                    |              | === image3.png
+                    |              | --- image1.png
+                    |              | --- image2.png
+                    |              | --- image3.png
                     |
                     |--- Chapter 2/|
-                    |              | === image1.png
-                    |              | === image2.png
-                    |              | === image3.png
-
+                    |              | --- image1.png
+                    |              | --- image2.png
+                    |              | --- image3.png
                     .
                     .
                     .
