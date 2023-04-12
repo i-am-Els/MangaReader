@@ -4,7 +4,8 @@
 
 Birthed through my curiosity about how GUI applications are made and a longing for a free desktop application to read manhua files offline, I researched, planned, designed and developed a manga/**manhua**/manhwa reading desktop application.
 
-![ManhuaReaderLogo][resources/logo/mrlogoRound.png]
+![ManhuaReaderLogo][https://github.com/[username]/[reponame]/blob/[branch]/mrlogoRound.png?raw=true)]
+
 
 It was implemented purely in `Python` and `PyQt6`.
 
