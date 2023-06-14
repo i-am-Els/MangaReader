@@ -51,7 +51,7 @@ class Settings(object):
 
     def defaults() -> dict:
         return  {
-            "libraryMetadata" : {},
+            "libraryMetadata" : dict(),
             "libraryInitPath" : "",
             "libraryNewPath" : "C:\\",
             "viewIsGrid" : False,

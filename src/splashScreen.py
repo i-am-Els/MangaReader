@@ -120,7 +120,9 @@ class SplashScreen(QWidget):
             self.close()
             time.sleep(.5)
             self.appWindow.showMaximized()
-            if Settings.viewIsGrid:
-                self.appWindow.stWindow.objMainWindow.selectViewTypeByObj(True)
+            # if Settings.viewIsGrid:
+            #     self.appWindow.stWindow.objMainWindow.selectViewTypeByObj(True)
+
+            self.appWindow.stWindow.objMainWindow.library.switchLayout()
         self.counter += 1
         
