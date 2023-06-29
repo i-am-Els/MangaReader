@@ -2,13 +2,19 @@
 
 ## First Major Personal Python Project.
 
-Birthed through my curiosity about how GUI applications are made and a longing for a free desktop application to read manhua files offline, I researched, planned, designed and developed a manga/**manhua**/manhwa reading desktop application.
+Born through my curiosity about how GUI applications are made and a longing for a free desktop application to read manhua files offline, I researched, planned, designed, and developed a manga/**manhua**/manhwa reading desktop application.
 
 ![ManhuaReaderLogo](screenshots_md/mrlogoRound.png)
 
 It was implemented purely in `Python` and `PyQt6`.
 
-This manhua reader supports reading manga `offline from directory` and in archived format `*.cbz`, `*.zip`.
+This manhua reader supports reading manga `offline from directory` and in archive format `*.cbz`, `*.zip`.
+
+### Setup
+- Make sure you are running a version of Python that recognizes type hinting; Python 3.6, 3.7, etc
+- Create a virtual environment (not mandatory), then install the `PyQt6` requirement using the command `pip install PyQt6`
+- Run `src/app.py`.
+- That should be all.
 
 ## Features
 
