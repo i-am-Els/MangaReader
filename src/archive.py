@@ -53,7 +53,7 @@ class Archiver:
 
         else:
             utilities.popDialog(consts.E_DIALOG_NONE)
-            return 0
+            return ""
 
     def writeNewCbz(self):
         with zipfile.ZipFile("hello.zip", mode="w") as archive:

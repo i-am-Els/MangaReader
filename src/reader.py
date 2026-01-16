@@ -59,12 +59,17 @@ class Reader(QWidget):
         self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
 
     def backAction(self) -> None:
-        Settings.historyData[0]["page"] = self.exitpage() + 1
-        Settings.historyData[0]["chapter"] = self.currentChapterKey
-        Settings.historyData[0]["path"] = self.currentIndexPath
-        Settings.historyData[0]["index"] = self.currentChapterIndex
-        Link.fetchAttribute(consts.OBJ_MW_NAME, "historyScrollL").layout().itemAt(0).widget().updateData()
-        Link.fetchAttribute(consts.OBJ_MW_NAME, "historyScrollL").layout().itemAt(0).widget().bindData()
+        if len(getattr(Settings, "historyData", [])) != 0:
+            Settings.historyData[0]["page"] = self.exitpage() + 1
+            Settings.historyData[0]["chapter"] = self.currentChapterKey
+            Settings.historyData[0]["path"] = self.currentIndexPath
+            Settings.historyData[0]["index"] = self.currentChapterIndex
+            historyLayout = Link.fetchAttribute(consts.OBJ_MW_NAME, "historyScrollL")
+            if hasattr(historyLayout, "layout") and historyLayout.layout().count() > 0:
+                item = historyLayout.layout().itemAt(0)
+                if item is not None and item.widget() is not None:
+                    item.widget().updateData()
+                    item.widget().bindData()
         Link.callBack(consts.OBJ_MW_NAME, "setFocus")
         self.previousManhuaName = self.currentManhuaName
         Link.callBack(consts.OBJ_WINDOW, "changeStackIndex", consts.E_WINDOW_STACK_MW)
@@ -317,7 +322,10 @@ class Reader(QWidget):
                 self.loadChapterPages(self.currentChapterIndex)
             else:
                 Link.callBack(consts.OBJ_LIB_NAME, "reloadManhuaData", self.manhuaKey, (self.currentChapterIndex - 1))
-                self.prevChapter()
+                if os.path.exists(currentIndexPath) and len(os.listdir(currentIndexPath)) != consts.EMPTY:
+                    self.currentChapterIndex -= 1
+                    self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
+                    self.loadChapterPages(self.currentChapterIndex)
 
     def nextChapter(self) -> None:
         if self.currentChapterIndex < (self.currentManhuaChapterLen - 1):
@@ -328,7 +336,10 @@ class Reader(QWidget):
                 self.loadChapterPages(self.currentChapterIndex)
             else:
                 Link.callBack(consts.OBJ_LIB_NAME, "reloadManhuaData", self.manhuaKey, self.currentChapterIndex)
-                self.nextChapter()
+                if os.path.exists(currentIndexPath) and len(os.listdir(currentIndexPath)) != consts.EMPTY:
+                    self.currentChapterIndex += 1
+                    self.currentChapterKey = str(list(self.currentDict["Chapters"].keys())[self.currentChapterIndex])
+                    self.loadChapterPages(self.currentChapterIndex)
 
     def exitpage(self) -> None:
         if Settings.readerDisplayIndex != consts.E_RADIO_SELECTED_WEBTOON:
@@ -358,8 +369,12 @@ class Reader(QWidget):
     def setToCoverAction(self) -> None:
         if Settings.readerDisplayIndex == consts.E_RADIO_SELECTED_WEBTOON:
             n = len(self.imageList)
+            if n == 0:
+                return
             v = self.screenScrollArea.verticalScrollBar().value()
             max = self.screenScrollArea.verticalScrollBar().maximum()
+            if max == 0:
+                return
             p = (v / max) * 100
             x = int((p/100) * n)
             if x < n:
@@ -437,8 +452,13 @@ class Reader(QWidget):
                     Link.callBack(consts.OBJ_WINDOW, "setCurrentIndex", consts.E_WINDOW_STACK_MW)
                     Link.callBack(consts.OBJ_LIB_NAME, "setCurrentIndex", consts.E_TAB_LIBRARY_DESCRIPTION_PAGE)
         except IndexError:
-            self.imageCurrent = 0
-            self.setImageToLabel(self.imageCurrent)
+            if len(self.imageList) != consts.EMPTY:
+                self.imageCurrent = 0
+                self.setImageToLabel(self.imageCurrent)
+            else:
+                Link.callBackDeep(consts.OBJ_LIB_NAME, "descriptionPage", "redisplayChapters")
+                Link.callBack(consts.OBJ_WINDOW, "setCurrentIndex", consts.E_WINDOW_STACK_MW)
+                Link.callBack(consts.OBJ_LIB_NAME, "setCurrentIndex", consts.E_TAB_LIBRARY_DESCRIPTION_PAGE)
 
     def setScrollLabelImages(self) -> None:
         self.setFocus()

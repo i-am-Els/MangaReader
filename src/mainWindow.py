@@ -348,8 +348,15 @@ class MainWindow(QWidget):
 
     def clearAllHistoryData(self) -> None:
         Settings.historyData.clear()
-        for x in range(self.historyScrollL.layout().count()):
-            self.historyScrollL.layout().itemAt(x).widget().deleteLater()
+        historyLayout = self.historyScrollL.layout()
+        if historyLayout is not None:
+            widgets = []
+            for i in range(historyLayout.count()):
+                item = historyLayout.itemAt(i)
+                if item is not None and item.widget() is not None:
+                    widgets.append(item.widget())
+            for w in widgets:
+                w.deleteLater()
 
     def historyScrollItems(self) -> None:
         self.scrollW = QWidget()
@@ -358,8 +365,8 @@ class MainWindow(QWidget):
         self.historyScrollL.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.scroll.setWidget(self.scrollW)
         self.historyScrollL.setContentsMargins(5, 10, 5, 10)
-        if self.launchDone:
-            self.themeObj.resetHistoryStyle()
+        if self.launchDone and hasattr(Themes, "resetHistoryStyle"):
+            Themes.resetHistoryStyle()
         if len(Settings.historyData) != 0:
             self.reloadHistory()
         self.historyListViewL.addWidget(self.scroll)

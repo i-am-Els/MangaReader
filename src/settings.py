@@ -95,11 +95,12 @@ class Settings(object):
         except PermissionError:
             ...
         except FileNotFoundError:
-            data = Settings.saveDefaults()
+            Settings.saveData(Settings.defaults())
             return Settings.loadSettings()
 
     def updateSettings():
-        data = {key: Settings.__dict__[key] for key in Settings.defaults()}
+        defaults = Settings.defaults()
+        data = {key: getattr(Settings, key, defaults[key]) for key in defaults}
 
         Settings.saveData(data)
 
